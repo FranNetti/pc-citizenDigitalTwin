@@ -14,9 +14,7 @@
 
 mas citizenDT {
 
-    agent sample_agent
-
-    
+    agent cdt_manager
 
 }
 
