@@ -2,11 +2,9 @@
 
 package citizenDT.gui;
 
-import java.util.Map;
-
 import cartago.*;
 import cartago.tools.GUIArtifact;
-import citizenDT.state.LeafCategory;
+import citizenDT.state.State;
 
 public class UserGUI extends GUIArtifact {
 	
@@ -17,7 +15,7 @@ public class UserGUI extends GUIArtifact {
 	}
 
 	@OPERATION
-	void updateState(final Map<LeafCategory, String> state) {
+	void updateState(final State state) {
 		gui.updateInfo(state);
 	}
 }

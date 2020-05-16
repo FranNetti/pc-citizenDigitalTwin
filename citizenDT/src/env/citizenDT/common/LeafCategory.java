@@ -1,4 +1,7 @@
-package citizenDT.state;
+package citizenDT.common;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public enum LeafCategory {
 	
@@ -21,5 +24,11 @@ public enum LeafCategory {
 	
 	public String getDisplayName() {
 		return displayName;
+	}
+	
+	public static Optional<LeafCategory> findByName(final String name) {
+		return Stream.of(LeafCategory.values())
+			.filter(dataCategory -> dataCategory.name.equals(name))
+			.findFirst();
 	}
 }

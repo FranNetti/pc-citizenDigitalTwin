@@ -2,15 +2,17 @@ package citizenDT.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import citizenDT.state.LeafCategory;
+import citizenDT.common.Data;
+import citizenDT.common.LeafCategory;
+import citizenDT.state.State;
 
 final class UserFrame extends JFrame {
 	
@@ -43,18 +45,18 @@ final class UserFrame extends JFrame {
 		this.setVisible(true);
 	}
 	
-	void updateInfo(final Map<LeafCategory, String> info) {
-		final Map<LeafCategory, String> infoCopy = new HashMap<>(info);
-		final String name = infoCopy.getOrDefault(LeafCategory.NAME, "");
-		final String surname = infoCopy.getOrDefault(LeafCategory.SURNAME, "");
-		infoCopy.remove(LeafCategory.NAME);
-		infoCopy.remove(LeafCategory.SURNAME);
+	void updateInfo(final State state) {
+		final Optional<Data> name = state.getData(LeafCategory.NAME);
+		final Optional<Data> surname = state.getData(LeafCategory.SURNAME);
+		final Map<LeafCategory,Data> info = state.getState();
+		info.remove(LeafCategory.NAME);
+		info.remove(LeafCategory.SURNAME);
 		
 		SwingUtilities.invokeLater(() -> {
-			if(!name.isBlank() && !surname.isBlank()) {
-				informationPanel.updateNameAndSurname(name, surname);
+			if(name.isPresent() && surname.isPresent()) {
+				informationPanel.updateNameAndSurname(name.get().getValue(), surname.get().getValue());
 			}
-			informationPanel.updateInformations(infoCopy);
+			informationPanel.updateInformations(info);
 		});
 	}
 	

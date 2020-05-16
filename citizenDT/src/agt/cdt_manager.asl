@@ -9,9 +9,14 @@
 /* Plans */
 
 +!start : true <- 
-	makeArtifact("state","citizenDT.state.State",["pippino","poppone"],StateId);
-	focus(StateId);
-	updateState("pappone","caccone").
+	makeArtifact("state","citizenDT.state.StateManager",[],StateManager)
+	focus(StateManager)
+	makeArtifact("connection","citizenDT.connection.ConnectionManager",[],ConnectionManager)
+	focus(ConnectionManager)
+	.print("CDT Manager ready").
+	
++newState(State) <-
+	updateState(State).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

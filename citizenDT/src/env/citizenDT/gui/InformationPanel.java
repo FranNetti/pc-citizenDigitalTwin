@@ -2,7 +2,8 @@ package citizenDT.gui;
 
 import javax.swing.*;
 
-import citizenDT.state.LeafCategory;
+import citizenDT.common.Data;
+import citizenDT.common.LeafCategory;
 
 import java.awt.*;
 import java.util.Map;
@@ -30,7 +31,7 @@ class InformationPanel extends JPanel {
         add(informationArea, BorderLayout.CENTER);
     }
 
-    void updateInformations(final Map<LeafCategory, String> info) {
+    void updateInformations(final Map<LeafCategory, Data> info) {
         Objects.requireNonNull(info);
     	informationArea.removeAll();
     	final Dimension d = new Dimension(length, 50);
@@ -38,6 +39,8 @@ class InformationPanel extends JPanel {
     		.stream()
     		.map(entry -> new SingleInfoShower(entry.getKey(), entry.getValue(), d))
     		.forEach(informationArea::add);
+    	informationArea.validate();
+    	informationArea.repaint();
     }
     
     void updateNameAndSurname(final String name, final String surname) {
@@ -69,8 +72,7 @@ class InformationPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		private static final int ID_LENGTH = 150;
 
-		SingleInfoShower(final LeafCategory id, final String info, final Dimension rowDimension) {
-			
+		SingleInfoShower(final LeafCategory id, final Data info, final Dimension rowDimension) {
     		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
     		setPreferredSize(rowDimension);
     		setSize(rowDimension);
@@ -83,7 +85,7 @@ class InformationPanel extends JPanel {
 			separator.setBackground(Color.getHSBColor(0,0,62));
 			add(separator);
 			
-			final JLabel infoLabel = createLabel(info);
+			final JLabel infoLabel = createLabel(info.getValue());
 			add(infoLabel);
 			add(Box.createHorizontalGlue());
 			//add(createSingleInfoArea(info));

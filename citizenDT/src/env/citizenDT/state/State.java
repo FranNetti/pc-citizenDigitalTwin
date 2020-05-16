@@ -1,63 +1,42 @@
-// CArtAgO artifact code for project citizenDT
-
 package citizenDT.state;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
-import cartago.*;
+import citizenDT.common.Data;
+import citizenDT.common.LeafCategory;
 
-public class State extends Artifact {
+public class State {
 	
-	private static final String PROP_NAME = "name";
-	private static final String PROP_SURNAME = "surname";
-	private static final String PROP_PIPPO = "pippo";
-	private final Map<State.LeafCategory, String> state = new HashMap<>();
+	private final Map<LeafCategory,Data> state;
 	
-	void init(final String name, final String surname) {
-		defineObsProperty(PROP_NAME, name);
-		defineObsProperty(PROP_SURNAME, surname);
-		defineObsProperty(PROP_PIPPO, new Pippo());
-	}
-
-	@OPERATION
-	void updateState(final String name, final String surname) {
-		final ObsProperty propName = getObsProperty(PROP_NAME);
-		propName.updateValue(name);
-		
-		final ObsProperty propPippo = getObsProperty(PROP_PIPPO);
-		Object val = propPippo.getValue();
-		System.out.println("obj non castato");
-		System.out.println(val);
-		if (val instanceof Pippo) {
-			Pippo pippo = (Pippo) val;
-			System.out.println("proprietà di pippo");
-			System.out.println(pippo.getName());
-		}
-		
-		signal("tick");
+	public State() {
+		this(new HashMap<>());
 	}
 	
-	private class Pippo {
-		private String name = "pippo";
-		public String getName() {
-			return name;
-		}
+	private State(final Map<LeafCategory,Data> state) {
+		this.state = state;
 	}
 	
-	private enum LeafCategory {
-		NAME("name");
-		
-		private final String name;
-		
-		LeafCategory(final String name) {
-			this.name = name;
-		}
-		
-		public String getName() {
-			return this.name;
-		}
+	public Optional<Data> getData(final LeafCategory dataCategory) {
+		return Optional.ofNullable(state.get(dataCategory));
 	}
+	
+	public Map<LeafCategory,Data> getState() {
+		return new HashMap<>(state);
+	}
+	
+	public State addData(final LeafCategory dataCategory, final Data data) {
+		final Map<LeafCategory,Data> state = getState();
+		state.put(dataCategory, data);
+		return new State(state);
+	}
+	
+	public State addMultipleData(final Map<LeafCategory,Data> newState) {
+		final Map<LeafCategory,Data> state = getState();
+		state.putAll(newState);
+		return new State(state);
+	}
+	
 }
-
