@@ -16,6 +16,7 @@ mas citizenDT {
 
     agent cdt_manager
     agent user_interaction
+    agent device_manager
 
 }
 

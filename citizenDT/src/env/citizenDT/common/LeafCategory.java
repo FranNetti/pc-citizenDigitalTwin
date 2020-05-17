@@ -8,7 +8,8 @@ public enum LeafCategory {
 	NAME("name", "Nome"),
 	SURNAME("surname", "Cognome"),
 	BIRTHDATE("birthdate", "Data di nascita"),
-	ADDRESS("address", "Indirizzo");
+	ADDRESS("address", "Indirizzo"),
+	CELSIUS_TEMPERATURE("celsius_temperature","Temperatura corporea");
 	
 	private final String name;
 	private final String displayName;
