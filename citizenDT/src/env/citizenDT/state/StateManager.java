@@ -11,11 +11,6 @@ import cartago.*;
 import citizenDT.common.Data;
 import citizenDT.common.LeafCategory;
 
-@ARTIFACT_INFO(
-		outports = {
-				@OUTPORT(name = "statusUpdate")
-		}
-)
 public class StateManager extends Artifact {
 	
 	private static final String PROP_STATE = "state";
@@ -34,12 +29,6 @@ public class StateManager extends Artifact {
 		
 		state = state.addMultipleData(newState);
 		stateProp.updateValue(state);
-
-		try {
-			execLinkedOp("statusUpdate","updateState", state);
-		} catch (final Exception ex){
-			System.err.println("no message sent");
-		}
 	}
 
 }

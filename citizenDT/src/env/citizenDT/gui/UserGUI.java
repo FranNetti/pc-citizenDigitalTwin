@@ -20,8 +20,8 @@ public class UserGUI extends GUIArtifact {
 		this.gui = new UserFrame(this);
 	}
 
-	@LINK
-	void updateState(final State state) {
+	@OPERATION
+	void showNewState(final State state) {
 		gui.updateInfo(state);
 	}
 	

@@ -4,32 +4,32 @@
 
 /* Initial goals */
 
-!initializeGui.
+!readyUp.
 
 /* Plans */
 
-+!initializeGui <-
-	makeArtifact("GUI", "citizenDT.gui.UserGUI", [], GuiId)
-	focus(GuiId)
-	!observeState(GuiId)
++!readyUp <-
+	!initializeGui
+	!observeState
 	.print("User interaction ready")
 	.wait(1000)
 	pippo.
 	
-+!observeState(GuiId) <-
-	lookupArtifact("state", S);
-	//+stateManager(S)
-	//focus(S).
-	linkArtifacts(S,"statusUpdate",GuiId).
++!initializeGui <-
+	makeArtifact("GUI", "citizenDT.gui.UserGUI", [], GuiId)
+	focus(GuiId).
 	
--!observeState(ID) <-
++!observeState <-
+	lookupArtifact("state", S)
+	focus(S).
+	
+-!observeState <-
 	.wait(100);
-	!observeState(ID).
+	!observeState.
 	
-/*+state(State) <-
++state(State) <-
 	.print("Aggiornamento di stato")
-	stateManager(Id)
-	updateState(State)[artifact_id(Id)].*/
+	showNewState(State).
 	
 +addDeviceFailed(Model) <-
 	.print("Failed:")
