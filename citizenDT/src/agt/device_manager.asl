@@ -24,12 +24,6 @@
 -!linkToView(ID) <-
 	.wait(100)
 	!linkToView(ID).
-	
-+addDeviceFailed(Model) <-
-	.send(user_interaction,tell,addDeviceFailed(Model)).
-
-+newDevice(_) <-
-	.send(user_interaction,tell,addDeviceSuccess).
 
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }

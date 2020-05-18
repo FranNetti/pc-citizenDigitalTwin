@@ -25,16 +25,17 @@ public class DeviceCommunication extends Artifact {
 	}
 
 	@LINK
-	void addDevice(final Device device, final String model) {
+	void addDevice(final Device device, final String model, final OpFeedbackParam<Boolean> success) {
 		final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
 		final Map<Device,List<Sensor<?>>> sensors = (Map<Device,List<Sensor<?>>>)propSensors.getValue();
 		final List<Sensor<?>> deviceSensors = Arrays.asList(new MockTemperatureSensor());
-		if (deviceSensors.isEmpty())
-			signal("addDeviceFailed", model);
-		else {
+		if (deviceSensors.isEmpty()) {
+			success.set(false);
+		} else {
 			sensors.put(device, deviceSensors);
 			propSensors.updateValue(sensors);
 			signal("newDevice",model);
+			success.set(true);
 		}
 	}
 	

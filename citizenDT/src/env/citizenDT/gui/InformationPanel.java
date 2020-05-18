@@ -14,14 +14,12 @@ class InformationPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
     private static final int SIZE = 20;
 
-    private final JLabel userNameLabel = createLabel();
+    private final JLabel userNameLabel = Views.createLabel(SIZE);
     private final JPanel informationArea;
     private final int length;
-    private final int height;
 
     InformationPanel(final int length, final int height) {
     	this.length = length;
-    	this.height = height;
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(length, height));
         
@@ -85,10 +83,9 @@ class InformationPanel extends JPanel {
 			separator.setBackground(Color.getHSBColor(0,0,62));
 			add(separator);
 			
-			final JLabel infoLabel = createLabel(info.getValue());
+			final JLabel infoLabel = Views.createLabel(info.getValue(),SIZE);
 			add(infoLabel);
 			add(Box.createHorizontalGlue());
-			//add(createSingleInfoArea(info));
 		}
     	
     	private JPanel createIdArea(final String id, final int rowHeight) {
@@ -99,29 +96,11 @@ class InformationPanel extends JPanel {
             idArea.setPreferredSize(d);
             idArea.setMaximumSize(d);
             idArea.setMinimumSize(d);
-            final JLabel idLabel = createLabel(id);
+            final JLabel idLabel = Views.createLabel(id, SIZE);
             idArea.add(idLabel);
             return idArea;
     	}
     	
-    	private JPanel createSingleInfoArea(final String info) {
-    		JPanel infoArea = new JPanel();
-            final JLabel infoLabel = createLabel(info);
-            infoArea.add(infoLabel);
-            return infoArea;
-    	}
-    	
-    }
-    
-    private static JLabel createLabel(final String text) {
-    	final JLabel label = new JLabel(text);
-    	label.setOpaque(true);
-    	label.setFont(new Font(label.getFont().getName(), Font.PLAIN, SIZE));
-    	return label;
-    }
-    
-    private static JLabel createLabel() {
-    	return createLabel("");
     }
 
 }

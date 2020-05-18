@@ -12,29 +12,37 @@ import javax.swing.border.EmptyBorder;
 
 import citizenDT.common.Data;
 import citizenDT.common.LeafCategory;
+import citizenDT.device.type.Device;
 import citizenDT.state.State;
 
 final class UserFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
-	private static final int WIDTH = 650;
-	private static final int HEIGHT = 400;
+	
 	private static final int MARGIN = 10;
+	private static final int WIDTH = 900;
+	private static final int INFO_WIDTH = 650;
+	private static final int DEVICE_WIDTH = WIDTH - INFO_WIDTH;
+	private static final int HEIGHT = 400;
 	private static final String TITLE = "Citizen Digital Twin";
 	
-	//private final UserGUI artifact;
+	private final UserGUI artifact;
 	private final InformationPanel informationPanel;
+	private final DevicePanel devicePanel;
 
 	UserFrame(final UserGUI artifact) {
-		//this.artifact = artifact;
+		this.artifact = artifact;
         
         final JPanel mainPanel = new JPanel();
         mainPanel.setBorder(new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         getContentPane().add(mainPanel);
         
-        this.informationPanel = new InformationPanel(WIDTH - MARGIN, HEIGHT - MARGIN);
+        this.informationPanel = new InformationPanel(INFO_WIDTH, HEIGHT);
         mainPanel.add(informationPanel);
+        
+        this.devicePanel = new DevicePanel(this, DEVICE_WIDTH, HEIGHT);
+        mainPanel.add(devicePanel);
 		
         this.setSize(new Dimension(WIDTH, HEIGHT));
         this.setTitle(TITLE);
@@ -60,5 +68,19 @@ final class UserFrame extends JFrame {
 		});
 	}
 	
+	void addDevice(final Device device, final String model) {
+        artifact.addDevice(device, model);
+	}
 	
+	void deviceAdded() {
+		SwingUtilities.invokeLater(() -> devicePanel.deviceAdded());
+	}
+	
+	void deviceRemoved() {
+		SwingUtilities.invokeLater(() -> devicePanel.deviceRemoved());
+	}
+	
+	void removeDevice(Device device) {
+        artifact.removeDevice(device);
+	}
 }

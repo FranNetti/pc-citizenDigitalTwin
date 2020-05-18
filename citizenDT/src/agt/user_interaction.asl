@@ -11,9 +11,7 @@
 +!readyUp <-
 	!initializeGui
 	!observeState
-	.print("User interaction ready")
-	.wait(1000)
-	pippo.
+	.print("User interaction ready").
 	
 +!initializeGui <-
 	makeArtifact("GUI", "citizenDT.gui.UserGUI", [], GuiId)
@@ -28,15 +26,7 @@
 	!observeState.
 	
 +state(State) <-
-	.print("Aggiornamento di stato")
 	showNewState(State).
-	
-+addDeviceFailed(Model) <-
-	.print("Failed:")
-	.print(Model).
-
-+addDeviceSuccess <-
-	.print("Success").
 
 
 /* ------------------------------------------------------------------------------ */
