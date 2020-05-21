@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">CitizenDigitalTwin</string>
+    <string name="app_name">CDT</string>
     <string name="title_home">You</string>
     <string name="title_devices">Your Devices</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_settings">Settings</string>
+    <string name="category_icon">Category icon</string>
+    <string name="category_name">Category name</string>
+    <string name="category_arrow">Expand category</string>
 </resources>
