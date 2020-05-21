@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CitizenDigitalTwin</string>
+    <string name="title_home">You</string>
+    <string name="title_devices">Your Devices</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_settings">Settings</string>
+</resources>
