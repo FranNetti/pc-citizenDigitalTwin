@@ -21,7 +21,7 @@ public class DataCategoryAdapter extends RecyclerView.Adapter<DataCategoryAdapte
 
         DataCategoryHolder(final ConstraintLayout layout) {
             super(layout);
-            this.dataCategoryName = (TextView) layout.getViewById(R.id.categoryName);
+            this.dataCategoryName = (TextView) layout.getViewById(R.id.notificationMessage);
             dataCategoryIcon = (ImageView) layout.getViewById(R.id.categoryIcon);
         }
     }

@@ -21,7 +21,7 @@ public class DevicesFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         devicesViewModel =
                 ViewModelProviders.of(this).get(DevicesViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        View root = inflater.inflate(R.layout.fragment_devices, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
         devicesViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

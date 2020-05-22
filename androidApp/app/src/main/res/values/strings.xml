@@ -7,4 +7,8 @@
     <string name="category_icon">Category icon</string>
     <string name="category_name">Category name</string>
     <string name="category_arrow">Expand category</string>
+    <string name="message_sent">has sent you a message</string>
+    <string name="data_change">has updated the following data</string>
+    <string name="notification_icon">Notification icon</string>
+    <string name="no_notifications_message">You have no notifications</string>
 </resources>

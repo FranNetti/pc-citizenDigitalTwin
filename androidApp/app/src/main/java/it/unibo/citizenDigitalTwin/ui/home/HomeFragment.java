@@ -11,6 +11,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
@@ -25,8 +26,13 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         final RecyclerView listView = root.findViewById(R.id.homeRecyclerView);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
+        final DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listView.getContext(),
+                linearLayoutManager.getOrientation());
+
+        listView.addItemDecoration(dividerItemDecoration);
         listView.setHasFixedSize(true);
-        listView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        listView.setLayoutManager(linearLayoutManager);
 
         final List<String> ciccio = Arrays.asList(
                 "Dati anagrafici",
