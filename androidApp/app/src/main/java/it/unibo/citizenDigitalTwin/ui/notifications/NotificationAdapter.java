@@ -1,10 +1,10 @@
 package it.unibo.citizenDigitalTwin.ui.notifications;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -22,6 +22,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     static class NotificationHolder extends RecyclerView.ViewHolder {
 
+        final ConstraintLayout container;
         final ImageView icon;
         final TextView sender;
         final TextView message;
@@ -29,17 +30,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         NotificationHolder(final ConstraintLayout view){
             super(view);
+            this.container = view;
             this.icon = view.findViewById(R.id.icon);
             this.message = view.findViewById(R.id.message);
             this.sender = view.findViewById(R.id.sender);
             this.content = view.findViewById(R.id.content);
+            view.setLongClickable(true);
         }
     }
 
     private final List<Notification> notifications;
+    private final NotificationSelectedListener listener;
+    private final Context context;
 
-    public NotificationAdapter(final List<Notification> notifications){
+    NotificationAdapter(final Context context, final List<Notification> notifications, final NotificationSelectedListener listener){
         this.notifications = notifications;
+        this.listener = listener;
+        this.context = context;
     }
 
     @NonNull
@@ -53,6 +60,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public void onBindViewHolder(@NonNull NotificationHolder holder, int position) {
         final Notification notification = notifications.get(position);
+        holder.container.setOnLongClickListener(ev -> {
+            if(notification.isSelected()){
+                notification.setSelected(false);
+                if(notifications.parallelStream().noneMatch(Notification::isSelected)){
+                    listener.onNoNotificationSelected();
+                }
+            } else {
+                notification.setSelected(true);
+                listener.onNotificationSelected(notification);
+            }
+            this.notifyDataSetChanged();
+            return true;
+        });
+
+        int color;
+        if(notification.isSelected()){
+            color = context.getColor(R.color.selectedItem);
+        } else {
+            color = Color.WHITE;
+        }
+        holder.container.setBackgroundColor(color);
         switch (notification.getType()){
             case DATA: handleDataNotification(holder, (DataNotification)notification); break;
             case MESSAGE: handleMessageNotification(holder, (MessageNotification)notification); break;

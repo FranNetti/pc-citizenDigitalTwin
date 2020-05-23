@@ -6,9 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -19,11 +23,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
 
-public class NotificationsFragment extends Fragment {
+public class NotificationsFragment extends Fragment implements NotificationSelectedListener {
 
     private NotificationsViewModel notificationsViewModel;
     private ConstraintLayout emptyNotifications;
+    private FloatingActionButton deleteNotificationsBtn;
     private ScrollView scrollView;
+
+    private List<Notification> notifications;
 
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
@@ -33,6 +40,7 @@ public class NotificationsFragment extends Fragment {
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);
         scrollView = root.findViewById(R.id.scrollView);
+        deleteNotificationsBtn = root.findViewById(R.id.deleteNotificationsButton);
 
         final RecyclerView listView = root.findViewById(R.id.notificationsRecyclerView);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
@@ -43,9 +51,29 @@ public class NotificationsFragment extends Fragment {
         listView.setHasFixedSize(true);
         listView.setLayoutManager(linearLayoutManager);
 
-        final List<Notification> notifications = new ArrayList<>();
-        final NotificationAdapter adapter = new NotificationAdapter(notifications);
+        notifications = new ArrayList<>();
+        final NotificationAdapter adapter = new NotificationAdapter(getContext(), notifications, this);
         listView.setAdapter(adapter);
+
+        final OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(deleteNotificationsBtn.getVisibility() == View.VISIBLE){
+                    deleteNotificationsBtn.setVisibility(View.GONE);
+                    deselectNotifications();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
+
+        deleteNotificationsBtn.setOnClickListener(ev -> {
+            final List<Notification> notificationsRead = notifications.parallelStream()
+                    .filter(Notification::isSelected)
+                    .collect(Collectors.toList());
+            notificationsViewModel.deleteNotifications(notificationsRead);
+            deleteNotificationsBtn.setVisibility(View.GONE);
+        });
 
         notificationsViewModel.getNotifications().observe(getViewLifecycleOwner(), currentNotifications -> {
             if(currentNotifications.size() > 0) {
@@ -60,6 +88,30 @@ public class NotificationsFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        deselectNotifications();
+    }
+
+    @Override
+    public void onNotificationSelected(Notification notification) {
+        if(deleteNotificationsBtn.getVisibility() == View.GONE){
+            deleteNotificationsBtn.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onNoNotificationSelected() {
+        if(deleteNotificationsBtn.getVisibility() == View.VISIBLE){
+            deleteNotificationsBtn.setVisibility(View.GONE);
+        }
+    }
+
+    private void deselectNotifications(){
+        notifications.parallelStream().filter(Notification::isSelected).forEach(not -> not.setSelected(false));
+    }
+
     private void hideNotifications(){
         setRightVisualization(false);
     }
@@ -72,6 +124,9 @@ public class NotificationsFragment extends Fragment {
         emptyNotifications.setVisibility(visibleNotifications ? View.GONE : View.VISIBLE);
         scrollView.setVisibility(visibleNotifications ? View.VISIBLE : View.GONE);
     }
+}
 
-
+interface NotificationSelectedListener {
+    void onNotificationSelected(Notification notification);
+    void onNoNotificationSelected();
 }

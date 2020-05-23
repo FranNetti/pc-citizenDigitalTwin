@@ -8,10 +8,20 @@ public class Notification {
 
     private final Type type;
     private final String sender;
+    private boolean selected;
 
-    public Notification(final Type type, final String sender){
+    Notification(final Type type, final String sender){
         this.type = type;
         this.sender = sender;
+        selected = false;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 
     public String getSender() {

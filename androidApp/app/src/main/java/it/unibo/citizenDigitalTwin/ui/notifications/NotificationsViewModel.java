@@ -33,6 +33,12 @@ public class NotificationsViewModel extends ViewModel {
         return notifications;
     }
 
+    public void deleteNotifications(List<Notification> notifications){
+        final List<Notification> not = getCurrentNotifications();
+        not.removeAll(notifications);
+        this.notifications.setValue(not);
+    }
+
     private List<Notification> getCurrentNotifications(){
         final List<Notification> not = this.notifications.getValue();
         return Objects.isNull(not) ? new ArrayList<>() : not;
