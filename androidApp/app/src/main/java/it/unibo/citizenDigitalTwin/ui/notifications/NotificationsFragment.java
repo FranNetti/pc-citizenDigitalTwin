@@ -55,6 +55,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         final NotificationAdapter adapter = new NotificationAdapter(getContext(), notifications, this);
         listView.setAdapter(adapter);
 
+        /* handle back command */
         final OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -67,6 +68,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
+        /* handle delete button click */
         deleteNotificationsBtn.setOnClickListener(ev -> {
             final List<Notification> notificationsRead = notifications.parallelStream()
                     .filter(Notification::isSelected)
@@ -75,6 +77,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
             deleteNotificationsBtn.setVisibility(View.GONE);
         });
 
+        /* handle notifications updates */
         notificationsViewModel.getNotifications().observe(getViewLifecycleOwner(), currentNotifications -> {
             if(currentNotifications.size() > 0) {
                 showNotifications();
@@ -95,7 +98,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
     }
 
     @Override
-    public void onNotificationSelected(Notification notification) {
+    public void onNotificationSelected(final Notification notification) {
         if(deleteNotificationsBtn.getVisibility() == View.GONE){
             deleteNotificationsBtn.setVisibility(View.VISIBLE);
         }
@@ -127,6 +130,14 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
 }
 
 interface NotificationSelectedListener {
+    /**
+     * A new notification has been selected
+     * @param notification the selected notification
+     */
     void onNotificationSelected(Notification notification);
+
+    /**
+     * Call this method when there are no notification selected
+     */
     void onNoNotificationSelected();
 }
