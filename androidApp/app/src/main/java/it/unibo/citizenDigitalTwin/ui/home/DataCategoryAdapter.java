@@ -6,11 +6,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.commons.GroupCategory;
@@ -22,10 +23,10 @@ public class DataCategoryAdapter extends RecyclerView.Adapter<DataCategoryAdapte
         final ImageView dataCategoryIcon;
         final TextView dataCategoryName;
 
-        DataCategoryHolder(final ConstraintLayout layout) {
+        DataCategoryHolder(final MaterialCardView layout) {
             super(layout);
-            this.dataCategoryName = (TextView) layout.getViewById(R.id.notificationMessage);
-            dataCategoryIcon = (ImageView) layout.getViewById(R.id.categoryIcon);
+            this.dataCategoryName = layout.findViewById(R.id.notificationMessage);
+            dataCategoryIcon = layout.findViewById(R.id.categoryIcon);
         }
     }
 
@@ -40,15 +41,16 @@ public class DataCategoryAdapter extends RecyclerView.Adapter<DataCategoryAdapte
     @NonNull
     @Override
     public DataCategoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ConstraintLayout layout = (ConstraintLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.data_category_item, parent, false);
+        MaterialCardView layout = (MaterialCardView) LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.group_category_item, parent, false);
         return new DataCategoryHolder(layout);
     }
 
     @Override
     public void onBindViewHolder(@NonNull DataCategoryHolder holder, int position) {
-        final String dataCategory = this.categories.get(position).getDisplayName(context);
-        holder.dataCategoryName.setText(dataCategory);
+        final GroupCategory dataCategory = this.categories.get(position);
+        holder.dataCategoryName.setText(dataCategory.getDisplayName(context));
+        holder.dataCategoryIcon.setImageDrawable(dataCategory.getDisplayIcon(context));
     }
 
     @Override

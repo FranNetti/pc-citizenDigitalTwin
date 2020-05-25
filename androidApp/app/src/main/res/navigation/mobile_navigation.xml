@@ -8,23 +8,23 @@
     <fragment
         android:id="@+id/navigation_settings"
         android:name="it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment"
-        android:label="@string/title_settings"
+        android:label=""
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/navigation_home"
         android:name="it.unibo.citizenDigitalTwin.ui.home.HomeFragment"
-        android:label="@string/title_home"
+        android:label=""
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_devices"
         android:name="it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment"
-        android:label="@string/title_devices"
+        android:label=""
         tools:layout="@layout/fragment_devices" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label=""
         tools:layout="@layout/fragment_notifications" />
 </navigation>

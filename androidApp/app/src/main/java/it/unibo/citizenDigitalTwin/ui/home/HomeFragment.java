@@ -6,14 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Arrays;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
 
@@ -29,12 +25,7 @@ public class HomeFragment extends Fragment {
         final TextView userName = root.findViewById(R.id.userName);
 
         final RecyclerView listView = root.findViewById(R.id.homeRecyclerView);
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
-        final DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listView.getContext(),
-                linearLayoutManager.getOrientation());
-
-        listView.addItemDecoration(dividerItemDecoration);
-        listView.setHasFixedSize(true);
+        final GridLayoutManager linearLayoutManager = new GridLayoutManager(this.getContext(), 2);
         listView.setLayoutManager(linearLayoutManager);
         listView.setNestedScrollingEnabled(false);
 
