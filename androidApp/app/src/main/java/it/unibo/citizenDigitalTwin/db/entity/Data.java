@@ -30,7 +30,7 @@ public class Data {
         this.date = date;
         this.feeder = feeder;
         this.leafCategory = dataCategory;
-        this.leafCategoryName = dataCategory.getName();
+        this.leafCategoryName = dataCategory.getIdentifier();
         this.value = value;
     }
 
@@ -73,7 +73,7 @@ public class Data {
 
     public void setLeafCategory(LeafCategory leafCategory) {
         this.leafCategory = leafCategory;
-        this.leafCategoryName = leafCategory.getName();
+        this.leafCategoryName = leafCategory.getIdentifier();
     }
 
     public void setLeafCategoryName(String leafCategoryName) {

@@ -24,4 +24,12 @@
     <string name="LC_celsius_temperature">Body Temperature</string>
     <string name="LC_blood_oxigen">Blood Oxygen</string>
     <string name="LC_heart_rate">Heart Rate</string>
+    <string name="LC_cf">Tax Code</string>
+    <string name="LC_medical_record">Medical Record</string>
+    <string name="LC_position">Last known position</string>
+    <string name="GC_medical_data">Medical Data</string>
+    <string name="GC_location">Location</string>
+    <string name="GC_personal_data">Personal Data</string>
+    <string name="GC_licences">Your Licences</string>
+    <string name="GC_legal_data">Legal Data</string>
 </resources>

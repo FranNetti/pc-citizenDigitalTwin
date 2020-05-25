@@ -38,15 +38,7 @@ public class HomeFragment extends Fragment {
         listView.setLayoutManager(linearLayoutManager);
         listView.setNestedScrollingEnabled(false);
 
-        final List<String> ciccio = Arrays.asList(
-                "Dati anagrafici",
-                "Dati sulla posizione",
-                "Dati sulla salute",
-                "Licenze acquisite",
-                "Dati legali"
-        );
-
-        listView.setAdapter(new DataCategoryAdapter(ciccio));
+        listView.setAdapter(new DataCategoryAdapter(getContext()));
 
 
         userName.setText("Francesco");

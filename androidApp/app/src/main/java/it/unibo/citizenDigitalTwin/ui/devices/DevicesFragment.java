@@ -41,25 +41,25 @@ public class DevicesFragment extends Fragment {
         final List<Device> ciccio = Arrays.asList(
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE)),
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.CELSIUS_TEMPERATURE))
+                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE))
         );
 
         listView.setAdapter(new DeviceAdapter(getContext(), ciccio));
