@@ -36,6 +36,7 @@ public class DevicesFragment extends Fragment {
 
         listView.addItemDecoration(dividerItemDecoration);
         listView.setLayoutManager(linearLayoutManager);
+        listView.setNestedScrollingEnabled(false);
 
         final List<Device> ciccio = Arrays.asList(
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),

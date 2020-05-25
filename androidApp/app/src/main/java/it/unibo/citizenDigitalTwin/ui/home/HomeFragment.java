@@ -36,6 +36,7 @@ public class HomeFragment extends Fragment {
         listView.addItemDecoration(dividerItemDecoration);
         listView.setHasFixedSize(true);
         listView.setLayoutManager(linearLayoutManager);
+        listView.setNestedScrollingEnabled(false);
 
         final List<String> ciccio = Arrays.asList(
                 "Dati anagrafici",
