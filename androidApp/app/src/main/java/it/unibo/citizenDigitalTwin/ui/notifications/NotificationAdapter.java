@@ -100,9 +100,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.content.setText(
                 notification.getChangedCategories()
                     .stream()
-                    .map(LeafCategory::getDisplayName)
+                    .map(x -> x.getDisplayName(context))
                     .reduce((a,b) -> a + ", " + b)
-                    .orElseGet(() -> "")
+                    .orElse("")
         );
     }
 
