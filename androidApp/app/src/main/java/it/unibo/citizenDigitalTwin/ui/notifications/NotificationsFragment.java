@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -26,9 +25,9 @@ import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
 public class NotificationsFragment extends Fragment implements NotificationSelectedListener {
 
     private NotificationsViewModel notificationsViewModel;
-    private ConstraintLayout emptyNotifications;
+    private TextView emptyNotifications;
     private FloatingActionButton deleteNotificationsBtn;
-    private ScrollView scrollView;
+    private RecyclerView listView;
 
     private List<Notification> notifications;
 
@@ -39,10 +38,9 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         final View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);
-        scrollView = root.findViewById(R.id.scrollView);
         deleteNotificationsBtn = root.findViewById(R.id.deleteNotificationsButton);
 
-        final RecyclerView listView = root.findViewById(R.id.notificationsRecyclerView);
+        listView = root.findViewById(R.id.notificationsRecyclerView);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         final DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listView.getContext(),
                 linearLayoutManager.getOrientation());
@@ -125,7 +123,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
 
     private void setRightVisualization(final boolean visibleNotifications){
         emptyNotifications.setVisibility(visibleNotifications ? View.GONE : View.VISIBLE);
-        scrollView.setVisibility(visibleNotifications ? View.VISIBLE : View.GONE);
+        listView.setVisibility(visibleNotifications ? View.VISIBLE : View.GONE);
     }
 }
 

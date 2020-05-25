@@ -6,55 +6,42 @@
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <TextView
         android:id="@+id/emptyNotifications"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/no_notifications_message"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/no_notifications_message"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notificationsRecyclerView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
-        android:fillViewport="true">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/notificationsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </ScrollView>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/deleteNotificationsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         android:clickable="true"
         android:src="@drawable/ic_delete_forever_black_24dp"
-        app:backgroundTint="#F44336"
         android:visibility="gone"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="24dp"
+        app:backgroundTint="@android:color/holo_red_light"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

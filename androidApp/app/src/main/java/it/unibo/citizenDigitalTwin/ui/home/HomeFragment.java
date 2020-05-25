@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,9 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        final View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        final TextView userName = root.findViewById(R.id.userName);
 
         final RecyclerView listView = root.findViewById(R.id.homeRecyclerView);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
@@ -44,6 +47,8 @@ public class HomeFragment extends Fragment {
 
         listView.setAdapter(new DataCategoryAdapter(ciccio));
 
+
+        userName.setText("Francesco");
 
         return root;
     }
