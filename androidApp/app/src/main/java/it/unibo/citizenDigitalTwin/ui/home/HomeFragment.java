@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
+import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
+import it.unibo.citizenDigitalTwin.view_model.HomeViewModel;
 
 public class HomeFragment extends Fragment {
 
@@ -19,7 +21,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class).home;
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         final TextView userName = root.findViewById(R.id.userName);

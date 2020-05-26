@@ -1,8 +1,8 @@
-package it.unibo.citizenDigitalTwin.ui.notifications.notification;
+package it.unibo.citizenDigitalTwin.data.notification;
 
 import java.util.List;
 
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
 public class DataNotification extends Notification {
 

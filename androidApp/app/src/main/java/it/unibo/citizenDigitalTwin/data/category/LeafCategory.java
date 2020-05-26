@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.commons;
+package it.unibo.citizenDigitalTwin.data.category;
 
 import android.content.Context;
 
@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import it.unibo.citizenDigitalTwin.R;
 
-import static it.unibo.citizenDigitalTwin.commons.GroupCategory.*;
+import static it.unibo.citizenDigitalTwin.data.category.GroupCategory.*;
 
 public enum LeafCategory {
 

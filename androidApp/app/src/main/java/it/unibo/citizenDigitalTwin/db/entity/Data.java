@@ -9,7 +9,7 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
 @Entity(tableName = "state")
 public class Data {

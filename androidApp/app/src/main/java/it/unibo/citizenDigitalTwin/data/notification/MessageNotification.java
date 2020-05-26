@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.ui.notifications.notification;
+package it.unibo.citizenDigitalTwin.data.notification;
 
 public class MessageNotification extends Notification {
 

@@ -1,16 +1,15 @@
-package it.unibo.citizenDigitalTwin.ui.settings;
+package it.unibo.citizenDigitalTwin.view_model;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class SettingsViewModel extends ViewModel {
+public class HomeViewModel {
 
     private MutableLiveData<String> mText;
 
-    public SettingsViewModel() {
+    public HomeViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is settings fragment");
+        mText.setValue("This is home fragment");
     }
 
     public LiveData<String> getText() {

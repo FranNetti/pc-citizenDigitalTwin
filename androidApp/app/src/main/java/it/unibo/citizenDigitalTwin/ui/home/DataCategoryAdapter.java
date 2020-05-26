@@ -14,7 +14,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.commons.GroupCategory;
+import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 
 public class DataCategoryAdapter extends RecyclerView.Adapter<DataCategoryAdapter.DataCategoryHolder> {
 

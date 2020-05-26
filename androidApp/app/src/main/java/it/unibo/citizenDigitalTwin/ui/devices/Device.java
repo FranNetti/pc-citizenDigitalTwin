@@ -2,7 +2,7 @@ package it.unibo.citizenDigitalTwin.ui.devices;
 
 import java.util.List;
 
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
 class Device {
 

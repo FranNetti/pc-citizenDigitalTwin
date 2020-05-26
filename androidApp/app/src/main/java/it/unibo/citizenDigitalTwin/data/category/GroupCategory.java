@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.commons;
+package it.unibo.citizenDigitalTwin.data.category;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

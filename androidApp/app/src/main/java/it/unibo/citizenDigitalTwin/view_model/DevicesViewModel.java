@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.ui.devices;
+package it.unibo.citizenDigitalTwin.view_model;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

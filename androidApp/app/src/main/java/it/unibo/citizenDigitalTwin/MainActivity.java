@@ -13,15 +13,15 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
-import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsViewModel;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.DataNotification;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.MessageNotification;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
+import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
+import it.unibo.citizenDigitalTwin.data.notification.Notification;
+import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    private NotificationsViewModel notificationsViewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
         final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
         badge.setVisible(false);
 
-        notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
-        notificationsViewModel.getNotifications().observe(this, notifications -> {
+        mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        mainActivityViewModel.notifications.getNotifications().observe(this, notifications -> {
             if(notifications.size() > 0) {
                 badge.setVisible(true);
                 badge.setNumber(notifications.size());
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        notificationsViewModel.addNotifications(
+        mainActivityViewModel.notifications.addNotifications(
                 Arrays.asList(
                         new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
                         new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void newNotification(final Notification notification) {
-        notificationsViewModel.addNotification(notification);
+        mainActivityViewModel.notifications.addNotification(notification);
     }
 
 }

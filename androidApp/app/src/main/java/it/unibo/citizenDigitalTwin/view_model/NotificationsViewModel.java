@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.ui.notifications;
+package it.unibo.citizenDigitalTwin.view_model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,10 +6,9 @@ import java.util.Objects;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
+import it.unibo.citizenDigitalTwin.data.notification.Notification;
 
-public class NotificationsViewModel extends ViewModel {
+public class NotificationsViewModel {
 
     private final MutableLiveData<List<Notification>> notifications;
 

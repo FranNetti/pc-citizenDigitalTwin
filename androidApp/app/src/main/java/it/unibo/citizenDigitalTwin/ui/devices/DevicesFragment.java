@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
+import it.unibo.citizenDigitalTwin.view_model.DevicesViewModel;
 
 public class DevicesFragment extends Fragment {
 
@@ -24,7 +26,7 @@ public class DevicesFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        devicesViewModel = new ViewModelProvider(requireActivity()).get(DevicesViewModel.class);
+        devicesViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class).devices;
         final View root = inflater.inflate(R.layout.fragment_devices, container, false);
 
         final TextView emptyDevices = root.findViewById(R.id.emptyDevices);

@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
+import it.unibo.citizenDigitalTwin.data.notification.Notification;
+import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
+import it.unibo.citizenDigitalTwin.view_model.NotificationsViewModel;
 
 public class NotificationsFragment extends Fragment implements NotificationSelectedListener {
 
@@ -34,7 +36,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
 
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(NotificationsViewModel.class);
+        notificationsViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class).notifications;
         final View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);

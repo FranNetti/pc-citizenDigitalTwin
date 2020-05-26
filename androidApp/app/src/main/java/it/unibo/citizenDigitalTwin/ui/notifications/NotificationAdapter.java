@@ -13,10 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.commons.LeafCategory;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.DataNotification;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.MessageNotification;
-import it.unibo.citizenDigitalTwin.ui.notifications.notification.Notification;
+import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
+import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
+import it.unibo.citizenDigitalTwin.data.notification.Notification;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationHolder> {
 
