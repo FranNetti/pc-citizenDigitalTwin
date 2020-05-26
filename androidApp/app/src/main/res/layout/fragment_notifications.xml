@@ -32,15 +32,15 @@
         android:layout_height="match_parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/deleteNotificationsButton"
+        android:id="@+id/readNotificationsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:clickable="true"
-        android:src="@drawable/ic_delete_forever_black_24dp"
+        android:src="@drawable/ic_done_black_24dp"
         android:visibility="gone"
-        app:backgroundTint="@android:color/holo_red_light"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

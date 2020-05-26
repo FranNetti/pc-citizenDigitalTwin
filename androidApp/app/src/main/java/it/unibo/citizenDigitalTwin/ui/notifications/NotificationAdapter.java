@@ -2,6 +2,7 @@ package it.unibo.citizenDigitalTwin.ui.notifications;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -65,21 +66,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 if(notifications.parallelStream().noneMatch(Notification::isSelected)){
                     listener.onNoNotificationSelected();
                 }
-            } else {
+            } else if(!notification.isRead()){
                 notification.setSelected(true);
                 listener.onNotificationSelected(notification);
+            } else {
+                return false;
             }
             this.notifyDataSetChanged();
             return true;
         });
 
-        int color;
-        if(notification.isSelected()){
-            color = context.getColor(R.color.selectedItem);
-        } else {
-            color = Color.WHITE;
-        }
-        holder.container.setBackgroundColor(color);
+        setBackgroundColor(holder, notification);
+        setReadOrNot(holder, notification);
         switch (notification.getType()){
             case DATA: handleDataNotification(holder, (DataNotification)notification); break;
             case MESSAGE: handleMessageNotification(holder, (MessageNotification)notification); break;
@@ -93,7 +91,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     private void handleDataNotification(final NotificationHolder holder, final DataNotification notification){
-        holder.icon.setImageResource(R.drawable.ic_add_box_black_24dp);
+        holder.icon.setImageResource(R.drawable.ic_edit_black_24dp);
         holder.sender.setText(notification.getSender());
         holder.message.setText(R.string.data_change);
         holder.content.setText(
@@ -110,6 +108,33 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.sender.setText(notification.getSender());
         holder.message.setText(R.string.message_sent);
         holder.content.setText(notification.getMessage());
+    }
+
+    private void setBackgroundColor(final NotificationHolder holder, final Notification notification){
+        int color;
+        if(notification.isSelected()){
+            color = context.getColor(R.color.selectedItem);
+        } else {
+            color = Color.WHITE;
+        }
+        holder.container.setBackgroundColor(color);
+    }
+
+    private void setReadOrNot(final NotificationHolder holder, final Notification notification){
+        if(!notification.isRead()){
+            holder.message.setTypeface(holder.message.getTypeface(), Typeface.BOLD);
+            holder.content.setTypeface(holder.content.getTypeface(), Typeface.BOLD);
+            holder.sender.setTextColor(Color.BLACK);
+            holder.content.setTextColor(Color.BLACK);
+            holder.message.setTextColor(Color.BLACK);
+        } else {
+            final int color = context.getColor(android.R.color.tab_indicator_text);
+            holder.message.setTypeface(null, Typeface.NORMAL);
+            holder.content.setTypeface(null, Typeface.NORMAL);
+            holder.sender.setTextColor(color);
+            holder.message.setTextColor(color);
+            holder.content.setTextColor(color);
+        }
     }
 
 

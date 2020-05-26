@@ -45,9 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         mainActivityViewModel.notifications.getNotifications().observe(this, notifications -> {
-            if(notifications.size() > 0) {
+            final int notificationToRead = (int)notifications.stream().filter(x -> !x.isRead()).count();
+            if(notificationToRead > 0) {
                 badge.setVisible(true);
-                badge.setNumber(notifications.size());
+                badge.setNumber(notificationToRead);
             } else {
                 badge.setVisible(false);
                 badge.clearNumber();

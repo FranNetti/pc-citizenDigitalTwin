@@ -44,9 +44,9 @@ public enum LeafCategory {
         return context.getString(displayName);
     }
 
-    public static Optional<LeafCategory> findByName(final String name) {
+    public static Optional<LeafCategory> findByLeafIdentifier(final String identifier) {
         return Stream.of(LeafCategory.values())
-                .filter(dataCategory -> dataCategory.identifier.equals(name))
+                .filter(dataCategory -> dataCategory.identifier.equals(identifier))
                 .findFirst();
     }
 }

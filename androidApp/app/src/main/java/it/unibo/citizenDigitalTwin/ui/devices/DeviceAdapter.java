@@ -3,6 +3,7 @@ package it.unibo.citizenDigitalTwin.ui.devices;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -18,13 +19,13 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceHold
 
         final TextView deviceName;
         final TextView deviceCharacteristics;
-        final TextView deleteText;
+        final Button deleteBtn;
 
         DeviceHolder(final ConstraintLayout layout) {
             super(layout);
             this.deviceName = layout.findViewById(R.id.deviceNameText);
             this.deviceCharacteristics = layout.findViewById(R.id.deviceCharacteristicsText);
-            this.deleteText = layout.findViewById(R.id.disconnectText);
+            this.deleteBtn = layout.findViewById(R.id.disconnectBtn);
         }
     }
 

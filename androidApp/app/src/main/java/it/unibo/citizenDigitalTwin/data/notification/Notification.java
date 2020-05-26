@@ -9,11 +9,13 @@ public class Notification {
     private final Type type;
     private final String sender;
     private boolean selected;
+    private boolean read;
 
     Notification(final Type type, final String sender){
         this.type = type;
         this.sender = sender;
         selected = false;
+        read = false;
     }
 
     public void setSelected(boolean selected) {
@@ -22,6 +24,14 @@ public class Notification {
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 
     public String getSender() {

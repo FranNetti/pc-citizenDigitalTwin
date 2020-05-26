@@ -38,6 +38,10 @@ public class NotificationsViewModel {
         this.notifications.setValue(not);
     }
 
+    public void setNotifications(List<Notification> notifications){
+        this.notifications.setValue(notifications);
+    }
+
     private List<Notification> getCurrentNotifications(){
         final List<Notification> not = this.notifications.getValue();
         return Objects.isNull(not) ? new ArrayList<>() : not;

@@ -28,7 +28,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
 
     private NotificationsViewModel notificationsViewModel;
     private TextView emptyNotifications;
-    private FloatingActionButton deleteNotificationsBtn;
+    private FloatingActionButton readNotificationsBtn;
     private RecyclerView listView;
 
     private List<Notification> notifications;
@@ -40,7 +40,7 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         final View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);
-        deleteNotificationsBtn = root.findViewById(R.id.deleteNotificationsButton);
+        readNotificationsBtn = root.findViewById(R.id.readNotificationsButton);
 
         listView = root.findViewById(R.id.notificationsRecyclerView);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
@@ -59,8 +59,8 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         final OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if(deleteNotificationsBtn.getVisibility() == View.VISIBLE){
-                    deleteNotificationsBtn.setVisibility(View.GONE);
+                if(readNotificationsBtn.getVisibility() == View.VISIBLE){
+                    readNotificationsBtn.setVisibility(View.GONE);
                     deselectNotifications();
                     adapter.notifyDataSetChanged();
                 }
@@ -69,12 +69,17 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
         /* handle delete button click */
-        deleteNotificationsBtn.setOnClickListener(ev -> {
-            final List<Notification> notificationsRead = notifications.parallelStream()
-                    .filter(Notification::isSelected)
+        readNotificationsBtn.setOnClickListener(ev -> {
+            final List<Notification> readNot = notifications.parallelStream()
+                    .peek(x -> {
+                        if(x.isSelected()) {
+                            x.setRead(true);
+                            x.setSelected(false);
+                        }
+                    })
                     .collect(Collectors.toList());
-            notificationsViewModel.deleteNotifications(notificationsRead);
-            deleteNotificationsBtn.setVisibility(View.GONE);
+            notificationsViewModel.setNotifications(readNot);
+            readNotificationsBtn.setVisibility(View.GONE);
         });
 
         /* handle notifications updates */
@@ -99,15 +104,15 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
 
     @Override
     public void onNotificationSelected(final Notification notification) {
-        if(deleteNotificationsBtn.getVisibility() == View.GONE){
-            deleteNotificationsBtn.setVisibility(View.VISIBLE);
+        if(readNotificationsBtn.getVisibility() == View.GONE){
+            readNotificationsBtn.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onNoNotificationSelected() {
-        if(deleteNotificationsBtn.getVisibility() == View.VISIBLE){
-            deleteNotificationsBtn.setVisibility(View.GONE);
+        if(readNotificationsBtn.getVisibility() == View.VISIBLE){
+            readNotificationsBtn.setVisibility(View.GONE);
         }
     }
 

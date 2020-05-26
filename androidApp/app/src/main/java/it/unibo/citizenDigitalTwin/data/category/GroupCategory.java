@@ -38,9 +38,9 @@ public enum GroupCategory {
         return identifier;
     }
 
-    public static Optional<GroupCategory> findByName(final String name) {
+    public static Optional<GroupCategory> findByGroupIdentifier(final String identifier) {
         return Stream.of(GroupCategory.values())
-                .filter(dataCategory -> dataCategory.identifier.equals(name))
+                .filter(dataCategory -> dataCategory.identifier.equals(identifier))
                 .findFirst();
     }
 }

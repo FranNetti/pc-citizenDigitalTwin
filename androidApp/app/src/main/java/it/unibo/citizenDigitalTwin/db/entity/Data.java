@@ -15,8 +15,8 @@ import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 public class Data {
 
     @PrimaryKey @NonNull @ColumnInfo(name = "leafCategory") private String leafCategoryName;
-    @ColumnInfo(name = "date") private long numericDate;
-    @ColumnInfo(defaultValue = "") private String uri;
+    @ColumnInfo private long timestamp;
+    @ColumnInfo(defaultValue = "") private String identifier;
     @ColumnInfo() private String value;
     @Embedded private Feeder feeder;
 
@@ -24,9 +24,9 @@ public class Data {
     @Ignore private LeafCategory leafCategory;
 
     @Ignore
-    public Data(final String uri, final Date date, final Feeder feeder, final LeafCategory dataCategory, final String value) {
-        this.uri = uri;
-        this.numericDate = date.getTime();
+    public Data(final String identifier, final Date date, final Feeder feeder, final LeafCategory dataCategory, final String value) {
+        this.identifier = identifier;
+        this.timestamp = date.getTime();
         this.date = date;
         this.feeder = feeder;
         this.leafCategory = dataCategory;
@@ -39,20 +39,25 @@ public class Data {
         this("", date, feeder, dataCategory, value);
     }
 
-    public Data(final String uri, final long numericDate, final Feeder feeder, final String leafCategoryName, final String value) throws NoSuchElementException {
-        this(uri, new Date(numericDate), feeder, LeafCategory.findByName(leafCategoryName).get(), value);
+    public Data(
+            final String identifier,
+            final long timestamp,
+            final Feeder feeder,
+            final String leafCategoryName,
+            final String value) throws NoSuchElementException {
+        this(identifier, new Date(timestamp), feeder, LeafCategory.findByLeafIdentifier(leafCategoryName).get(), value);
     }
 
-    public String getUri() {
-        return uri;
+    public String getIdentifier() {
+        return identifier;
     }
 
     public Date getDate() {
         return date;
     }
 
-    public long getNumericDate() {
-        return numericDate;
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public Feeder getFeeder() {
@@ -78,21 +83,21 @@ public class Data {
 
     public void setLeafCategoryName(String leafCategoryName) {
         this.leafCategoryName = leafCategoryName;
-        LeafCategory.findByName(leafCategoryName).ifPresent(value -> this.leafCategory = value);
+        LeafCategory.findByLeafIdentifier(leafCategoryName).ifPresent(value -> this.leafCategory = value);
     }
 
-    public void setNumericDate(long numericDate) {
-        this.numericDate = numericDate;
-        this.date = new Date(numericDate);
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+        this.date = new Date(timestamp);
     }
 
     public void setDate(Date date) {
         this.date = date;
-        this.numericDate = date.getTime();
+        this.timestamp = date.getTime();
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public void setValue(String value) {
