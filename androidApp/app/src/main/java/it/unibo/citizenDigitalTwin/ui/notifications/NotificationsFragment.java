@@ -24,7 +24,7 @@ import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
 import it.unibo.citizenDigitalTwin.view_model.NotificationsViewModel;
 
-public class NotificationsFragment extends Fragment implements NotificationSelectedListener {
+public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationSelectedListener {
 
     private NotificationsViewModel notificationsViewModel;
     private TextView emptyNotifications;
@@ -132,17 +132,4 @@ public class NotificationsFragment extends Fragment implements NotificationSelec
         emptyNotifications.setVisibility(visibleNotifications ? View.GONE : View.VISIBLE);
         listView.setVisibility(visibleNotifications ? View.VISIBLE : View.GONE);
     }
-}
-
-interface NotificationSelectedListener {
-    /**
-     * A new notification has been selected
-     * @param notification the selected notification
-     */
-    void onNotificationSelected(Notification notification);
-
-    /**
-     * Call this method when there are no notification selected
-     */
-    void onNoNotificationSelected();
 }

@@ -2,17 +2,21 @@ package it.unibo.citizenDigitalTwin.view_model;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import it.unibo.citizenDigitalTwin.data.State;
 
 public class HomeViewModel {
 
-    private MutableLiveData<String> mText;
+    private MutableLiveData<State> state;
 
     public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        state = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public void setState(final State state){
+        this.state.setValue(state);
+    }
+
+    public LiveData<State> getState() {
+        return state;
     }
 }

@@ -39,6 +39,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
+    interface NotificationSelectedListener {
+        /**
+         * A new notification has been selected
+         * @param notification the selected notification
+         */
+        void onNotificationSelected(Notification notification);
+
+        /**
+         * Call this method when there are no notification selected
+         */
+        void onNoNotificationSelected();
+    }
+
     private final List<Notification> notifications;
     private final NotificationSelectedListener listener;
     private final Context context;

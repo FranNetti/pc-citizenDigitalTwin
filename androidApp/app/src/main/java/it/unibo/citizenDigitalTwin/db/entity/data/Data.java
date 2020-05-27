@@ -1,5 +1,6 @@
-package it.unibo.citizenDigitalTwin.db.entity;
+package it.unibo.citizenDigitalTwin.db.entity.data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
@@ -10,6 +11,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
 @Entity(tableName = "state")
 public class Data {

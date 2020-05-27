@@ -8,7 +8,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-import it.unibo.citizenDigitalTwin.db.entity.Data;
+import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 
 @Dao
 public interface DataDAO {
