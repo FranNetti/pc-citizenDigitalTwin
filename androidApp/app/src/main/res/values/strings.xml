@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">CDT</string>
+    <string name="title_home">You</string>
+    <string name="title_devices">Your Devices</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_settings">Settings</string>
+    <string name="category_icon">Category icon</string>
+    <string name="category_name">Category name</string>
+    <string name="category_arrow">Expand category</string>
+    <string name="message_sent">has sent you a message</string>
+    <string name="data_change">has updated the following data</string>
+    <string name="notification_icon">Notification icon</string>
+    <string name="no_notifications_message">You have no notifications</string>
+    <string name="no_devices_message">You have no registered devices</string>
+    <string name="disconnect_device">Disconnect</string>
+    <string name="device_icon">Device icon</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="no_data_available">No data for this category</string>
+
+    /* -----------------Leaf categories-----------------*/
+    <string name="LC_name">Name</string>
+    <string name="LC_surname">Surname</string>
+    <string name="LC_birthdate">Birth Date</string>
+    <string name="LC_address">Address</string>
+    <string name="LC_celsius_temperature">Body Temperature</string>
+    <string name="LC_blood_oxigen">Blood Oxygen</string>
+    <string name="LC_heart_rate">Heart Rate</string>
+    <string name="LC_cf">Tax Code</string>
+    <string name="LC_medical_record">Medical Record</string>
+    <string name="LC_position">Last known position</string>
+    /* -----------------Group categories-----------------*/
+    <string name="GC_medical_data">Medical Data</string>
+    <string name="GC_location">Location</string>
+    <string name="GC_personal_data">Personal Data</string>
+    <string name="GC_licences">Your Licences</string>
+    <string name="GC_legal_data">Legal Data</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
