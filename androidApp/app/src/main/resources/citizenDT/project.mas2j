@@ -1,0 +1,10 @@
+MAS citizenDT {
+  infrastructure: Centralised
+
+  environment: jaca.CartagoEnvironment("infrastructure")
+
+  agents:
+    main user_interaction agentArchClass jaca.CAgentArch;
+
+    aslSourcePath: "citizenDT/agents";
+}

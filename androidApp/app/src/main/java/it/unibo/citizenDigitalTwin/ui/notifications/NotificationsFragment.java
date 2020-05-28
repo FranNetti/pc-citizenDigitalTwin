@@ -1,5 +1,6 @@
 package it.unibo.citizenDigitalTwin.ui.notifications;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,33 +11,56 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import it.unibo.citizenDigitalTwin.MainUI;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
-import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
-import it.unibo.citizenDigitalTwin.view_model.NotificationsViewModel;
+import it.unibo.citizenDigitalTwin.util.BackHelper;
 
-public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationSelectedListener {
+public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationSelectedListener, BackHelper.BackListener {
 
-    private NotificationsViewModel notificationsViewModel;
+    private static final String NOTIFICATIONS = "notifications";
+    private static final String ARTIFACT = "artifact";
+
+    public static NotificationsFragment getInstance(final List<Notification> notifications, final MainUI artifact){
+        final NotificationsFragment fragment = new NotificationsFragment();
+        final Bundle bundle = new Bundle();
+        if(Objects.nonNull(notifications)){
+            bundle.putSerializable(NOTIFICATIONS, new ArrayList<>(notifications));
+        }
+        if(Objects.nonNull(artifact)) {
+            bundle.putSerializable(ARTIFACT, artifact);
+        }
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     private TextView emptyNotifications;
     private FloatingActionButton readNotificationsBtn;
     private RecyclerView listView;
+    private NotificationAdapter adapter;
 
     private List<Notification> notifications;
+    private MainUI mainUIArtifact;
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(Objects.nonNull(getArguments())){
+            notifications = (List<Notification>)getArguments().getSerializable(NOTIFICATIONS);
+            mainUIArtifact = (MainUI)getArguments().getSerializable(ARTIFACT);
+        }
+    }
 
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
 
-        notificationsViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class).notifications;
         final View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);
@@ -48,58 +72,48 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 linearLayoutManager.getOrientation());
 
         listView.addItemDecoration(dividerItemDecoration);
-        listView.setHasFixedSize(true);
         listView.setLayoutManager(linearLayoutManager);
 
-        notifications = new ArrayList<>();
-        final NotificationAdapter adapter = new NotificationAdapter(getContext(), notifications, this);
+        adapter = new NotificationAdapter(getContext(), notifications, this);
         listView.setAdapter(adapter);
-
-        /* handle back command */
-        final OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if(readNotificationsBtn.getVisibility() == View.VISIBLE){
-                    readNotificationsBtn.setVisibility(View.GONE);
-                    deselectNotifications();
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
         /* handle delete button click */
         readNotificationsBtn.setOnClickListener(ev -> {
-            final List<Notification> readNot = notifications.parallelStream()
-                    .peek(x -> {
-                        if(x.isSelected()) {
-                            x.setRead(true);
-                            x.setSelected(false);
-                        }
-                    })
-                    .collect(Collectors.toList());
-            notificationsViewModel.setNotifications(readNot);
+            final List<Notification> readNot = new ArrayList<>();
+            for(final Notification notification : notifications){
+                if(notification.isSelected()) {
+                    notification.setRead(true);
+                    notification.setSelected(false);
+                    readNot.add(notification);
+                }
+            }
+            mainUIArtifact.beginExternalSession();
+            mainUIArtifact.readNotification(readNot);
+            mainUIArtifact.endExternalSession(true);
             readNotificationsBtn.setVisibility(View.GONE);
+            adapter.notifyDataSetChanged();
         });
 
         /* handle notifications updates */
-        notificationsViewModel.getNotifications().observe(getViewLifecycleOwner(), currentNotifications -> {
-            if(currentNotifications.size() > 0) {
-                showNotifications();
-                notifications.clear();
-                notifications.addAll(currentNotifications);
-                adapter.notifyDataSetChanged();
-            } else {
-                hideNotifications();
-            }
-        });
+        if(notifications.size() > 0) {
+            showNotifications();
+        } else {
+            hideNotifications();
+        }
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BackHelper.getInstance().setListener(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         deselectNotifications();
+        BackHelper.getInstance().clearListener();
     }
 
     @Override
@@ -114,6 +128,22 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         if(readNotificationsBtn.getVisibility() == View.VISIBLE){
             readNotificationsBtn.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean onBackClick(){
+        if(readNotificationsBtn.getVisibility() == View.VISIBLE){
+            readNotificationsBtn.setVisibility(View.GONE);
+            deselectNotifications();
+            adapter.notifyDataSetChanged();
+            return true;
+        }
+        return false;
+    }
+
+    public void newNotification(final Notification notification){
+        notifications.add(notification);
+        adapter.notifyDataSetChanged();
     }
 
     private void deselectNotifications(){

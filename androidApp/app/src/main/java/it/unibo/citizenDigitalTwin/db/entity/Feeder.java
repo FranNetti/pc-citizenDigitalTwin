@@ -1,9 +1,11 @@
 package it.unibo.citizenDigitalTwin.db.entity;
 
+import java.io.Serializable;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
-public class Feeder {
+public class Feeder implements Serializable {
 
     @ColumnInfo(name = "feeder_isResource") private boolean isResource;
     @ColumnInfo(name = "feeder_uri") private String uri;

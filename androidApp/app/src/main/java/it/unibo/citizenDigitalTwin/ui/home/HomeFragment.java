@@ -1,5 +1,9 @@
 package it.unibo.citizenDigitalTwin.ui.home;
 
+import android.app.ActionBar;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,16 +11,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.NavigationUI;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
@@ -25,17 +26,43 @@ import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
-import it.unibo.citizenDigitalTwin.view_model.MainActivityViewModel;
-import it.unibo.citizenDigitalTwin.view_model.HomeViewModel;
 
 public class HomeFragment extends Fragment implements GroupCategoryAdapter.GroupCategoryListener {
 
-    private HomeViewModel homeViewModel;
+    private static final String STATE = "state";
+
+    public static HomeFragment getInstance(final State state){
+        final HomeFragment fragment = new HomeFragment();
+        final Bundle bundle = new Bundle();
+        if(Objects.nonNull(state)){
+            bundle.putSerializable(STATE, new HashMap<>(state.getState()));
+        }
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    private State state;
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        state = new State();
+        if(Objects.nonNull(getArguments())){
+            final Map<LeafCategory, Data> data = (Map<LeafCategory, Data>)getArguments().getSerializable(STATE);
+            if(Objects.nonNull(data)) {
+                state = state.addMultipleData(data);
+            }
+        }
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class).home;
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        final ActionBar actionBar = getActivity().getActionBar();
+        if(Objects.nonNull(actionBar)){
+            actionBar.setTitle("");
+        }
 
         final TextView userName = root.findViewById(R.id.userName);
 
@@ -46,23 +73,27 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
 
         listView.setAdapter(new GroupCategoryAdapter(getContext(), this));
 
-        homeViewModel.getState().observe(getViewLifecycleOwner(), state -> {
-            final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
-            userNameInfo.ifPresent(name -> userName.setText(name.getValue()));
-        });
+        final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
+        userNameInfo.ifPresent(name -> userName.setText(name.getValue()));
 
         return root;
     }
 
     @Override
     public void onGroupCategorySelected(final View view, final GroupCategory category) {
-        final State state = homeViewModel.getState().getValue();
         if(Objects.nonNull(state) && state.getDataFromGroupCategory(category).size() > 0){
-            final Bundle bundle = GroupCategoryInfoFragment.getBundle(category);
-            Navigation.createNavigateOnClickListener(R.id.expand_group_category, bundle)
-                    .onClick(view);
+            final FragmentManager fragmentManager = getFragmentManager();
+            final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            final Fragment fragment = GroupCategoryInfoFragment.getInstance(category, state);
+            fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         } else {
             Toast.makeText(getContext(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void newData(final State state){
+        this.state = state;
     }
 }

@@ -1,6 +1,8 @@
 package it.unibo.citizenDigitalTwin.data.notification;
 
-public class Notification {
+import java.io.Serializable;
+
+public class Notification implements Serializable {
 
     public enum Type {
         DATA, MESSAGE;
