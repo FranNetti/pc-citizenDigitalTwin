@@ -4,7 +4,8 @@ MAS citizenDT {
   environment: jaca.CartagoEnvironment("infrastructure")
 
   agents:
-    main user_interaction agentArchClass jaca.CAgentArch;
+    user_interaction user_interaction agentArchClass jaca.CAgentArch;
+    cdt_manager cdt_manager agentArchClass jaca.CAgentArch;
 
     aslSourcePath: "citizenDT/agents";
 }

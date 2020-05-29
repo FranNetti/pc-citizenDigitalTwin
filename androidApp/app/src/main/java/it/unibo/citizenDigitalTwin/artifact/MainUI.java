@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin;
+package it.unibo.citizenDigitalTwin.artifact;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -18,19 +18,20 @@ import java.util.Objects;
 
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
+import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
-import it.unibo.citizenDigitalTwin.db.entity.Feeder;
-import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.citizenDigitalTwin.ui.devices.Device;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
+import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
 import it.unibo.citizenDigitalTwin.ui.home.HomeFragment;
 import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
 import it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment;
-import it.unibo.citizenDigitalTwin.util.BackHelper;
+import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
+import it.unibo.citizenDigitalTwin.ui.util.StateView;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
@@ -47,24 +48,46 @@ public class MainUI extends ActivityArtifact implements Serializable {
         }
     }
 
-    private State userState = null;
+    private static final String PAGE_SHOWN_PROP = "pageShown";
+    private enum PageShown {
+        HOME,DEVICES,NOTIFICATIONS,SETTINGS;
+    }
+
+    private Fragment currentFragment = null;
     private List<Device> devices;
     private List<Notification> notifications;
 
     public void init() {
         super.init(MainActivity.class, R.layout.activity_main, true);
-        userState = new State();
+        defineObsProperty(PAGE_SHOWN_PROP, "");
         devices = new ArrayList<>();
+    }
+
+    @OPERATION
+    public void showNewState(final State state){
+        execute(() -> {
+            if(currentFragment instanceof StateView){
+                ((StateView)currentFragment).newData(state);
+            }
+        });
+    }
+
+    @OPERATION
+    public void readNotification(final List<Notification> notifications){
+        final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
+        final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
+        final int notificationToRead = (int)this.notifications.stream().filter(x -> !x.isRead()).count();
+        if(notificationToRead > 0) {
+            badge.setVisible(true);
+            badge.setNumber(notificationToRead);
+        } else {
+            badge.setVisible(false);
+            badge.clearNumber();
+        }
     }
 
     @INTERNAL_OPERATION
     protected void setup() {
-        userState = userState.addData(LeafCategory.NAME, new DataBuilder()
-                .dataCategory(LeafCategory.NAME)
-                .value("Francesco")
-                .feeder(new Feeder("", "Francesco Grandinetti"))
-                .build());
-
         devices = Arrays.asList(
                 new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
                 new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
@@ -103,20 +126,6 @@ public class MainUI extends ActivityArtifact implements Serializable {
         initUI();
     }
 
-    @OPERATION
-    public void readNotification(final List<Notification> notifications){
-        final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
-        final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
-        final int notificationToRead = (int)this.notifications.stream().filter(x -> !x.isRead()).count();
-        if(notificationToRead > 0) {
-            badge.setVisible(true);
-            badge.setNumber(notificationToRead);
-        } else {
-            badge.setVisible(false);
-            badge.clearNumber();
-        }
-    }
-
     private void initUI(){
         execute(() -> {
             final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
@@ -140,29 +149,49 @@ public class MainUI extends ActivityArtifact implements Serializable {
         });
     }
 
+    private void updateState(final State state){
+        if(currentFragment instanceof HomeFragment){
+            ((HomeFragment)currentFragment).newData(state);
+        } else if (currentFragment instanceof GroupCategoryInfoFragment){
+            ((GroupCategoryInfoFragment)currentFragment).newData(state);
+        }
+    }
+
     private boolean handleNewMenuItemSelected(final int item){
         final FragmentManager fragmentManager = ((Activity)getActivityContext()).getFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         final Fragment fragment;
+        final PageShown page;
         setTitle();
         switch (item){
             case R.id.navigation_home:
-                fragment = HomeFragment.getInstance(userState);
+                fragment = HomeFragment.getInstance(null);
+                page = PageShown.HOME;
                 break;
             case R.id.navigation_devices:
                 fragment = DevicesFragment.getInstance(devices);
+                page = PageShown.DEVICES;
                 break;
             case R.id.navigation_notifications:
                 fragment = NotificationsFragment.getInstance(notifications, this);
+                page = PageShown.NOTIFICATIONS;
                 break;
             case R.id.navigation_settings:
                 fragment = SettingsFragment.getInstance();
+                page = PageShown.SETTINGS;
                 break;
-            default: fragment = null; break;
+            default:
+                fragment = null;
+                page = PageShown.HOME;
+                break;
         }
         if(Objects.nonNull(fragment)){
             fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
             fragmentTransaction.commit();
+            currentFragment = fragment;
+            beginExternalSession();
+            updateObsProperty(PAGE_SHOWN_PROP, page.name());
+            endExternalSession(true);
             return true;
         }
         return false;

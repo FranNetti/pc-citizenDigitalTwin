@@ -12,6 +12,7 @@ import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
+import it.unibo.citizenDigitalTwin.ui.util.StateView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class GroupCategoryInfoFragment extends Fragment {
+public class GroupCategoryInfoFragment extends Fragment implements StateView {
 
     private static final String GROUP_CATEGORY = "groupCategory";
     private static final String STATE = "state";
@@ -57,7 +58,7 @@ public class GroupCategoryInfoFragment extends Fragment {
         // Inflate the layout for this fragment
         final View root = inflater.inflate(R.layout.fragment_group_category_info, container, false);
         final ActionBar actionBar = getActivity().getActionBar();
-        if(Objects.nonNull(actionBar)){
+        if(Objects.nonNull(actionBar) && Objects.nonNull(groupCategory)){
             actionBar.setTitle(groupCategory.getDisplayName(getContext()));
         }
 
@@ -77,6 +78,7 @@ public class GroupCategoryInfoFragment extends Fragment {
         return root;
     }
 
+    @Override
     public void newData(final State state){
         data.clear();
         data.addAll(state.getDataFromGroupCategory(groupCategory));

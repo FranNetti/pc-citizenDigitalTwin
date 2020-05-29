@@ -18,10 +18,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import it.unibo.citizenDigitalTwin.MainUI;
+import it.unibo.citizenDigitalTwin.artifact.MainUI;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
-import it.unibo.citizenDigitalTwin.util.BackHelper;
+import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
 
 public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationSelectedListener, BackHelper.BackListener {
 
@@ -33,6 +33,8 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(notifications)){
             bundle.putSerializable(NOTIFICATIONS, new ArrayList<>(notifications));
+        }  else {
+            bundle.putSerializable(NOTIFICATIONS, new ArrayList<>());
         }
         if(Objects.nonNull(artifact)) {
             bundle.putSerializable(ARTIFACT, artifact);
@@ -87,9 +89,11 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                     readNot.add(notification);
                 }
             }
-            mainUIArtifact.beginExternalSession();
-            mainUIArtifact.readNotification(readNot);
-            mainUIArtifact.endExternalSession(true);
+            if(Objects.nonNull(mainUIArtifact)) {
+                mainUIArtifact.beginExternalSession();
+                mainUIArtifact.readNotification(readNot);
+                mainUIArtifact.endExternalSession(true);
+            }
             readNotificationsBtn.setVisibility(View.GONE);
             adapter.notifyDataSetChanged();
         });

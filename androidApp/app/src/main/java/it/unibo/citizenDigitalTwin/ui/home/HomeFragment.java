@@ -26,8 +26,9 @@ import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
+import it.unibo.citizenDigitalTwin.ui.util.StateView;
 
-public class HomeFragment extends Fragment implements GroupCategoryAdapter.GroupCategoryListener {
+public class HomeFragment extends Fragment implements GroupCategoryAdapter.GroupCategoryListener, StateView {
 
     private static final String STATE = "state";
 
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
     }
 
     private State state;
+    private TextView userName;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
             actionBar.setTitle("");
         }
 
-        final TextView userName = root.findViewById(R.id.userName);
+        userName = root.findViewById(R.id.userName);
 
         final RecyclerView listView = root.findViewById(R.id.homeRecyclerView);
         final GridLayoutManager linearLayoutManager = new GridLayoutManager(this.getContext(), 2);
@@ -93,7 +95,10 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
         }
     }
 
+    @Override
     public void newData(final State state){
         this.state = state;
+        final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
+        userNameInfo.ifPresent(name -> userName.setText(name.getValue()));
     }
 }

@@ -27,6 +27,8 @@ public class DevicesFragment extends Fragment {
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(devices)){
             bundle.putSerializable(DEVICES, new ArrayList<>(devices));
+        } else {
+            bundle.putSerializable(DEVICES, new ArrayList<>());
         }
         fragment.setArguments(bundle);
         return fragment;
