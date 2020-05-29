@@ -11,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
+import it.unibo.citizenDigitalTwin.artifact.MainUI;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
@@ -30,19 +29,20 @@ import it.unibo.citizenDigitalTwin.ui.util.StateView;
 
 public class HomeFragment extends Fragment implements GroupCategoryAdapter.GroupCategoryListener, StateView {
 
-    private static final String STATE = "state";
+    private static final String ARTIFACT = "artifact";
 
-    public static HomeFragment getInstance(final State state){
+    public static HomeFragment getInstance(final MainUI artifact){
         final HomeFragment fragment = new HomeFragment();
         final Bundle bundle = new Bundle();
-        if(Objects.nonNull(state)){
-            bundle.putSerializable(STATE, new HashMap<>(state.getState()));
+        if(Objects.nonNull(artifact)){
+            bundle.putSerializable(ARTIFACT, artifact);
         }
         fragment.setArguments(bundle);
         return fragment;
     }
 
     private State state;
+    private MainUI artifact;
     private TextView userName;
 
     @Override
@@ -50,10 +50,7 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
         super.onCreate(savedInstanceState);
         state = new State();
         if(Objects.nonNull(getArguments())){
-            final Map<LeafCategory, Data> data = (Map<LeafCategory, Data>)getArguments().getSerializable(STATE);
-            if(Objects.nonNull(data)) {
-                state = state.addMultipleData(data);
-            }
+            artifact = (MainUI) getArguments().getSerializable(ARTIFACT);
         }
     }
 
@@ -75,9 +72,13 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
 
         listView.setAdapter(new GroupCategoryAdapter(getContext(), this));
 
-        final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
-        userNameInfo.ifPresent(name -> userName.setText(name.getValue()));
-
+        /*
+            Used for getting newest state information in case the back button is pressed from
+            GroupCategoryInfoFragment since it's not detected from the MainUI.
+         */
+        artifact.beginExternalSession();
+        artifact.newSubView(this, MainUI.PageShown.HOME.name());
+        artifact.endExternalSession(true);
         return root;
     }
 
@@ -90,6 +91,11 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
             fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
+            if(Objects.nonNull(artifact)){
+                artifact.beginExternalSession();
+                artifact.newSubView(fragment, GroupCategoryInfoFragment.FRAGMENT_ID);
+                artifact.endExternalSession(true);
+            }
         } else {
             Toast.makeText(getContext(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
         }

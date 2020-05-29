@@ -25,13 +25,9 @@ import java.util.Objects;
 
 public class GroupCategoryInfoFragment extends Fragment implements StateView {
 
+    public static final String FRAGMENT_ID = "GROUP_CATEGORY";
     private static final String GROUP_CATEGORY = "groupCategory";
     private static final String STATE = "state";
-
-    private GroupCategory groupCategory;
-    private State state;
-    private List<Data> data;
-    private GroupCategoryInfoAdapter adapter;
 
     public static GroupCategoryInfoFragment getInstance(final GroupCategory groupCategory, final State state) {
         final GroupCategoryInfoFragment fragment = new GroupCategoryInfoFragment();
@@ -41,6 +37,11 @@ public class GroupCategoryInfoFragment extends Fragment implements StateView {
         fragment.setArguments(args);
         return fragment;
     }
+
+    private GroupCategory groupCategory;
+    private State state;
+    private List<Data> data;
+    private GroupCategoryInfoAdapter adapter;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {

@@ -26,7 +26,6 @@ import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.ui.devices.Device;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
-import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
 import it.unibo.citizenDigitalTwin.ui.home.HomeFragment;
 import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
 import it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment;
@@ -49,7 +48,7 @@ public class MainUI extends ActivityArtifact implements Serializable {
     }
 
     private static final String PAGE_SHOWN_PROP = "pageShown";
-    private enum PageShown {
+    public enum PageShown {
         HOME,DEVICES,NOTIFICATIONS,SETTINGS;
     }
 
@@ -84,6 +83,12 @@ public class MainUI extends ActivityArtifact implements Serializable {
             badge.setVisible(false);
             badge.clearNumber();
         }
+    }
+
+    @OPERATION
+    public void newSubView(final Fragment fragment, final String identifier){
+        this.currentFragment = fragment;
+        updateObsProperty(PAGE_SHOWN_PROP, identifier);
     }
 
     @INTERNAL_OPERATION
@@ -149,14 +154,6 @@ public class MainUI extends ActivityArtifact implements Serializable {
         });
     }
 
-    private void updateState(final State state){
-        if(currentFragment instanceof HomeFragment){
-            ((HomeFragment)currentFragment).newData(state);
-        } else if (currentFragment instanceof GroupCategoryInfoFragment){
-            ((GroupCategoryInfoFragment)currentFragment).newData(state);
-        }
-    }
-
     private boolean handleNewMenuItemSelected(final int item){
         final FragmentManager fragmentManager = ((Activity)getActivityContext()).getFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -165,7 +162,7 @@ public class MainUI extends ActivityArtifact implements Serializable {
         setTitle();
         switch (item){
             case R.id.navigation_home:
-                fragment = HomeFragment.getInstance(null);
+                fragment = HomeFragment.getInstance(this);
                 page = PageShown.HOME;
                 break;
             case R.id.navigation_devices:
@@ -186,11 +183,11 @@ public class MainUI extends ActivityArtifact implements Serializable {
                 break;
         }
         if(Objects.nonNull(fragment)){
+            fragmentManager.popBackStack();
             fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
             fragmentTransaction.commit();
-            currentFragment = fragment;
             beginExternalSession();
-            updateObsProperty(PAGE_SHOWN_PROP, page.name());
+            newSubView(fragment, page.name());
             endExternalSession(true);
             return true;
         }
