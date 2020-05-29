@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.util;
+package it.unibo.citizenDigitalTwin.data;
 
 public interface Builder<K> {
 

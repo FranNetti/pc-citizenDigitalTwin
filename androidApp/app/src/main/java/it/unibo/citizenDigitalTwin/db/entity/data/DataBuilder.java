@@ -3,7 +3,7 @@ package it.unibo.citizenDigitalTwin.db.entity.data;
 import java.util.Date;
 import java.util.Objects;
 
-import it.unibo.citizenDigitalTwin.util.Builder;
+import it.unibo.citizenDigitalTwin.data.Builder;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
