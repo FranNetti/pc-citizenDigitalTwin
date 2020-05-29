@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toolbar;
 
@@ -16,15 +17,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import cartago.ARTIFACT_INFO;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
+import cartago.OUTPORT;
+import cartago.OpFeedbackParam;
+import cartago.OperationException;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
-import it.unibo.citizenDigitalTwin.ui.devices.Device;
+import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
 import it.unibo.citizenDigitalTwin.ui.home.HomeFragment;
 import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
@@ -34,6 +39,11 @@ import it.unibo.citizenDigitalTwin.ui.util.StateView;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
+@ARTIFACT_INFO(
+        outports = {
+                @OUTPORT(name = "deviceManagement")
+        }
+)
 public class MainUI extends ActivityArtifact implements Serializable {
 
     public static class MainActivity extends JaCaBaseActivity {
@@ -47,19 +57,18 @@ public class MainUI extends ActivityArtifact implements Serializable {
         }
     }
 
+    private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
     public enum PageShown {
         HOME,DEVICES,NOTIFICATIONS,SETTINGS;
     }
 
     private Fragment currentFragment = null;
-    private List<Device> devices;
     private List<Notification> notifications;
 
     public void init() {
         super.init(MainActivity.class, R.layout.activity_main, true);
         defineObsProperty(PAGE_SHOWN_PROP, "");
-        devices = new ArrayList<>();
     }
 
     @OPERATION
@@ -67,6 +76,15 @@ public class MainUI extends ActivityArtifact implements Serializable {
         execute(() -> {
             if(currentFragment instanceof StateView){
                 ((StateView)currentFragment).newData(state);
+            }
+        });
+    }
+
+    @OPERATION
+    public void showConnectedDevices(final List<Device> devices){
+        execute(() -> {
+            if(currentFragment instanceof DevicesFragment){
+                ((DevicesFragment)currentFragment).updateConnectedDevices(devices);
             }
         });
     }
@@ -91,32 +109,38 @@ public class MainUI extends ActivityArtifact implements Serializable {
         updateObsProperty(PAGE_SHOWN_PROP, identifier);
     }
 
+    @OPERATION
+    public void addDevice(final Device device, final String model) {
+        execInternalOp("sendAddDeviceRequest", device, model);
+    }
+
+    @OPERATION
+    public void removeDevice(final Device device) {
+        execInternalOp("sendRemoveDeviceRequest", device);
+    }
+
+    @INTERNAL_OPERATION
+    protected void sendAddDeviceRequest(final Device device, final String model) {
+        try {
+            OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
+            execLinkedOp("deviceManagement", "addDevice",device, model, operationResult);
+        } catch (OperationException e) {
+            Log.e(MAIN_UI_TAG, "Error in sendAddDeviceRequest --> " + e.getLocalizedMessage());
+        }
+    }
+
+    @INTERNAL_OPERATION
+    protected void sendRemoveDeviceRequest(final Device device) {
+        try {
+            OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
+            execLinkedOp("deviceManagement", "removeDevice",device, operationResult);
+        } catch (OperationException e) {
+            Log.e(MAIN_UI_TAG, "Error in sendRemoveDeviceRequest --> " + e.getLocalizedMessage());
+        }
+    }
+
     @INTERNAL_OPERATION
     protected void setup() {
-        devices = Arrays.asList(
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE)),
-                new Device("Braccialetto", Arrays.asList(LeafCategory.BLOOD_OXIGEN, LeafCategory.HEART_RATE)),
-                new Device("Cardiofrequenziometro", Arrays.asList(LeafCategory.HEART_RATE)),
-                new Device("Termometro", Arrays.asList(LeafCategory.TEMPERATURE))
-        );
-
         notifications = Arrays.asList(
                 new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
                 new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
@@ -166,7 +190,7 @@ public class MainUI extends ActivityArtifact implements Serializable {
                 page = PageShown.HOME;
                 break;
             case R.id.navigation_devices:
-                fragment = DevicesFragment.getInstance(devices);
+                fragment = DevicesFragment.getInstance(this);
                 page = PageShown.DEVICES;
                 break;
             case R.id.navigation_notifications:

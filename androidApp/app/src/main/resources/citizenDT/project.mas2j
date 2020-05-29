@@ -6,6 +6,7 @@ MAS citizenDT {
   agents:
     user_interaction user_interaction agentArchClass jaca.CAgentArch;
     cdt_manager cdt_manager agentArchClass jaca.CAgentArch;
+    device_manager device_manager agentArchClass jaca.CAgentArch;
 
     aslSourcePath: "citizenDT/agents";
 }

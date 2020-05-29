@@ -23,7 +23,7 @@ import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
 
-public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationSelectedListener, BackHelper.BackListener {
+public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationAdapterListener, BackHelper.BackListener {
 
     private static final String NOTIFICATIONS = "notifications";
     private static final String ARTIFACT = "artifact";

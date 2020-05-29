@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
+import it.unibo.citizenDigitalTwin.data.device.type.Device;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceHolder> {
 
@@ -29,12 +30,22 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceHold
         }
     }
 
+    interface DeviceAdapterListener {
+        /**
+         * Called when the disconnect button has been clicked
+         * @param device the device to disconnect from
+         */
+        void onDisconnectButtonClick(Device device);
+    }
+
     private final List<Device> devices;
     private final Context context;
+    private final DeviceAdapterListener listener;
 
-    DeviceAdapter(final Context context, final List<Device> devices){
+    DeviceAdapter(final Context context, final List<Device> devices, final DeviceAdapterListener listener){
         this.devices = devices;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -55,6 +66,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceHold
                     .reduce((a,b) -> a + ", " + b)
                     .orElse("")
         );
+        holder.deleteBtn.setOnClickListener(ev -> listener.onDisconnectButtonClick(device));
     }
 
     @Override

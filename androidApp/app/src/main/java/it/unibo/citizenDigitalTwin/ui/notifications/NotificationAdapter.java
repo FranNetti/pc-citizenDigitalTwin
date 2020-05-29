@@ -39,7 +39,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
-    interface NotificationSelectedListener {
+    interface NotificationAdapterListener {
         /**
          * A new notification has been selected
          * @param notification the selected notification
@@ -53,10 +53,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     private final List<Notification> notifications;
-    private final NotificationSelectedListener listener;
+    private final NotificationAdapterListener listener;
     private final Context context;
 
-    NotificationAdapter(final Context context, final List<Notification> notifications, final NotificationSelectedListener listener){
+    NotificationAdapter(final Context context, final List<Notification> notifications, final NotificationAdapterListener listener){
         this.notifications = notifications;
         this.listener = listener;
         this.context = context;

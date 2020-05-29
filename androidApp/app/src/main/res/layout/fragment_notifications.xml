@@ -42,6 +42,7 @@
         android:src="@drawable/ic_done_black_24dp"
         android:visibility="gone"
         app:backgroundTint="@color/colorPrimary"
+        app:tint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
