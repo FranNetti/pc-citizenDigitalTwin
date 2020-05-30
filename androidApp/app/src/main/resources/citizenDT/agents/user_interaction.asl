@@ -11,43 +11,45 @@
 
 +!observeState <-
     lookupArtifact("state", S);
-    focus(S);
-    !!observeDevices.
+    focus(S).
 
 -!observeState <-
     .wait(100);
     !!observeState.
 
++ui_ready [artifact_name(Id,MainUI)] <-
+    +viewReady;
+    .send(device_manager, tell, activate);
+    println("MainUI ready.");
+    !!observeDevices.
+
 +!observeDevices <-
     lookupArtifact("devices", D);
-    focus(D).
+    focus(D);
+    lookupArtifact("bluetooth", B);
+    focus(B).
 
 -!observeDevices <-
     .wait(100);
     !!observeDevices.
 
-+ui_ready [artifact_name(Id,MainUI)] <-
-    +viewReady
-    println("MainUI ready.").
-
 /* Handle state change */
-+state(State) <-
-    .count(viewReady, N);
-    N == 1;
-    showNewState(State).
-/* ------------------ */
++state(State): viewReady <- showNewState(State).
 
 /* Handle connected devices change */
-+connectedDevices(Devices) <-
-    .count(viewReady, N);
-    N == 1;
++connectedDevices(Devices): viewReady <- showConnectedDevices(Devices).
+
+/* Handle bluetooth changes */
++bluetoothState(X): pageShown("DEVICES") <-
+    ?connectedDevices(Devices);
     showConnectedDevices(Devices).
-/* ------------------ */
 
 /* Handle user that changes page, acquiring the information needed */
 +pageShown("HOME") [artifact_name(Id,MainUI)] <-
     ?state(State);
     showNewState(State).
+
++pageShown("DEVICES") [artifact_name(Id,MainUI)]: bluetoothState("OFF") <- askToTurnOnBluetooth.
 
 +pageShown("DEVICES") [artifact_name(Id,MainUI)] <-
     ?connectedDevices(Devices);
@@ -58,4 +60,3 @@
 
 +pageShown("SETTINGS") [artifact_name(Id,MainUI)] <-
     .print("Settings").
-/* -------------------------------------------------------------- */

@@ -1,9 +1,10 @@
-!readyUp.
-
-+!readyUp <-
+@start[atomic]
++activate <-
 	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [], Communication);
 	focus(Communication);
 	!linkToView(Communication);
+	makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
+    focus(Bluetooth);
 	.print("Device Manager ready").
 
 +!linkToView(CommId) <-

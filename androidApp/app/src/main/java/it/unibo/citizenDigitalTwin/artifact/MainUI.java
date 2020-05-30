@@ -59,6 +59,8 @@ public class MainUI extends ActivityArtifact implements Serializable {
 
     private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
+    public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
+
     public enum PageShown {
         HOME,DEVICES,NOTIFICATIONS,SETTINGS;
     }
