@@ -31,19 +31,17 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
 
     private static final String ARTIFACT = "artifact";
 
-    public static HomeFragment getInstance(/*final MainUI artifact*/ final MainUI.MainUIMediator pippo){
+    public static HomeFragment getInstance(final MainUI.MainUIMediator artifact){
         final HomeFragment fragment = new HomeFragment();
         final Bundle bundle = new Bundle();
-        /*if(Objects.nonNull(artifact)){
-            bundle.putSerializable(ARTIFACT, artifact);
-        }*/
-        bundle.putParcelable(ARTIFACT, pippo);
+        if(Objects.nonNull(artifact)){
+            bundle.putParcelable(ARTIFACT, artifact);
+        }
         fragment.setArguments(bundle);
         return fragment;
     }
 
     private State state;
-    //private MainUI artifact;
     private MainUI.MainUIMediator artifact;
     private TextView userName;
 
@@ -52,7 +50,7 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
         super.onCreate(savedInstanceState);
         state = new State();
         if(Objects.nonNull(getArguments())){
-            artifact = (MainUI.MainUIMediator) getArguments().getParcelable(ARTIFACT);
+            artifact = getArguments().getParcelable(ARTIFACT);
         }
     }
 
@@ -78,9 +76,6 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
             Used for getting newest state information in case the back button is pressed from
             GroupCategoryInfoFragment since it's not detected from the MainUI.
          */
-        /*artifact.beginExternalSession();
-        artifact.newSubView(this, MainUI.PageShown.HOME.name());
-        artifact.endExternalSession(true);*/
         artifact.newSubView(this, MainUI.PageShown.HOME.name());
         return root;
     }
@@ -95,9 +90,6 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
             if(Objects.nonNull(artifact)){
-                /*artifact.beginExternalSession();
-                artifact.newSubView(fragment, GroupCategoryInfoFragment.FRAGMENT_ID);
-                artifact.endExternalSession(true);*/
                 artifact.newSubView(fragment, GroupCategoryInfoFragment.FRAGMENT_ID);
             }
         } else {
