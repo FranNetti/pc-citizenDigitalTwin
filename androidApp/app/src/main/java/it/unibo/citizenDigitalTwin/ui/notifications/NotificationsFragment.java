@@ -28,7 +28,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private static final String NOTIFICATIONS = "notifications";
     private static final String ARTIFACT = "artifact";
 
-    public static NotificationsFragment getInstance(final List<Notification> notifications, final MainUI artifact){
+    public static NotificationsFragment getInstance(final List<Notification> notifications, final MainUI.MainUIMediator artifact){
         final NotificationsFragment fragment = new NotificationsFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(notifications)){
@@ -37,7 +37,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             bundle.putSerializable(NOTIFICATIONS, new ArrayList<>());
         }
         if(Objects.nonNull(artifact)) {
-            bundle.putSerializable(ARTIFACT, artifact);
+            bundle.putParcelable(ARTIFACT, artifact);
         }
         fragment.setArguments(bundle);
         return fragment;
@@ -49,14 +49,14 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     private NotificationAdapter adapter;
 
     private List<Notification> notifications;
-    private MainUI mainUIArtifact;
+    private MainUI.MainUIMediator mainUIArtifact;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(Objects.nonNull(getArguments())){
             notifications = (List<Notification>)getArguments().getSerializable(NOTIFICATIONS);
-            mainUIArtifact = (MainUI)getArguments().getSerializable(ARTIFACT);
+            mainUIArtifact = getArguments().getParcelable(ARTIFACT);
         }
     }
 
@@ -90,9 +90,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
                 }
             }
             if(Objects.nonNull(mainUIArtifact)) {
-                mainUIArtifact.beginExternalSession();
                 mainUIArtifact.readNotification(readNot);
-                mainUIArtifact.endExternalSession(true);
             }
             readNotificationsBtn.setVisibility(View.GONE);
             adapter.notifyDataSetChanged();

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toolbar;
@@ -11,8 +13,6 @@ import android.widget.Toolbar;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +44,7 @@ import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
                 @OUTPORT(name = "deviceManagement")
         }
 )
-public class MainUI extends ActivityArtifact implements Serializable {
+public class MainUI extends ActivityArtifact {
 
     public static class MainActivity extends JaCaBaseActivity {
 
@@ -57,9 +57,10 @@ public class MainUI extends ActivityArtifact implements Serializable {
         }
     }
 
+    public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
+
     private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
-    public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
 
     public enum PageShown {
         HOME,DEVICES,NOTIFICATIONS,SETTINGS;
@@ -67,6 +68,7 @@ public class MainUI extends ActivityArtifact implements Serializable {
 
     private Fragment currentFragment = null;
     private List<Notification> notifications;
+    private final MainUIMediator mediator = new MainUIMediator();
 
     public void init() {
         super.init(MainActivity.class, R.layout.activity_main, true);
@@ -188,15 +190,15 @@ public class MainUI extends ActivityArtifact implements Serializable {
         setTitle();
         switch (item){
             case R.id.navigation_home:
-                fragment = HomeFragment.getInstance(this);
+                fragment = HomeFragment.getInstance(mediator);
                 page = PageShown.HOME;
                 break;
             case R.id.navigation_devices:
-                fragment = DevicesFragment.getInstance(this);
+                fragment = DevicesFragment.getInstance(mediator);
                 page = PageShown.DEVICES;
                 break;
             case R.id.navigation_notifications:
-                fragment = NotificationsFragment.getInstance(notifications, this);
+                fragment = NotificationsFragment.getInstance(notifications, mediator);
                 page = PageShown.NOTIFICATIONS;
                 break;
             case R.id.navigation_settings:
@@ -229,4 +231,53 @@ public class MainUI extends ActivityArtifact implements Serializable {
         toolbar.setTitle("");
     }
 
+    public class MainUIMediator implements Parcelable {
+
+        protected MainUIMediator() {
+        }
+
+        public final Creator<MainUIMediator> CREATOR = new Creator<MainUIMediator>() {
+            @Override
+            public MainUIMediator createFromParcel(final Parcel in) {
+                return new MainUIMediator();
+            }
+
+            @Override
+            public MainUIMediator[] newArray(final int size) {
+                return new MainUIMediator[size];
+            }
+        };
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {}
+
+        public void newSubView(final Fragment fragment, final String identifier){
+            MainUI.this.beginExternalSession();
+            MainUI.this.newSubView(fragment, identifier);
+            MainUI.this.endExternalSession(true);
+        }
+
+        public void addDevice(final Device device, final String model) {
+            MainUI.this.beginExternalSession();
+            MainUI.this.addDevice(device, model);
+            MainUI.this.endExternalSession(true);
+        }
+
+        public void removeDevice(final Device device) {
+            MainUI.this.beginExternalSession();
+            MainUI.this.removeDevice(device);
+            MainUI.this.endExternalSession(true);
+        }
+
+        public void readNotification(final List<Notification> notifications){
+            MainUI.this.beginExternalSession();
+            MainUI.this.readNotification(notifications);
+            MainUI.this.endExternalSession(true);
+        }
+    }
 }

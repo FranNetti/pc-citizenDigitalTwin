@@ -31,11 +31,11 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
 
     private static final String ARTIFACT = "artifact";
 
-    public static DevicesFragment getInstance(final MainUI artifact){
+    public static DevicesFragment getInstance(final MainUI.MainUIMediator artifact){
         final DevicesFragment fragment = new DevicesFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(artifact)){
-            bundle.putSerializable(ARTIFACT, artifact);
+            bundle.putParcelable(ARTIFACT, artifact);
         }
         fragment.setArguments(bundle);
         return fragment;
@@ -46,13 +46,13 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
     private TextView emptyDevices;
 
     private List<Device> devices = new ArrayList<>();
-    private MainUI artifact;
+    private MainUI.MainUIMediator artifact;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(Objects.nonNull(getArguments())){
-            artifact = (MainUI)getArguments().getSerializable(ARTIFACT);
+            artifact = getArguments().getParcelable(ARTIFACT);
         }
     }
 
@@ -84,9 +84,7 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
                     Arrays.asList(LeafCategory.TEMPERATURE, LeafCategory.BLOOD_OXIGEN)
             );
             if(Objects.nonNull(artifact)) {
-                artifact.beginExternalSession();
                 artifact.addDevice(device, "ciao");
-                artifact.endExternalSession(true);
             }
         });
 
@@ -96,9 +94,7 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
     @Override
     public void onDisconnectButtonClick(final Device device) {
         if(Objects.nonNull(artifact)) {
-            artifact.beginExternalSession();
             artifact.removeDevice(device);
-            artifact.endExternalSession(true);
         }
     }
 
