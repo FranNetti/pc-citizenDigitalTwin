@@ -36,6 +36,9 @@
 /* Handle state change */
 +state(State): viewReady <- showNewState(State).
 
+/* Handle discovered devices change */
++discoveredDevices(Devices): viewReady <- showDiscoveredDevices(Devices).
+
 /* Handle connected devices change */
 +connectedDevices(Devices): viewReady <- showConnectedDevices(Devices).
 
@@ -55,8 +58,15 @@
     ?connectedDevices(Devices);
     showConnectedDevices(Devices).
 
++pageShown("CONNECT_DEVICE") [artifact_name(Id,MainUI)] <-
+    ?pairedDevices(Devices);
+    showPairedDevices(Devices);
+    scanForDevices.
+
 +pageShown("NOTIFICATIONS") [artifact_name(Id,MainUI)] <-
     .print("Notifications").
 
 +pageShown("SETTINGS") [artifact_name(Id,MainUI)] <-
     .print("Settings").
+
++pageShown(X) [artifact_name(Id,MainUI)] <- .print(X).

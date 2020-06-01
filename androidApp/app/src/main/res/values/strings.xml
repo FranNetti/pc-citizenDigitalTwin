@@ -17,6 +17,18 @@
     <string name="device_icon">Device icon</string>
     <string name="welcome_back">Welcome back</string>
     <string name="no_data_available">No data for this category</string>
+    <string name="connect_device_title">Connect to a Health Device</string>
+    <string name="connect_device_text">Choose a device to connect to among the ones shown.</string>
+    <string name="paired_devices_title">Paired devices</string>
+    <string name="discovered_devices_title">Discovered devices</string>
+    <string name="device_type_icon">Device Type icon</string>
+    <string name="device_name_not_found">Device name not found</string>
+    <string name="add_device_text">Please type the device model that you have selected</string>
+    <string name="add_device_hint">Device model</string>
+    <string name="add_device_title">Insert device model</string>
+    <string name="add_device_positive">Connect</string>
+    <string name="add_device_negative">Cancel</string>
+    <string name="add_device_error_text">This field must contain at least one character</string>
 
     /* -----------------Leaf categories-----------------*/
     <string name="LC_name">Name</string>

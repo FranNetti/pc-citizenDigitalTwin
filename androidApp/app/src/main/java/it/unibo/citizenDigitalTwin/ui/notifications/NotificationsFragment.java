@@ -1,6 +1,5 @@
 package it.unibo.citizenDigitalTwin.ui.notifications;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +21,11 @@ import it.unibo.citizenDigitalTwin.artifact.MainUI;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
+import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 
-public class NotificationsFragment extends Fragment implements NotificationAdapter.NotificationAdapterListener, BackHelper.BackListener {
+public class NotificationsFragment extends FragmentWithId implements NotificationAdapter.NotificationAdapterListener, BackHelper.BackListener {
 
+    private static final String FRAGMENT_ID = "NOTIFICATIONS";
     private static final String NOTIFICATIONS = "notifications";
     private static final String ARTIFACT = "artifact";
 
@@ -116,6 +117,11 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         super.onStop();
         deselectNotifications();
         BackHelper.getInstance().clearListener();
+    }
+
+    @Override
+    public String getFragmentId() {
+        return FRAGMENT_ID;
     }
 
     @Override

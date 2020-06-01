@@ -9,8 +9,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import it.unibo.citizenDigitalTwin.R;
+import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends FragmentWithId {
+
+    private static final String FRAGMENT_ID = "SETTINGS";
 
     public static SettingsFragment getInstance(){
         return new SettingsFragment();
@@ -22,5 +25,10 @@ public class SettingsFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.text_settings);
         textView.setText("This is settings fragment");
         return root;
+    }
+
+    @Override
+    public String getFragmentId() {
+        return FRAGMENT_ID;
     }
 }

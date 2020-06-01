@@ -1,7 +1,6 @@
 package it.unibo.citizenDigitalTwin.ui.home;
 
 import android.app.ActionBar;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -25,10 +24,12 @@ import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
+import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 import it.unibo.citizenDigitalTwin.ui.util.StateView;
 
-public class HomeFragment extends Fragment implements GroupCategoryAdapter.GroupCategoryListener, StateView {
+public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter.GroupCategoryListener, StateView {
 
+    private static final String FRAGMENT_ID = "HOME";
     private static final String ARTIFACT = "artifact";
 
     public static HomeFragment getInstance(final MainUI.MainUIMediator artifact){
@@ -76,8 +77,15 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
             Used for getting newest state information in case the back button is pressed from
             GroupCategoryInfoFragment since it's not detected from the MainUI.
          */
-        artifact.newSubView(this, MainUI.PageShown.HOME.name());
+        if(Objects.nonNull(artifact)) {
+            artifact.newSubView(this);
+        }
         return root;
+    }
+
+    @Override
+    public String getFragmentId() {
+        return FRAGMENT_ID;
     }
 
     @Override
@@ -85,12 +93,12 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
         if(Objects.nonNull(state) && state.getDataFromGroupCategory(category).size() > 0){
             final FragmentManager fragmentManager = getFragmentManager();
             final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            final Fragment fragment = GroupCategoryInfoFragment.getInstance(category, state);
+            final GroupCategoryInfoFragment fragment = GroupCategoryInfoFragment.getInstance(category, state);
             fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
             if(Objects.nonNull(artifact)){
-                artifact.newSubView(fragment, GroupCategoryInfoFragment.FRAGMENT_ID);
+                artifact.newSubView(fragment);
             }
         } else {
             Toast.makeText(getContext(), R.string.no_data_available, Toast.LENGTH_SHORT).show();
@@ -101,6 +109,10 @@ public class HomeFragment extends Fragment implements GroupCategoryAdapter.Group
     public void newData(final State state){
         this.state = state;
         final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
-        userNameInfo.ifPresent(name -> userName.setText(name.getValue()));
+        userNameInfo.ifPresent(name -> {
+            if(Objects.nonNull(userName)){
+                userName.setText(name.getValue());
+            }
+        });
     }
 }

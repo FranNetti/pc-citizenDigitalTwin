@@ -1,6 +1,7 @@
 package it.unibo.citizenDigitalTwin.ui.devices;
 
-import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +11,8 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,12 +22,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.artifact.MainUI;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.device.type.BluetoothDevice;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
+import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
+import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 
-public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAdapterListener {
+public class DevicesFragment extends FragmentWithId implements DeviceAdapter.DeviceAdapterListener {
 
+    private static final String FRAGMENT_ID = "DEVICES";
     private static final String ARTIFACT = "artifact";
 
     public static DevicesFragment getInstance(final MainUI.MainUIMediator artifact){
@@ -75,26 +75,26 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
         deviceAdapter = new DeviceAdapter(getContext(), devices, this);
         listView.setAdapter(deviceAdapter);
 
-        final AtomicInteger i = new AtomicInteger(0);
         /* handle plus button click */
         final FloatingActionButton addDeviceBtn = root.findViewById(R.id.addDeviceBtn);
-        addDeviceBtn.setOnClickListener(ev -> {
-            final Device device = new BluetoothDevice(
-                    "personale-" + i.incrementAndGet(),
-                    Arrays.asList(LeafCategory.TEMPERATURE, LeafCategory.BLOOD_OXIGEN)
-            );
-            if(Objects.nonNull(artifact)) {
-                artifact.addDevice(device, "ciao");
-            }
-        });
+        addDeviceBtn.setOnClickListener(ev -> addDeviceButtonClicked());
+
+        if(Objects.nonNull(artifact)){
+            artifact.newSubView(this);
+        }
 
         return root;
     }
 
     @Override
+    public String getFragmentId() {
+        return FRAGMENT_ID;
+    }
+
+    @Override
     public void onDisconnectButtonClick(final Device device) {
         if(Objects.nonNull(artifact)) {
-            artifact.removeDevice(device);
+            artifact.disconnectFromDevice(device);
         }
     }
 
@@ -106,6 +106,18 @@ public class DevicesFragment extends Fragment implements DeviceAdapter.DeviceAda
             showDevices();
         } else {
             hideDevices();
+        }
+    }
+
+    private void addDeviceButtonClicked(){
+        final FragmentManager fragmentManager = getFragmentManager();
+        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        final ConnectDeviceFragment fragment = ConnectDeviceFragment.getInstance(artifact);
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        if(Objects.nonNull(artifact)){
+            artifact.newSubView(fragment);
         }
     }
 

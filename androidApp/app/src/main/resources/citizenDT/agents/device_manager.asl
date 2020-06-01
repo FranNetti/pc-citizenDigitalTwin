@@ -1,10 +1,10 @@
 @start[atomic]
 +activate <-
-	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [], Communication);
+    makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
+    focus(Bluetooth);
+	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Bluetooth], Communication);
 	focus(Communication);
 	!linkToView(Communication);
-	makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
-    focus(Bluetooth);
 	.print("Device Manager ready").
 
 +!linkToView(CommId) <-
@@ -18,3 +18,5 @@
 +newDevice(Device) <-
     .print("New device connected! ");
     println(Device).
+
++shutdown <- disconnectBTServices.

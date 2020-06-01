@@ -1,7 +1,7 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Parcel;
@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.core.app.ActivityCompat;
 import cartago.ARTIFACT_INFO;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
@@ -30,10 +31,12 @@ import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
+import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
 import it.unibo.citizenDigitalTwin.ui.home.HomeFragment;
 import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
 import it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment;
+import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
 import it.unibo.citizenDigitalTwin.ui.util.StateView;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
@@ -59,14 +62,11 @@ public class MainUI extends ActivityArtifact {
 
     public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
 
+    private static final int BL_USE_REQ_CODE = 12;
     private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
 
-    public enum PageShown {
-        HOME,DEVICES,NOTIFICATIONS,SETTINGS;
-    }
-
-    private Fragment currentFragment = null;
+    private FragmentWithId currentFragment = null;
     private List<Notification> notifications;
     private final MainUIMediator mediator = new MainUIMediator();
 
@@ -94,6 +94,24 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
+    public void showPairedDevices(final List<Device> devices){
+        execute(() -> {
+            if(currentFragment instanceof ConnectDeviceFragment){
+                ((ConnectDeviceFragment)currentFragment).updatePairedDevices(devices);
+            }
+        });
+    }
+
+    @OPERATION
+    public void showDiscoveredDevices(final List<Device> devices){
+        execute(() -> {
+            if(currentFragment instanceof ConnectDeviceFragment){
+                ((ConnectDeviceFragment)currentFragment).updateDiscoveredDevices(devices);
+            }
+        });
+    }
+
+    @OPERATION
     public void readNotification(final List<Notification> notifications){
         final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
         final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
@@ -108,36 +126,36 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
-    public void newSubView(final Fragment fragment, final String identifier){
+    public void newSubView(final FragmentWithId fragment){
         this.currentFragment = fragment;
-        updateObsProperty(PAGE_SHOWN_PROP, identifier);
+        updateObsProperty(PAGE_SHOWN_PROP, fragment.getFragmentId());
     }
 
     @OPERATION
-    public void addDevice(final Device device, final String model) {
+    public void connectToDevice(final Device device, final String model) {
         execInternalOp("sendAddDeviceRequest", device, model);
     }
 
     @OPERATION
-    public void removeDevice(final Device device) {
-        execInternalOp("sendRemoveDeviceRequest", device);
+    public void disconnectFromDevice(final Device device) {
+        execInternalOp("sendDisconnectFromDeviceRequest", device);
     }
 
     @INTERNAL_OPERATION
-    protected void sendAddDeviceRequest(final Device device, final String model) {
+    protected void sendConnectToDeviceRequest(final Device device, final String model) {
         try {
             OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
-            execLinkedOp("deviceManagement", "addDevice",device, model, operationResult);
+            execLinkedOp("deviceManagement", "connectToDevice",device, model, operationResult);
         } catch (OperationException e) {
             Log.e(MAIN_UI_TAG, "Error in sendAddDeviceRequest --> " + e.getLocalizedMessage());
         }
     }
 
     @INTERNAL_OPERATION
-    protected void sendRemoveDeviceRequest(final Device device) {
+    protected void sendDisconnectFromDeviceRequest(final Device device) {
         try {
             OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
-            execLinkedOp("deviceManagement", "removeDevice",device, operationResult);
+            execLinkedOp("deviceManagement", "disconnectFromDevice",device, operationResult);
         } catch (OperationException e) {
             Log.e(MAIN_UI_TAG, "Error in sendRemoveDeviceRequest --> " + e.getLocalizedMessage());
         }
@@ -145,6 +163,11 @@ public class MainUI extends ActivityArtifact {
 
     @INTERNAL_OPERATION
     protected void setup() {
+        ActivityCompat.requestPermissions(
+                (Activity) getActivityContext(),
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                BL_USE_REQ_CODE
+        );
         notifications = Arrays.asList(
                 new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
                 new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
@@ -185,29 +208,23 @@ public class MainUI extends ActivityArtifact {
     private boolean handleNewMenuItemSelected(final int item){
         final FragmentManager fragmentManager = ((Activity)getActivityContext()).getFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        final Fragment fragment;
-        final PageShown page;
+        final FragmentWithId fragment;
         setTitle();
         switch (item){
             case R.id.navigation_home:
                 fragment = HomeFragment.getInstance(mediator);
-                page = PageShown.HOME;
                 break;
             case R.id.navigation_devices:
                 fragment = DevicesFragment.getInstance(mediator);
-                page = PageShown.DEVICES;
                 break;
             case R.id.navigation_notifications:
                 fragment = NotificationsFragment.getInstance(notifications, mediator);
-                page = PageShown.NOTIFICATIONS;
                 break;
             case R.id.navigation_settings:
                 fragment = SettingsFragment.getInstance();
-                page = PageShown.SETTINGS;
                 break;
             default:
                 fragment = null;
-                page = PageShown.HOME;
                 break;
         }
         if(Objects.nonNull(fragment)){
@@ -215,7 +232,7 @@ public class MainUI extends ActivityArtifact {
             fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
             fragmentTransaction.commit();
             beginExternalSession();
-            newSubView(fragment, page.name());
+            newSubView(fragment);
             endExternalSession(true);
             return true;
         }
@@ -256,21 +273,21 @@ public class MainUI extends ActivityArtifact {
         @Override
         public void writeToParcel(Parcel dest, int flags) {}
 
-        public void newSubView(final Fragment fragment, final String identifier){
+        public void newSubView(final FragmentWithId fragment){
             MainUI.this.beginExternalSession();
-            MainUI.this.newSubView(fragment, identifier);
+            MainUI.this.newSubView(fragment);
             MainUI.this.endExternalSession(true);
         }
 
-        public void addDevice(final Device device, final String model) {
+        public void connectToDevice(final Device device, final String model) {
             MainUI.this.beginExternalSession();
-            MainUI.this.addDevice(device, model);
+            MainUI.this.connectToDevice(device, model);
             MainUI.this.endExternalSession(true);
         }
 
-        public void removeDevice(final Device device) {
+        public void disconnectFromDevice(final Device device) {
             MainUI.this.beginExternalSession();
-            MainUI.this.removeDevice(device);
+            MainUI.this.disconnectFromDevice(device);
             MainUI.this.endExternalSession(true);
         }
 
