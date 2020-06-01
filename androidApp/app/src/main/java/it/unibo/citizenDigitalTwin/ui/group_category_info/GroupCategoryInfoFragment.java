@@ -12,7 +12,7 @@ import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
-import it.unibo.citizenDigitalTwin.ui.util.StateView;
+import it.unibo.citizenDigitalTwin.ui.util.StateViewer;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class GroupCategoryInfoFragment extends FragmentWithId implements StateView {
+public class GroupCategoryInfoFragment extends FragmentWithId implements StateViewer {
 
     private static final String FRAGMENT_ID = "GROUP_CATEGORY";
     private static final String GROUP_CATEGORY = "groupCategory";

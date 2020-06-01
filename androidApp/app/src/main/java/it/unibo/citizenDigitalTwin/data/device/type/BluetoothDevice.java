@@ -4,11 +4,8 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Parcel;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
 public class BluetoothDevice extends AbstractDevice {
 
@@ -18,10 +15,6 @@ public class BluetoothDevice extends AbstractDevice {
     public BluetoothDevice(final android.bluetooth.BluetoothDevice device) {
         super(device.getName(), new ArrayList<>());
         this.device = device;
-    }
-
-    public BluetoothDevice(final String name, final List<LeafCategory> categories) {
-        super(name, categories);
     }
 
     @Override

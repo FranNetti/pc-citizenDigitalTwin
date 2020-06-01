@@ -25,9 +25,9 @@ import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
-import it.unibo.citizenDigitalTwin.ui.util.StateView;
+import it.unibo.citizenDigitalTwin.ui.util.StateViewer;
 
-public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter.GroupCategoryListener, StateView {
+public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter.GroupCategoryListener, StateViewer {
 
     private static final String FRAGMENT_ID = "HOME";
     private static final String ARTIFACT = "artifact";

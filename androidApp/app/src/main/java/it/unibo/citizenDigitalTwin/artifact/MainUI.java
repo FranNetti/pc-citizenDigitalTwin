@@ -38,7 +38,7 @@ import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
 import it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
-import it.unibo.citizenDigitalTwin.ui.util.StateView;
+import it.unibo.citizenDigitalTwin.ui.util.StateViewer;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
@@ -78,8 +78,8 @@ public class MainUI extends ActivityArtifact {
     @OPERATION
     public void showNewState(final State state){
         execute(() -> {
-            if(currentFragment instanceof StateView){
-                ((StateView)currentFragment).newData(state);
+            if(currentFragment instanceof StateViewer){
+                ((StateViewer)currentFragment).newData(state);
             }
         });
     }
@@ -112,6 +112,13 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
+    public void showResultOfConnectionToDevice(final boolean success){
+        if(!success && currentFragment instanceof DevicesFragment){
+            execute(() -> ((DevicesFragment) currentFragment).connectionFailed());
+        }
+    }
+
+    @OPERATION
     public void readNotification(final List<Notification> notifications){
         final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
         final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
@@ -132,23 +139,8 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
-    public void connectToDevice(final Device device, final String model) {
-        execInternalOp("sendAddDeviceRequest", device, model);
-    }
-
-    @OPERATION
     public void disconnectFromDevice(final Device device) {
         execInternalOp("sendDisconnectFromDeviceRequest", device);
-    }
-
-    @INTERNAL_OPERATION
-    protected void sendConnectToDeviceRequest(final Device device, final String model) {
-        try {
-            OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
-            execLinkedOp("deviceManagement", "connectToDevice",device, model, operationResult);
-        } catch (OperationException e) {
-            Log.e(MAIN_UI_TAG, "Error in sendAddDeviceRequest --> " + e.getLocalizedMessage());
-        }
     }
 
     @INTERNAL_OPERATION
@@ -281,7 +273,7 @@ public class MainUI extends ActivityArtifact {
 
         public void connectToDevice(final Device device, final String model) {
             MainUI.this.beginExternalSession();
-            MainUI.this.connectToDevice(device, model);
+            signal("deviceSelected", device, model);
             MainUI.this.endExternalSession(true);
         }
 

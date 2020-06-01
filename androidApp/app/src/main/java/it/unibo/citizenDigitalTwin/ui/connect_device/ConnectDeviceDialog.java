@@ -67,7 +67,7 @@ public class ConnectDeviceDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle(R.string.add_device_title)
                 .setPositiveButton(R.string.add_device_positive, null)
-                .setNegativeButton(R.string.add_device_negative, (d,i) -> listener.onNegativeButtonClick());
+                .setNegativeButton(android.R.string.cancel, (d,i) -> listener.onNegativeButtonClick());
 
         final AlertDialog dialog = builder.create();
 

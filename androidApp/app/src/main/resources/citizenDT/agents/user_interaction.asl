@@ -42,6 +42,11 @@
 /* Handle connected devices change */
 +connectedDevices(Devices): viewReady <- showConnectedDevices(Devices).
 
+/* Handle when user select a device to connect to */
++deviceSelected(Device, Model) <-
+    connectToDevice(Device, Model, Result);
+    showResultOfConnectionToDevice(Result).
+
 /* Handle bluetooth changes */
 +bluetoothState(X): pageShown("DEVICES") <-
     ?connectedDevices(Devices);

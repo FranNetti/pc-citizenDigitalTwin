@@ -10,12 +10,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import cartago.INTERNAL_OPERATION;
+import cartago.LINK;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.Observable;
 import it.unibo.citizenDigitalTwin.data.device.BluetoothHelper;
 import it.unibo.citizenDigitalTwin.data.device.BluetoothHelper.BluetoothState;
 import it.unibo.citizenDigitalTwin.data.device.type.BluetoothDevice;
+import it.unibo.citizenDigitalTwin.data.device.type.CommunicationType;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
@@ -52,33 +54,43 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
-    @OPERATION
-    public void connectToDevice(final BluetoothDevice device, final OpFeedbackParam<Boolean> connectionEstablished){
-        if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
-            final Optional<BluetoothSocket> result = BluetoothHelper.createBluetoothConnectionTo(adapter, device.getAndroidBluetoothDevice());
-            if (result.isPresent()) {
-                device.setSocket(result.get());
-                connectionEstablished.set(true);
-            } else {
-                connectionEstablished.set(false);
+    @LINK
+    public void connectDevice(final Device device, final OpFeedbackParam<Boolean> connectionEstablished){
+        if(device.getCommunicationType() == CommunicationType.BT) {
+            final BluetoothDevice deviceBT = (BluetoothDevice)device;
+            if (!hasObsProperty(PROP_NO_BLUETOOTH)) {
+                final Optional<BluetoothSocket> result = BluetoothHelper.createBluetoothConnectionTo(adapter, deviceBT.getAndroidBluetoothDevice());
+                if (result.isPresent()) {
+                    deviceBT.setSocket(result.get());
+                    connectionEstablished.set(true);
+                } else {
+                    connectionEstablished.set(false);
+                }
             }
+        } else {
+            connectionEstablished.set(false);
         }
     }
 
-    @OPERATION
-    public void disconnectFromDevice(final BluetoothDevice device, final OpFeedbackParam<Boolean> disconnectionSuccessful){
-        if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
-            final Optional<BluetoothSocket> socket = device.getSocket();
-            if (socket.isPresent()) {
-                BluetoothHelper.closeBluetoothConnection(socket.get());
-                disconnectionSuccessful.set(true);
-            } else {
-                disconnectionSuccessful.set(false);
+    @LINK
+    public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnectionSuccessful){
+        if(device.getCommunicationType() == CommunicationType.BT) {
+            final BluetoothDevice deviceBT = (BluetoothDevice)device;
+            if (!hasObsProperty(PROP_NO_BLUETOOTH)) {
+                final Optional<BluetoothSocket> socket = deviceBT.getSocket();
+                if (socket.isPresent()) {
+                    BluetoothHelper.closeBluetoothConnection(socket.get());
+                    disconnectionSuccessful.set(true);
+                } else {
+                    disconnectionSuccessful.set(false);
+                }
             }
+        } else {
+            disconnectionSuccessful.set(false);
         }
     }
 
-    @OPERATION
+    @LINK
     public void getAvailableDevices(final OpFeedbackParam<Observable<Device>> result){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
             final Observable<Device> observable = new Observable<>();
@@ -94,7 +106,7 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
-    @OPERATION
+    @LINK
     public void getPairedDevices(final OpFeedbackParam<List<Device>> result){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
             result.set(

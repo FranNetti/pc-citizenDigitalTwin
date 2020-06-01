@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import cartago.ARTIFACT_INFO;
 import cartago.ArtifactId;
@@ -18,8 +19,8 @@ import cartago.ObsProperty;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.Observable;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.device.type.BluetoothDevice;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
-import it.unibo.citizenDigitalTwin.data.device.sensor.MockTemperatureSensor;
 import it.unibo.citizenDigitalTwin.data.device.sensor.Sensor;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
@@ -32,7 +33,7 @@ public class DeviceCommunication extends JaCaArtifact {
 
     private static final String DEVICE_COMMUNICATION_TAG = "[DeviceCommunication]";
 
-    private static final String PROP_DEVICES = "connectedDevices";
+    private static final String PROP_CONNECTED_DEVICES = "connectedDevices";
     private static final String PROP_PAIRED_DEVICES = "pairedDevices";
     private static final String PROP_DISCOVERED_DEVICES = "discoveredDevices";
     private static final String PROP_SENSORS = "sensors";
@@ -46,15 +47,15 @@ public class DeviceCommunication extends JaCaArtifact {
         work = true;
 
         defineObsProperty(PROP_SENSORS, new HashMap<LeafCategory, List<Sensor<?>>>());
-        defineObsProperty(PROP_DEVICES, new ArrayList<>());
-        defineObsProperty(PROP_PAIRED_DEVICES, new ArrayList<>());
-        defineObsProperty(PROP_DISCOVERED_DEVICES, new ArrayList<>());
+        defineObsProperty(PROP_CONNECTED_DEVICES, new ArrayList<Device>());
+        defineObsProperty(PROP_PAIRED_DEVICES, new ArrayList<Device>());
+        defineObsProperty(PROP_DISCOVERED_DEVICES, new ArrayList<Device>());
         execInternalOp("updatePairedDevices");
     }
 
-    @LINK
+    @OPERATION
     public void connectToDevice(final Device device, final String model, final OpFeedbackParam<Boolean> success) {
-        final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
+        /*final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
         final Map<Device,List<Sensor<?>>> sensors = (Map<Device, List<Sensor<?>>>)propSensors.getValue();
         final List<Sensor<?>> deviceSensors = Arrays.asList(new MockTemperatureSensor());
         final ObsProperty propDevices = getObsProperty(PROP_DEVICES);
@@ -68,14 +69,32 @@ public class DeviceCommunication extends JaCaArtifact {
             propDevices.updateValue(devices);
             signal("newDevice",model);
             success.set(true);
+        }*/
+        final AtomicBoolean successRes = new AtomicBoolean(false);
+        this.technologies.forEach(x -> {
+            final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
+            try{
+                execLinkedOp(x, "connectDevice", device, op);
+                successRes.set(successRes.get() | op.get());
+            } catch (Exception e){
+                Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
+            }
+        });
+        if(successRes.get()){
+            final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
+            final List<Device> devices = (List<Device>)propDevices.getValue();
+            devices.add(device);
+            propDevices.updateValue(devices);
+            signal("newDevice",model);
         }
+        success.set(successRes.get());
     }
 
     @LINK
     public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnected) {
         final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
         final Map<Device,List<Sensor<?>>> sensors = (Map<Device, List<Sensor<?>>>)propSensors.getValue();
-        final ObsProperty propDevices = getObsProperty(PROP_DEVICES);
+        final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
         final List<Device> devices = (List<Device>)propDevices.getValue();
 
         sensors.remove(device);

@@ -1,5 +1,6 @@
 package it.unibo.citizenDigitalTwin.ui.devices;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -107,6 +108,14 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
         } else {
             hideDevices();
         }
+    }
+
+    public void connectionFailed(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.connection_failed)
+                .setPositiveButton(android.R.string.ok, null);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void addDeviceButtonClicked(){

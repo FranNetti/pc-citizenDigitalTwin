@@ -27,8 +27,8 @@
     <string name="add_device_hint">Device model</string>
     <string name="add_device_title">Insert device model</string>
     <string name="add_device_positive">Connect</string>
-    <string name="add_device_negative">Cancel</string>
     <string name="add_device_error_text">This field must contain at least one character</string>
+    <string name="connection_failed">The connection with the device has failed, try again.</string>
 
     /* -----------------Leaf categories-----------------*/
     <string name="LC_name">Name</string>
