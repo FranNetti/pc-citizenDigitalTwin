@@ -1,5 +1,7 @@
 package it.unibo.citizenDigitalTwin.data.device.type;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,9 +12,9 @@ public abstract class AbstractDevice implements Device {
     private final String name;
     private final List<LeafCategory> categories;
 
-    AbstractDevice(final String name, final List<LeafCategory> categories) {
+    AbstractDevice(final String name) {
         this.name = name;
-        this.categories = categories;
+        this.categories = new ArrayList<>();
     }
 
     @Override
@@ -20,8 +22,14 @@ public abstract class AbstractDevice implements Device {
         return name;
     }
 
+    @Override
     public List<LeafCategory> getCategories() {
         return categories;
+    }
+
+    @Override
+    public void setCategories(final Collection<LeafCategory> categories){
+        this.categories.addAll(categories);
     }
 
     @Override

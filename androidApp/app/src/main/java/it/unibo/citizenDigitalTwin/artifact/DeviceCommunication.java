@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cartago.ARTIFACT_INFO;
 import cartago.ArtifactId;
@@ -20,9 +21,11 @@ import cartago.ObsProperty;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.Observable;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.device.type.BluetoothDevice;
+import it.unibo.citizenDigitalTwin.data.device.DeviceKnowledge;
+import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
+import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannel;
+import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannels;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
-import it.unibo.citizenDigitalTwin.data.device.sensor.Sensor;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 @ARTIFACT_INFO(
@@ -37,7 +40,6 @@ public class DeviceCommunication extends JaCaArtifact {
     private static final String PROP_CONNECTED_DEVICES = "connectedDevices";
     private static final String PROP_PAIRED_DEVICES = "pairedDevices";
     private static final String PROP_DISCOVERED_DEVICES = "discoveredDevices";
-    private static final String PROP_SENSORS = "sensors";
     private static final int UPDATE_PAIRED_DEVICES_TIME = 30000;
 
     private List<ArtifactId> technologies;
@@ -47,7 +49,6 @@ public class DeviceCommunication extends JaCaArtifact {
         this.technologies = Arrays.asList(technologies);
         work = true;
 
-        defineObsProperty(PROP_SENSORS, new HashMap<LeafCategory, List<Sensor<?>>>());
         defineObsProperty(PROP_CONNECTED_DEVICES, new ArrayList<Device>());
         defineObsProperty(PROP_PAIRED_DEVICES, new ArrayList<Device>());
         defineObsProperty(PROP_DISCOVERED_DEVICES, new ArrayList<Device>());
@@ -56,51 +57,35 @@ public class DeviceCommunication extends JaCaArtifact {
 
     @OPERATION
     public void connectToDevice(final Device device, final String model, final OpFeedbackParam<Boolean> success) {
-        /*final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
-        final Map<Device,List<Sensor<?>>> sensors = (Map<Device, List<Sensor<?>>>)propSensors.getValue();
-        final List<Sensor<?>> deviceSensors = Arrays.asList(new MockTemperatureSensor());
-        final ObsProperty propDevices = getObsProperty(PROP_DEVICES);
-        final List<Device> devices = (List<Device>)propDevices.getValue();
-        if (deviceSensors.isEmpty()) {
-            success.set(false);
-        } else {
-            sensors.put(device, deviceSensors);
-            devices.add(device);
-            propSensors.updateValue(sensors);
-            propDevices.updateValue(devices);
-            signal("newDevice",model);
-            success.set(true);
-        }*/
-        final AtomicBoolean successRes = new AtomicBoolean(false);
-        this.technologies.forEach(x -> {
-            final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
-            try{
-                execLinkedOp(x, "connectDevice", device, op);
-                successRes.set(successRes.get() | op.get());
-            } catch (Exception e){
-                Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
+        final DeviceKnowledge deviceKnowledge = checkDeviceKnowledge();
+        if(Objects.nonNull(deviceKnowledge)){
+            //final AtomicBoolean successRes = new AtomicBoolean(false);
+            final AtomicBoolean successRes = new AtomicBoolean(true);
+            /*this.technologies.forEach(x -> {
+                final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
+                try{
+                    execLinkedOp(x, "connectDevice", device, op);
+                    successRes.set(successRes.get() | op.get());
+                } catch (Exception e){
+                    Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
+                }
+            });*/
+            if(successRes.get()){
+                success.set(handleNewDevice(device, deviceKnowledge));
+            } else {
+                success.set(false);
             }
-        });
-        if(successRes.get()){
-            final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
-            final List<Device> devices = (List<Device>)propDevices.getValue();
-            devices.add(device);
-            propDevices.updateValue(devices);
-            signal("newDevice",model);
+        } else {
+            success.set(false);
         }
-        success.set(successRes.get());
     }
 
     @LINK
     public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnected) {
-        final ObsProperty propSensors = getObsProperty(PROP_SENSORS);
-        final Map<Device,List<Sensor<?>>> sensors = (Map<Device, List<Sensor<?>>>)propSensors.getValue();
         final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
         final List<Device> devices = (List<Device>)propDevices.getValue();
 
-        sensors.remove(device);
         devices.remove(device);
-        propSensors.updateValue(sensors);
         propDevices.updateValue(devices);
         disconnected.set(true);
     }
@@ -149,6 +134,54 @@ public class DeviceCommunication extends JaCaArtifact {
             updateObsProperty(PROP_PAIRED_DEVICES, result);
             await_time(UPDATE_PAIRED_DEVICES_TIME);
         }
+    }
+
+    private boolean handleNewDevice(final Device device, final DeviceKnowledge knowledge){
+        final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
+        device.setCategories(knowledge.getKnowledge().keySet());
+        final List<Device> devices = (List<Device>)propDevices.getValue();
+        devices.add(device);
+        propDevices.updateValue(devices);
+        try{
+            final DeviceChannel channel = DeviceChannels.createFromDevice(device);
+            final AtomicInteger count = new AtomicInteger(0);
+            knowledge.getKnowledge().forEach(((leafCategory, sensorKnowledge) -> {
+                final String sensorName = "sensor" + count.getAndIncrement();
+                signal("newSensor", device.getName(), sensorName, channel, leafCategory, sensorKnowledge);
+            }));
+            return true;
+        } catch (final Exception e) {
+            Log.e(DEVICE_COMMUNICATION_TAG, "Error in handleNewDevice: " + e.getLocalizedMessage());
+            return false;
+        }
+    }
+
+    private DeviceKnowledge checkDeviceKnowledge(){
+        final Map<LeafCategory, SensorKnowledge> knowledge = new HashMap<>();
+        final SensorKnowledge tempKnowledge = new SensorKnowledge.SensorKnowledgeBuilder()
+                .sensorDataIdentifier("body/temperature")
+                .reqDataMessage("get/body/temperature")
+                .subForDataMessage("subscribe/body/temperature")
+                .unitOfMeasure("°C")
+                .build();
+        final SensorKnowledge spo2Knowledge = new SensorKnowledge.SensorKnowledgeBuilder()
+                .sensorDataIdentifier("body/oxygen")
+                .reqDataMessage("get/body/oxygen")
+                .subForDataMessage("subscribe/body/oxygen")
+                .unitOfMeasure("???")
+                .build();
+        final SensorKnowledge heartRateKnowledge = new SensorKnowledge.SensorKnowledgeBuilder()
+                .sensorDataIdentifier("body/heartrate")
+                .reqDataMessage("get/body/heartrate")
+                .subForDataMessage("subscribe/body/heartrate")
+                .unitOfMeasure("???")
+                .build();
+
+        knowledge.put(LeafCategory.TEMPERATURE, tempKnowledge);
+        knowledge.put(LeafCategory.BLOOD_OXIGEN, spo2Knowledge);
+        knowledge.put(LeafCategory.HEART_RATE, heartRateKnowledge);
+
+        return new DeviceKnowledge(knowledge);
     }
 
 }

@@ -1,3 +1,8 @@
+/*
+    -- Knowledge --
+    sensor(DeviceName, SensorName)
+*/
+
 @start[atomic]
 +activate <-
     makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
@@ -5,7 +10,8 @@
 	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Bluetooth], Communication);
 	focus(Communication);
 	!linkToView(Communication);
-	.print("Device Manager ready").
+	.print("Device Manager ready");
+	!!checkSensorData.
 
 +!linkToView(CommId) <-
 	lookupArtifact("mainUI", MainUI);
@@ -15,8 +21,34 @@
 	.wait(100)
 	!linkToView(ID).
 
-+newDevice(Device) <-
-    .print("New device connected! ");
-    println(Device).
++!checkSensorData <-
+    .wait(2000);
+    .findall(X,sensor(_,X),L);
+    !askForData(L);
+    .findall(data(X,Y,Z),data(X,Y,Z),L2);
+    !updateState(L2);
+    !!checkSensorData.
+
+-!checkSensorData <- .print("Error in checkSensorData!"); !!checkSensorData.
+
++!askForData([]).
++!askForData([H|T]) <-
+    sendDataRequest[artifact_name(H)];
+    !askForData(T).
+
++!updateState([]).
++!updateState([data(LeafCategory,Value,UnitOfMeasure)|T]) <-
+    .print(LeafCategory);
+    .print(Value);
+    .print(UnitOfMeasure);
+    .print("-------------------");
+    !updateState(T).
+
++newSensor(DeviceName, SensorName, Channel, LeafCategory, SensorKnowledge) <-
+    makeArtifact(SensorName, "it.unibo.citizenDigitalTwin.artifact.ExternalSensorArtifact", [Channel, LeafCategory, SensorKnowledge], Id);
+    focus(Id);
+    +sensor(DeviceName,SensorName);
+    sendDataRequest[artifact_id(Id)];
+    println(SensorName).
 
 +shutdown <- disconnectBTServices.

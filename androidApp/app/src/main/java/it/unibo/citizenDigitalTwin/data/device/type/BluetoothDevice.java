@@ -3,17 +3,16 @@ package it.unibo.citizenDigitalTwin.data.device.type;
 import android.bluetooth.BluetoothSocket;
 import android.os.Parcel;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
 public class BluetoothDevice extends AbstractDevice {
 
-    private android.bluetooth.BluetoothDevice device;
+    private final android.bluetooth.BluetoothDevice device;
     private BluetoothSocket socket;
 
     public BluetoothDevice(final android.bluetooth.BluetoothDevice device) {
-        super(device.getName(), new ArrayList<>());
+        super(device.getName());
         this.device = device;
     }
 
@@ -33,6 +32,8 @@ public class BluetoothDevice extends AbstractDevice {
     public void setSocket(final BluetoothSocket socket) {
         this.socket = socket;
     }
+
+    /* ----------------------------------------------- */
 
     @Override
     public boolean equals(Object o) {
