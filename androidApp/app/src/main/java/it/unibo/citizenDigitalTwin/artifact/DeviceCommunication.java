@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cartago.ARTIFACT_INFO;
@@ -112,14 +113,17 @@ public class DeviceCommunication extends JaCaArtifact {
             final OpFeedbackParam<Observable<Device>> op = new OpFeedbackParam<>();
             try{
                 execLinkedOp(x, "getAvailableDevices", op);
-                op.get().subscribe(DeviceCommunication.this, device -> {
-                    if(!devices.contains(device)){
-                        devices.add(device);
-                        beginExternalSession();
-                        updateObsProperty(PROP_DISCOVERED_DEVICES, devices);
-                        endExternalSession(true);
-                    }
-                });
+                final Observable<Device> observable = op.get();
+                if(Objects.nonNull(observable)){
+                    observable.subscribe(DeviceCommunication.this, device -> {
+                        if(!devices.contains(device)){
+                            devices.add(device);
+                            beginExternalSession();
+                            updateObsProperty(PROP_DISCOVERED_DEVICES, devices);
+                            endExternalSession(true);
+                        }
+                    });
+                }
             } catch (Exception e){
                 Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
             }
@@ -134,7 +138,10 @@ public class DeviceCommunication extends JaCaArtifact {
                 final OpFeedbackParam<List<Device>> op = new OpFeedbackParam<>();
                 try{
                     execLinkedOp(x, "getPairedDevices", op);
-                    result.addAll(op.get());
+                    final List<Device> devices = op.get();
+                    if(Objects.nonNull(devices)){
+                        result.addAll(devices);
+                    }
                 } catch (Exception e){
                     Log.e(DEVICE_COMMUNICATION_TAG, "Error in updatePairDevices: " + e.getLocalizedMessage());
                 }
