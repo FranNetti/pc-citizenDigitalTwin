@@ -28,6 +28,9 @@ import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannels;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that handles the initiation and the end of a connection with an external device
+ */
 @ARTIFACT_INFO(
         outports = {
                 @OUTPORT(name = "technologies")

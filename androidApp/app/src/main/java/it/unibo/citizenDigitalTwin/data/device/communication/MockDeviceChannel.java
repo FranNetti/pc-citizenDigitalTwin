@@ -7,12 +7,15 @@ import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.Observable;
 
-public class DeviceChannelStub implements DeviceChannel {
+/**
+ * Mock device channel used for testing porpoises
+ */
+public class MockDeviceChannel implements DeviceChannel {
 
     final Thread t;
     final Observable<MsgReceived> msgReceivedObservable;
 
-    public DeviceChannelStub(){
+    public MockDeviceChannel(){
         msgReceivedObservable = new Observable<>();
         t = new Thread(() -> {
             while(true) {

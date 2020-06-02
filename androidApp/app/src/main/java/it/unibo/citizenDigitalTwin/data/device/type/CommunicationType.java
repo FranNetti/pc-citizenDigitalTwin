@@ -5,6 +5,9 @@ import android.graphics.drawable.Drawable;
 
 import it.unibo.citizenDigitalTwin.R;
 
+/**
+ * Type of communication with a device
+ */
 public enum CommunicationType {
 
     BT(R.drawable.ic_baseline_bluetooth_24),

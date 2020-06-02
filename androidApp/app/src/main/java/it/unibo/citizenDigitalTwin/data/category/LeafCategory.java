@@ -9,6 +9,9 @@ import it.unibo.citizenDigitalTwin.R;
 
 import static it.unibo.citizenDigitalTwin.data.category.GroupCategory.*;
 
+/**
+ * Low level categories of the system
+ */
 public enum LeafCategory {
 
     NAME(PERSONAL_DATA, "name", R.string.LC_name),

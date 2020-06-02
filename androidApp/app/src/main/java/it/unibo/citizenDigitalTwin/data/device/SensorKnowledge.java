@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import it.unibo.citizenDigitalTwin.data.Builder;
 
+/**
+ * Class that contains all the information needed to communicate with a device's sensor
+ */
 public class SensorKnowledge {
 
     private final String sensorDataIdentifier;
@@ -36,6 +39,9 @@ public class SensorKnowledge {
     }
 
 
+    /**
+     * Builder for the {@link SensorKnowledge} class
+     */
     public static class SensorKnowledgeBuilder implements Builder<SensorKnowledge> {
 
         private String sensorDataIdentifier;

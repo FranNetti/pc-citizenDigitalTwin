@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
-public abstract class AbstractDevice implements Device {
+abstract class AbstractDevice implements Device {
 
     private final String name;
     private final List<LeafCategory> categories;

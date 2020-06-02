@@ -6,6 +6,9 @@ import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannel;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that represents external sensor from which it is possible to gather data
+ */
 public class ExternalSensorArtifact extends JaCaArtifact {
 
     private static final String PROP_DATA = "data";

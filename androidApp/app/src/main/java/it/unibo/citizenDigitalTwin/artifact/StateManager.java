@@ -14,6 +14,9 @@ import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that represent the current state of the user
+ */
 public class StateManager extends JaCaArtifact {
 
     private static final String PROP_STATE = "state";

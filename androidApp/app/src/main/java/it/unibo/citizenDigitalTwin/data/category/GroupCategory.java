@@ -8,6 +8,9 @@ import java.util.stream.Stream;
 
 import it.unibo.citizenDigitalTwin.R;
 
+/**
+ * High level categories of the system
+ */
 public enum GroupCategory {
 
     PERSONAL_DATA("personalData", R.string.GC_personal_data, R.drawable.ic_personal_black_24dp),

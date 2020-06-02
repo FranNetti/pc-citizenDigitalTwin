@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -141,17 +140,6 @@ public class BluetoothHelper {
         }
         return Optional.of(socket);
     }
-
-    /*public static boolean sendMessage(final BluetoothSocket socket, final String message){
-        try {
-            final OutputStream channel = socket.getOutputStream();
-            channel.write(message.getBytes());
-            return true;
-        } catch (final IOException e) {
-            Log.e(BLUETOOTH_HELPER_TAG, "Error occurred when sending data: " + e.getLocalizedMessage());
-            return false;
-        }
-    }*/
 
     /**
      * Close the bluetooth connection to a device

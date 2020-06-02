@@ -6,6 +6,9 @@ import android.os.Parcel;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A wrapper for the {@link android.bluetooth.BluetoothDevice} that is compatible with the interface {@link Device}
+ */
 public class BluetoothDevice extends AbstractDevice {
 
     private final android.bluetooth.BluetoothDevice device;

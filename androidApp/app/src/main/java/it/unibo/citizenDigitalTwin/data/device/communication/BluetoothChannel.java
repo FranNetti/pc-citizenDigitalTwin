@@ -13,6 +13,9 @@ import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.Observable;
 
+/**
+ * Class that represent a channel for the Bluetooth technology
+ */
 public class BluetoothChannel extends Thread implements DeviceChannel {
 
     private static final String TAG = "[BluetoothCommunicator]";

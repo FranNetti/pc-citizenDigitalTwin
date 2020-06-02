@@ -42,6 +42,9 @@ import it.unibo.citizenDigitalTwin.ui.util.StateViewer;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
+/**
+ * Artifact that represents the main view
+ */
 @ARTIFACT_INFO(
         outports = {
                 @OUTPORT(name = "deviceManagement")

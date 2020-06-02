@@ -21,6 +21,9 @@ import it.unibo.citizenDigitalTwin.data.device.type.CommunicationType;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that handles the bluetooth
+ */
 public class BluetoothArtifact extends JaCaArtifact {
 
     private static final String PROP_NO_BLUETOOTH = "noBluetooth";
