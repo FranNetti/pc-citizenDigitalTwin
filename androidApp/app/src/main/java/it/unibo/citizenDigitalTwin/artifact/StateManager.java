@@ -24,8 +24,8 @@ public class StateManager extends JaCaArtifact {
     public void init() {
         State state = new State();
         state = state.addData(LeafCategory.NAME, new DataBuilder()
-                .dataCategory(LeafCategory.NAME)
-                .value("Francesco")
+                .leafCategory(LeafCategory.NAME)
+                .addInformation("value", "Francesco")
                 .feeder(new Feeder("", "Francesco Grandinetti"))
                 .build());
         defineObsProperty(PROP_STATE, state);
@@ -41,6 +41,11 @@ public class StateManager extends JaCaArtifact {
 
         state = state.addMultipleData(newData);
         stateProp.updateValue(state);
+    }
+
+    @OPERATION
+    void updateStateFromSingleData(final Data data){
+        System.out.println(data.getInformation());
     }
 
 }

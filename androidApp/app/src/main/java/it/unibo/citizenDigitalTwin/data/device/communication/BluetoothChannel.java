@@ -20,7 +20,6 @@ public class BluetoothChannel extends Thread implements DeviceChannel {
 
     private static final String TAG = "[BluetoothCommunicator]";
 
-    private final BluetoothSocket socket;
     private final InputStream inCommunication;
     private final OutputStream outCommunication;
     private boolean work;
@@ -29,7 +28,6 @@ public class BluetoothChannel extends Thread implements DeviceChannel {
 
     BluetoothChannel(final BluetoothSocket socket) throws IOException {
         Objects.requireNonNull(socket);
-        this.socket = socket;
         this.inCommunication = socket.getInputStream();
         this.outCommunication = socket.getOutputStream();
         this.work = true;
@@ -60,7 +58,7 @@ public class BluetoothChannel extends Thread implements DeviceChannel {
     }
 
     @Override
-    public void askForData(final String reqMessage) {
+    public synchronized void askForData(final String reqMessage) {
         try{
             final String message = reqMessage + '\n';
             outCommunication.write(message.getBytes());

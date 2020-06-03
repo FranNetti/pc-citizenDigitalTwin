@@ -2,6 +2,7 @@ package it.unibo.citizenDigitalTwin.db.entity.data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import androidx.annotation.NonNull;
@@ -17,37 +18,43 @@ import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 public class Data implements Serializable {
 
     @PrimaryKey @NonNull @ColumnInfo(name = "leafCategory") private String leafCategoryName;
-    @ColumnInfo private long timestamp;
+    @ColumnInfo private Date date;
     @ColumnInfo(defaultValue = "") private String identifier;
-    @ColumnInfo() private String value;
+    @ColumnInfo() private Map<String, String> information;
     @Embedded private Feeder feeder;
 
-    @Ignore private Date date;
     @Ignore private LeafCategory leafCategory;
 
     @Ignore
-    public Data(final String identifier, final Date date, final Feeder feeder, final LeafCategory dataCategory, final String value) {
+    public Data(
+            final String identifier,
+            final Date date,
+            final Feeder feeder,
+            final LeafCategory dataCategory,
+            final Map<String, String> information) {
         this.identifier = identifier;
-        this.timestamp = date.getTime();
         this.date = date;
         this.feeder = feeder;
         this.leafCategory = dataCategory;
         this.leafCategoryName = dataCategory.getIdentifier();
-        this.value = value;
+        this.information = information;
     }
 
     @Ignore
-    public Data(final Date date, final Feeder feeder, final LeafCategory dataCategory, final String value) {
-        this("", date, feeder, dataCategory, value);
+    public Data(final Date date,
+                final Feeder feeder,
+                final LeafCategory dataCategory,
+                final Map<String, String> information) {
+        this("", date, feeder, dataCategory, information);
     }
 
     public Data(
             final String identifier,
-            final long timestamp,
+            final Date date,
             final Feeder feeder,
             final String leafCategoryName,
-            final String value) throws NoSuchElementException {
-        this(identifier, new Date(timestamp), feeder, LeafCategory.findByLeafIdentifier(leafCategoryName).get(), value);
+            final Map<String, String> information) throws NoSuchElementException {
+        this(identifier, date, feeder, LeafCategory.findByLeafIdentifier(leafCategoryName).get(), information);
     }
 
     public String getIdentifier() {
@@ -56,10 +63,6 @@ public class Data implements Serializable {
 
     public Date getDate() {
         return date;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
     }
 
     public Feeder getFeeder() {
@@ -74,8 +77,8 @@ public class Data implements Serializable {
         return leafCategoryName;
     }
 
-    public String getValue() {
-        return value;
+    public Map<String, String> getInformation() {
+        return information;
     }
 
     public void setLeafCategory(LeafCategory leafCategory) {
@@ -88,22 +91,16 @@ public class Data implements Serializable {
         LeafCategory.findByLeafIdentifier(leafCategoryName).ifPresent(value -> this.leafCategory = value);
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-        this.date = new Date(timestamp);
-    }
-
     public void setDate(Date date) {
         this.date = date;
-        this.timestamp = date.getTime();
     }
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setInformation(Map<String, String> information) {
+        this.information = information;
     }
 
     public void setFeeder(Feeder feeder) {

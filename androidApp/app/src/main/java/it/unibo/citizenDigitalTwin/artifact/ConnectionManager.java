@@ -22,27 +22,27 @@ public class ConnectionManager extends JaCaArtifact {
     private List<List<Data>> fakeStates = Arrays.asList(
             Arrays.asList(
                     new DataBuilder()
-                            .dataCategory(LeafCategory.NAME)
-                            .value("Stefano")
+                            .leafCategory(LeafCategory.NAME)
+                            .addInformation("value", "Stefano")
                             .feeder(fakeFeeder)
                             .build(),
                     new DataBuilder()
-                            .dataCategory(LeafCategory.SURNAME)
-                            .value("Righini")
+                            .leafCategory(LeafCategory.SURNAME)
+                            .addInformation("value", "Righini")
                             .feeder(fakeFeeder)
                             .build()
             ),
             Arrays.asList(
                     new DataBuilder()
-                            .dataCategory(LeafCategory.BIRTHDATE)
-                            .value("24-10-1996")
+                            .leafCategory(LeafCategory.BIRTHDATE)
+                            .addInformation("value", "24-10-1996")
                             .feeder(fakeFeeder)
                             .build()
             ),
             Arrays.asList(
                     new DataBuilder()
-                            .dataCategory(LeafCategory.ADDRESS)
-                            .value("Via Luca Ghini 4")
+                            .leafCategory(LeafCategory.ADDRESS)
+                            .addInformation("value", "Via Luca Ghini 4")
                             .feeder(fakeFeeder)
                             .build()
             )
@@ -55,7 +55,7 @@ public class ConnectionManager extends JaCaArtifact {
     @OPERATION
     void send(final List<Data> state) {
         state.forEach(data -> {
-            System.out.println("{data_category: " + data.getLeafCategory() + " | value: " + data.getValue() + "}");
+            //System.out.println("{data_category: " + data.getLeafCategory() + " | value: " + data.getValue() + "}");
         });
     }
 

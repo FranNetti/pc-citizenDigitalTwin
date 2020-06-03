@@ -147,6 +147,7 @@ public class DeviceCommunication extends JaCaArtifact {
         propDevices.updateValue(devices);
         try{
             final DeviceChannel channel = DeviceChannels.createFromDevice(device);
+            channel.start();
             final AtomicInteger count = new AtomicInteger(0);
             knowledge.getKnowledge().forEach(((leafCategory, sensorKnowledge) -> {
                 final String sensorName = "sensor" + count.getAndIncrement();

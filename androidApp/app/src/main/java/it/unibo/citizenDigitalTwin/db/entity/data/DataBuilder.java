@@ -1,6 +1,8 @@
 package it.unibo.citizenDigitalTwin.db.entity.data;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import it.unibo.citizenDigitalTwin.data.Builder;
@@ -13,7 +15,7 @@ public class DataBuilder implements Builder<Data> {
     private Date date;
     private Feeder feeder;
     private LeafCategory dataCategory;
-    private String value;
+    private Map<String, String> information = new HashMap<>();
 
     public DataBuilder uri(final String uri) {
         this.identifier = uri;
@@ -30,25 +32,32 @@ public class DataBuilder implements Builder<Data> {
         return this;
     }
 
-    public DataBuilder dataCategory(final LeafCategory dataCategory) {
+    public DataBuilder leafCategory(final LeafCategory dataCategory) {
         this.dataCategory = dataCategory;
         return this;
     }
 
-    public DataBuilder value(final String value) {
-        this.value = value;
+    public DataBuilder addInformation(final String informationType, final String value) {
+        Objects.requireNonNull(informationType);
+        Objects.requireNonNull(value);
+        if(informationType.isEmpty() || informationType.trim().isEmpty() || value.isEmpty() || value.trim().isEmpty()){
+            throw new IllegalArgumentException("The parameters must not be empty!");
+        }
+        information.put(informationType, value);
         return this;
     }
 
     @Override
-    public Data build() throws NullPointerException {
+    public Data build() throws NullPointerException, IllegalStateException {
         Objects.requireNonNull(dataCategory);
-        Objects.requireNonNull(value);
         Objects.requireNonNull(feeder);
+        if(information.isEmpty()){
+            throw new IllegalStateException("There is no information!");
+        }
         if (Objects.isNull(date)) {
             date = new Date();
         }
-        return new Data(identifier,date,feeder,dataCategory,value);
+        return new Data(identifier,date,feeder,dataCategory,information);
     }
 
 }

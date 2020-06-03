@@ -12,8 +12,8 @@ import it.unibo.citizenDigitalTwin.data.Observable;
  */
 public class MockDeviceChannel implements DeviceChannel {
 
-    final Thread t;
-    final Observable<MsgReceived> msgReceivedObservable;
+    private final Thread t;
+    private final Observable<MsgReceived> msgReceivedObservable;
 
     public MockDeviceChannel(){
         msgReceivedObservable = new Observable<>();
@@ -28,7 +28,6 @@ public class MockDeviceChannel implements DeviceChannel {
                 }
             }
         });
-        t.start();
     }
 
     @Override
@@ -43,5 +42,10 @@ public class MockDeviceChannel implements DeviceChannel {
     @Override
     public void unsubscribeFromIncomingMessages(Object subscriber) {
         msgReceivedObservable.unsubscribe(subscriber);
+    }
+
+    @Override
+    public void start() {
+        t.start();
     }
 }

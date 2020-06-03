@@ -26,4 +26,9 @@ public interface DeviceChannel {
      */
     void unsubscribeFromIncomingMessages(final Object subscriber);
 
+    /**
+     * Start communication with the device
+     */
+    void start();
+
 }
