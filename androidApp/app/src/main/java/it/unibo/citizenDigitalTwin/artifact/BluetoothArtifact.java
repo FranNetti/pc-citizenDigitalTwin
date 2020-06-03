@@ -100,6 +100,7 @@ public class BluetoothArtifact extends JaCaArtifact {
             final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
             if(Objects.nonNull(activity)){
                 BluetoothHelper.scanAvailableDevices(adapter, activity, deviceFound -> {
+                    //TODO filter for BluetoothClass.Device.Major.HEALTH
                     observable.set(new BluetoothDevice(deviceFound));
                 });
             }

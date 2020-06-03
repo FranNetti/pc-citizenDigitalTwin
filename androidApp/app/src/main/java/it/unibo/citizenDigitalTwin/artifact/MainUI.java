@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toolbar;
 
@@ -22,8 +21,6 @@ import cartago.ARTIFACT_INFO;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.OUTPORT;
-import cartago.OpFeedbackParam;
-import cartago.OperationException;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
@@ -65,7 +62,8 @@ public class MainUI extends ActivityArtifact {
 
     public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
 
-    private static final int BL_USE_REQ_CODE = 12;
+    private static final int GPS_REQ_CODE = 12;
+    private static final int GPS_BACKGROUND_REQ_CODE = 13;
     private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
 
@@ -152,8 +150,13 @@ public class MainUI extends ActivityArtifact {
     protected void setup() {
         ActivityCompat.requestPermissions(
                 (Activity) getActivityContext(),
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                BL_USE_REQ_CODE
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                GPS_REQ_CODE
+        );
+        ActivityCompat.requestPermissions(
+                (Activity) getActivityContext(),
+                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                GPS_BACKGROUND_REQ_CODE
         );
         notifications = Arrays.asList(
                 new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),

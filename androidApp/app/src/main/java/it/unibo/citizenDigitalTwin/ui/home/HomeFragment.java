@@ -22,6 +22,7 @@ import it.unibo.citizenDigitalTwin.artifact.MainUI;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
@@ -111,7 +112,7 @@ public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter
         final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
         userNameInfo.ifPresent(name -> {
             if(Objects.nonNull(userName)){
-                userName.setText(name.getInformation().get(LeafCategory.DEFAULT_VALUE_IDENTIFIER));
+                userName.setText(name.getInformation().get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getMessage()));
             }
         });
     }

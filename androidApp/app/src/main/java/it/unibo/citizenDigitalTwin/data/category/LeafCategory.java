@@ -25,9 +25,6 @@ public enum LeafCategory {
     MEDICAL_RECORD(MEDICAL_DATA, "medicalRecord", R.string.LC_medical_record),
     POSITION(LOCATION, "position", R.string.LC_position);
 
-    public static final String DEFAULT_VALUE_IDENTIFIER = "value";
-    public static final String DEFAULT_UNIT_OF_MEASURE_IDENTIFIER = "um";
-
     private final GroupCategory groupCategory;
     private final String identifier;
     private final int displayName;

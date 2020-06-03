@@ -7,8 +7,11 @@
 +activate <-
     makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
     focus(Bluetooth);
+    makeArtifact("GPS", "it.unibo.citizenDigitalTwin.artifact.GPSArtifact", [], GPS);
+    focus(GPS);
 	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Bluetooth], Communication);
 	focus(Communication);
+	subscribeForLocationUpdates;
 	!linkToView(Communication);
 	!observeState;
 	.print("Device Manager ready");
