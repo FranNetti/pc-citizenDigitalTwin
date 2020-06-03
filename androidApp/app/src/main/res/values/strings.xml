@@ -23,7 +23,7 @@
     <string name="discovered_devices_title">Discovered devices</string>
     <string name="device_type_icon">Device Type icon</string>
     <string name="device_name_not_found">Device name not found</string>
-    <string name="add_device_text">Please type the device model that you have selected</string>
+    <string name="add_device_text">Please type the model of the device that you have selected</string>
     <string name="add_device_hint">Device model</string>
     <string name="add_device_title">Insert device model</string>
     <string name="add_device_positive">Connect</string>
