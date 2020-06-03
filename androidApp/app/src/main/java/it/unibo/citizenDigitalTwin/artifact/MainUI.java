@@ -122,6 +122,13 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
+    public void showResultOfDisconnectionToDevice(final boolean success){
+        if(!success && currentFragment instanceof DevicesFragment){
+            execute(() -> ((DevicesFragment) currentFragment).disconnectionFailed());
+        }
+    }
+
+    @OPERATION
     public void readNotification(final List<Notification> notifications){
         final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
         final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
@@ -139,21 +146,6 @@ public class MainUI extends ActivityArtifact {
     public void newSubView(final FragmentWithId fragment){
         this.currentFragment = fragment;
         updateObsProperty(PAGE_SHOWN_PROP, fragment.getFragmentId());
-    }
-
-    @OPERATION
-    public void disconnectFromDevice(final Device device) {
-        execInternalOp("sendDisconnectFromDeviceRequest", device);
-    }
-
-    @INTERNAL_OPERATION
-    protected void sendDisconnectFromDeviceRequest(final Device device) {
-        try {
-            OpFeedbackParam<Boolean> operationResult = new OpFeedbackParam<>();
-            execLinkedOp("deviceManagement", "disconnectFromDevice",device, operationResult);
-        } catch (OperationException e) {
-            Log.e(MAIN_UI_TAG, "Error in sendRemoveDeviceRequest --> " + e.getLocalizedMessage());
-        }
     }
 
     @INTERNAL_OPERATION
@@ -282,7 +274,7 @@ public class MainUI extends ActivityArtifact {
 
         public void disconnectFromDevice(final Device device) {
             MainUI.this.beginExternalSession();
-            MainUI.this.disconnectFromDevice(device);
+            signal("deviceToDisconnect", device);
             MainUI.this.endExternalSession(true);
         }
 

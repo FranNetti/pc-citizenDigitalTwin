@@ -83,14 +83,27 @@ public class DeviceCommunication extends JaCaArtifact {
         }
     }
 
-    @LINK
+    @OPERATION
     public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnected) {
-        final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
-        final List<Device> devices = (List<Device>)propDevices.getValue();
-
-        devices.remove(device);
-        propDevices.updateValue(devices);
-        disconnected.set(true);
+        /*final AtomicBoolean success = new AtomicBoolean(false);
+        this.technologies.forEach(x -> {
+            final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
+            try{
+                execLinkedOp(x, "disconnectDevice", device, op);
+                success.set(success.get() | op.get());
+            } catch (Exception e){
+                Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
+            }
+        });*/
+        final AtomicBoolean success = new AtomicBoolean(true);
+        if(success.get()){
+            final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
+            final List<Device> devices = (List<Device>)propDevices.getValue();
+            devices.remove(device);
+            propDevices.updateValue(devices);
+            signal("deviceDisconnected", device.getName());
+        }
+        disconnected.set(success.get());
     }
 
     @OPERATION
@@ -149,8 +162,9 @@ public class DeviceCommunication extends JaCaArtifact {
             final DeviceChannel channel = DeviceChannels.createFromDevice(device);
             channel.start();
             final AtomicInteger count = new AtomicInteger(0);
+            final String baseName = device.getName() + "-sensor";
             knowledge.getKnowledge().forEach(((leafCategory, sensorKnowledge) -> {
-                final String sensorName = "sensor" + count.getAndIncrement();
+                final String sensorName = baseName + count.getAndIncrement();
                 signal("newSensor", device.getName(), sensorName, channel, leafCategory, sensorKnowledge);
             }));
             return true;

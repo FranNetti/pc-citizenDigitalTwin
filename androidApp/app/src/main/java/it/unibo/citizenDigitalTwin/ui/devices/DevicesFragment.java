@@ -111,8 +111,16 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
     }
 
     public void connectionFailed(){
+        showDialog(R.string.connection_failed);
+    }
+
+    public void disconnectionFailed(){
+        showDialog(R.string.disconnection_failed);
+    }
+
+    private void showDialog(final int message){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(R.string.connection_failed)
+        builder.setMessage(message)
                 .setPositiveButton(android.R.string.ok, null);
         final AlertDialog dialog = builder.create();
         dialog.show();

@@ -76,7 +76,7 @@ public class BluetoothArtifact extends JaCaArtifact {
     }
 
     @LINK
-    public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnectionSuccessful){
+    public void disconnectDevice(final Device device, final OpFeedbackParam<Boolean> disconnectionSuccessful){
         if(device.getCommunicationType() == CommunicationType.BT) {
             final BluetoothDevice deviceBT = (BluetoothDevice)device;
             if (!hasObsProperty(PROP_NO_BLUETOOTH)) {

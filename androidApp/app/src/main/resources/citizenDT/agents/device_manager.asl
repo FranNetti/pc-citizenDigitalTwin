@@ -43,12 +43,26 @@
     sendDataRequest[artifact_name(H)];
     !askForData(T).
 
++!deleteSensors(DeviceName, L) <- !unsubscribeFromSensors(DeviceName, L).
+
++!unsubscribeFromSensors(DeviceName, []).
++!unsubscribeFromSensors(DeviceName, [H|T]) <-
+    unsubscribeForData[artifact_name(H)];
+    lookupArtifact(H,Id);
+    disposeArtifact(Id);
+    -sensor(DeviceName, H);
+    !!unsubscribeFromSensors(DeviceName, T).
+
 +newSensor(DeviceName, SensorName, Channel, LeafCategory, SensorKnowledge) <-
     makeArtifact(SensorName, "it.unibo.citizenDigitalTwin.artifact.ExternalSensorArtifact", [DeviceName, Channel, LeafCategory, SensorKnowledge], Id);
     focus(Id);
     +sensor(DeviceName,SensorName);
     sendDataRequest[artifact_id(Id)];
     println(SensorName).
+
++deviceDisconnected(DeviceName) <-
+    .findall(X,sensor(DeviceName,X),L);
+    !!deleteSensors(DeviceName, L).
 
 +data(Data) <- updateStateFromSingleData(Data).
 

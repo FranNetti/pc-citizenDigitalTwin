@@ -29,6 +29,7 @@
     <string name="add_device_positive">Connect</string>
     <string name="add_device_error_text">This field must contain at least one character</string>
     <string name="connection_failed">The connection with the device has failed, try again.</string>
+    <string name="disconnection_failed">The disconnection from the device has failed, try again.</string>
 
     /* -----------------Leaf categories-----------------*/
     <string name="LC_name">Name</string>
