@@ -1,29 +1,31 @@
 package it.unibo.citizenDigitalTwin.db.dao;
 
+import java.util.Collection;
 import java.util.List;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import io.reactivex.Flowable;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 
 @Dao
 public interface DataDAO {
 
     @Query("SELECT * FROM state")
-    LiveData<List<Data>> getAll();
+    Flowable<List<Data>> getAll();
 
     @Query("SELECT * FROM state WHERE leafCategory LIKE :leafCategoryName LIMIT 1")
-    LiveData<Data> getDataFromCategory(String leafCategoryName);
+    Flowable<Data> getDataFromCategory(String leafCategoryName);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Data data);
 
-    @Insert
-    void insertAll(Data... data);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(Collection<Data> data);
 
     @Query("DELETE FROM state")
     void clear();

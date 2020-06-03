@@ -1,6 +1,5 @@
-!start.
-
-+!start <-
+@start[atomic]
++activate <-
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
 	focus(StateManager);
 	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",[],ConnectionManager);

@@ -1,17 +1,13 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+import androidx.room.Room;
 import cartago.OPERATION;
-import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.db.entity.Feeder;
+import it.unibo.citizenDigitalTwin.db.AppDatabase;
+import it.unibo.citizenDigitalTwin.db.dao.DataDAO;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
-import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
@@ -21,31 +17,31 @@ public class StateManager extends JaCaArtifact {
 
     private static final String PROP_STATE = "state";
 
+    private DataDAO dbState;
+
     public void init() {
-        State state = new State();
-        state = state.addData(LeafCategory.NAME, new DataBuilder()
-                .leafCategory(LeafCategory.NAME)
-                .addInformation("value", "Francesco")
-                .feeder(new Feeder("", "Francesco Grandinetti"))
-                .build());
-        defineObsProperty(PROP_STATE, state);
+
+        final AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, AppDatabase.DB_NAME).build();
+        this.dbState = db.dataDao();
+        defineObsProperty(PROP_STATE, new State());
+
+        /* RxJava Flowable */
+        dbState.getAll().forEach(dataList -> {
+            beginExternalSession();
+            updateObsProperty(PROP_STATE, new State(dataList));
+            endExternalSession(true);
+        });
     }
 
     @OPERATION
     void updateState(final List<Data> dataList) {
-        final ObsProperty stateProp = getObsProperty(PROP_STATE);
-        State state = (State)stateProp.getValue();
-
-        final Map<LeafCategory,Data> newData = dataList.stream()
-                .collect(Collectors.toMap(Data::getLeafCategory, Function.identity()));
-
-        state = state.addMultipleData(newData);
-        stateProp.updateValue(state);
+        dbState.insertAll(dataList);
     }
 
     @OPERATION
-    void updateStateFromSingleData(final Data data){
-        System.out.println(data.getInformation());
+    void updateStateFromSingleData(final Data newData){
+        dbState.insert(newData);
     }
 
 }

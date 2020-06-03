@@ -20,6 +20,7 @@
 +ui_ready [artifact_name(Id,MainUI)] <-
     +viewReady;
     .send(device_manager, tell, activate);
+    .send(cdt_manager, tell, activate);
     println("MainUI ready.");
     !!observeDevices.
 

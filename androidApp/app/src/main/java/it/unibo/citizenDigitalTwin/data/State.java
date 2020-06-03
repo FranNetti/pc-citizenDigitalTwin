@@ -1,9 +1,11 @@
 package it.unibo.citizenDigitalTwin.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
@@ -18,6 +20,12 @@ public class State {
         this(new HashMap<>());
     }
 
+    public State(final Collection<Data> dataCollection) {
+        this(dataCollection.stream().collect(
+                Collectors.toMap(Data::getLeafCategory, Function.identity())
+        ));
+    }
+
     private State(final Map<LeafCategory,Data> state) {
         this.state = state;
     }
@@ -30,9 +38,9 @@ public class State {
         return new HashMap<>(state);
     }
 
-    public State addData(final LeafCategory dataCategory, final Data data) {
+    public State addData(final Data data) {
         final Map<LeafCategory,Data> state = getState();
-        state.put(dataCategory, data);
+        state.put(data.getLeafCategory(), data);
         return new State(state);
     }
 
