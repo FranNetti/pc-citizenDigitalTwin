@@ -20,16 +20,15 @@ public class StateManager extends JaCaArtifact {
     private DataDAO dbState;
 
     public void init() {
-
         final AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
         this.dbState = db.dataDao();
         defineObsProperty(PROP_STATE, new State());
 
         /* RxJava Flowable */
-        dbState.getAll().forEach(dataList -> {
+        dbState.getAll().map(State::new).forEach(state -> {
             beginExternalSession();
-            updateObsProperty(PROP_STATE, new State(dataList));
+            updateObsProperty(PROP_STATE, state);
             endExternalSession(true);
         });
     }
@@ -41,6 +40,7 @@ public class StateManager extends JaCaArtifact {
 
     @OPERATION
     void updateStateFromSingleData(final Data newData){
+        //TODO set user uri in the feeder
         dbState.insert(newData);
     }
 
