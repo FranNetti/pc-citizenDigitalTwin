@@ -14,6 +14,7 @@ import java.util.Map;
 
 import androidx.room.TypeConverter;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 
 public class Converters {
 
@@ -21,13 +22,13 @@ public class Converters {
     private static final String LIST_LEAF_TAG = "leaves";
 
     @TypeConverter
-    public static Map<String, String> fromStringToMap(final String string){
-        final Map<String, String> map = new HashMap<>();
+    public static Map<CommunicationStandard, String> fromStringToMap(final String string){
+        final Map<CommunicationStandard, String> map = new HashMap<>();
         try{
             final JSONObject object = new JSONObject(string);
             object.keys().forEachRemaining(name -> {
                 try {
-                    map.put(name, object.getString(name));
+                    map.put(CommunicationStandard.valueOf(name), object.getString(name));
                 } catch (final Exception e){
                     Log.e(TAG, "Error in fromStringToMap: " + e.getLocalizedMessage());
                 }
@@ -39,11 +40,11 @@ public class Converters {
     }
 
     @TypeConverter
-    public static String fromMapToString(final Map<String,String> value){
+    public static String fromMapToString(final Map<CommunicationStandard,String> value){
         final JSONObject object = new JSONObject();
         try{
-            for(final Map.Entry<String, String> entry: value.entrySet()){
-                object.put(entry.getKey(), entry.getValue());
+            for(final Map.Entry<CommunicationStandard, String> entry: value.entrySet()){
+                object.put(entry.getKey().name(), entry.getValue());
             }
             return object.toString();
         } catch (final JSONException e){

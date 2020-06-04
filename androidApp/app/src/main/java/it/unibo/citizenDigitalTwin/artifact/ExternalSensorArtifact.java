@@ -29,11 +29,11 @@ public class ExternalSensorArtifact extends JaCaArtifact {
                         .feeder(feeder)
                         .leafCategory(leafCategory)
                         .addInformation(
-                                CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getMessage(),
+                                CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,
                                 msg.getValue()
                         )
                         .addInformation(
-                                CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER.getMessage(),
+                                CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER,
                                 knowledge.getUnitOfMeasure()
                         )
                         .build();

@@ -132,11 +132,11 @@ public class GPSArtifact extends JaCaArtifact {
                 .feeder(feeder)
                 .leafCategory(LeafCategory.POSITION)
                 .addInformation(
-                        CommunicationStandard.LATITUDE.getMessage(),
+                        CommunicationStandard.LATITUDE,
                         location.getLatitude() + ""
                 )
                 .addInformation(
-                        CommunicationStandard.LONGITUDE.getMessage(),
+                        CommunicationStandard.LONGITUDE,
                         location.getLongitude() + ""
                 )
                 .build();

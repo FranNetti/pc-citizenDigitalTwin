@@ -7,6 +7,7 @@ import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
@@ -26,26 +27,26 @@ public class ConnectionManager extends JaCaArtifact {
             Arrays.asList(
                     new DataBuilder()
                             .leafCategory(LeafCategory.NAME)
-                            .addInformation("value", "Stefano")
+                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Stefano")
                             .feeder(fakeFeeder)
                             .build(),
                     new DataBuilder()
                             .leafCategory(LeafCategory.SURNAME)
-                            .addInformation("value", "Righini")
+                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Righini")
                             .feeder(fakeFeeder)
                             .build()
             ),
             Arrays.asList(
                     new DataBuilder()
                             .leafCategory(LeafCategory.BIRTHDATE)
-                            .addInformation("value", "24-10-1996")
+                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "24-10-1996")
                             .feeder(fakeFeeder)
                             .build()
             ),
             Arrays.asList(
                     new DataBuilder()
                             .leafCategory(LeafCategory.ADDRESS)
-                            .addInformation("value", "Via Luca Ghini 4")
+                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Via Luca Ghini 4")
                             .feeder(fakeFeeder)
                             .build()
             )

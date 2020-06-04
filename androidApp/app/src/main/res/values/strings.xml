@@ -30,6 +30,9 @@
     <string name="add_device_error_text">This field must contain at least one character</string>
     <string name="connection_failed">The connection with the device has failed, try again.</string>
     <string name="disconnection_failed">The disconnection from the device has failed, try again.</string>
+    <string name="expand_item">Expand element</string>
+    <string name="feeder_text">Produced by</string>
+    <string name="date_text">In date</string>
 
     /* -----------------Leaf categories-----------------*/
     <string name="LC_name">Name</string>
@@ -48,5 +51,10 @@
     <string name="GC_personal_data">Personal Data</string>
     <string name="GC_licences">Your Licences</string>
     <string name="GC_legal_data">Legal Data</string>
+    /* -----------------Communication standard-----------------*/
+    <string name="value">Value</string>
+    <string name="um">Unit of measure</string>
+    <string name="lat">Latitude</string>
+    <string name="lng">Longitude</string>
 
 </resources>

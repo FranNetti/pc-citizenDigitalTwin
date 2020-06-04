@@ -112,7 +112,7 @@ public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter
         final Optional<Data> userNameInfo = state.getData(LeafCategory.NAME);
         userNameInfo.ifPresent(name -> {
             if(Objects.nonNull(userName)){
-                userName.setText(name.getInformation().get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getMessage()));
+                userName.setText(name.getInformation().get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER));
             }
         });
     }

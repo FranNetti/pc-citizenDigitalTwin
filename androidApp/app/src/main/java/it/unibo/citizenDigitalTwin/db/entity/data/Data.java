@@ -12,6 +12,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
 @Entity(tableName = "state")
@@ -20,7 +21,7 @@ public class Data implements Serializable {
     @PrimaryKey @NonNull @ColumnInfo(name = "leafCategory") private String leafCategoryName;
     @ColumnInfo private Date date;
     @ColumnInfo(defaultValue = "") private String identifier;
-    @ColumnInfo() private Map<String, String> information;
+    @ColumnInfo() private Map<CommunicationStandard, String> information;
     @Embedded private Feeder feeder;
 
     @Ignore private LeafCategory leafCategory;
@@ -31,7 +32,7 @@ public class Data implements Serializable {
             final Date date,
             final Feeder feeder,
             final LeafCategory dataCategory,
-            final Map<String, String> information) {
+            final Map<CommunicationStandard, String> information) {
         this.identifier = identifier;
         this.date = date;
         this.feeder = feeder;
@@ -44,7 +45,7 @@ public class Data implements Serializable {
     public Data(final Date date,
                 final Feeder feeder,
                 final LeafCategory dataCategory,
-                final Map<String, String> information) {
+                final Map<CommunicationStandard, String> information) {
         this("", date, feeder, dataCategory, information);
     }
 
@@ -53,7 +54,7 @@ public class Data implements Serializable {
             final Date date,
             final Feeder feeder,
             final String leafCategoryName,
-            final Map<String, String> information) throws NoSuchElementException {
+            final Map<CommunicationStandard, String> information) throws NoSuchElementException {
         this(identifier, date, feeder, LeafCategory.findByLeafIdentifier(leafCategoryName).get(), information);
     }
 
@@ -77,7 +78,7 @@ public class Data implements Serializable {
         return leafCategoryName;
     }
 
-    public Map<String, String> getInformation() {
+    public Map<CommunicationStandard, String> getInformation() {
         return information;
     }
 
@@ -99,7 +100,7 @@ public class Data implements Serializable {
         this.identifier = identifier;
     }
 
-    public void setInformation(Map<String, String> information) {
+    public void setInformation(Map<CommunicationStandard, String> information) {
         this.information = information;
     }
 

@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import it.unibo.citizenDigitalTwin.data.Builder;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
 public class DataBuilder implements Builder<Data> {
@@ -15,7 +16,7 @@ public class DataBuilder implements Builder<Data> {
     private Date date;
     private Feeder feeder;
     private LeafCategory dataCategory;
-    private Map<String, String> information = new HashMap<>();
+    private Map<CommunicationStandard, String> information = new HashMap<>();
 
     public DataBuilder uri(final String uri) {
         this.identifier = uri;
@@ -37,11 +38,11 @@ public class DataBuilder implements Builder<Data> {
         return this;
     }
 
-    public DataBuilder addInformation(final String informationType, final String value) {
+    public DataBuilder addInformation(final CommunicationStandard informationType, final String value) {
         Objects.requireNonNull(informationType);
         Objects.requireNonNull(value);
-        if(informationType.isEmpty() || informationType.trim().isEmpty() || value.isEmpty() || value.trim().isEmpty()){
-            throw new IllegalArgumentException("The parameters must not be empty!");
+        if(value.isEmpty() || value.trim().isEmpty()){
+            throw new IllegalArgumentException("The value must not be empty!");
         }
         information.put(informationType, value);
         return this;
