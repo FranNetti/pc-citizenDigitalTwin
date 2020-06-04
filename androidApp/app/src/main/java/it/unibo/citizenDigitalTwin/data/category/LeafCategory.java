@@ -19,10 +19,12 @@ public enum LeafCategory {
     BIRTHDATE(PERSONAL_DATA,"birthdate", R.string.LC_birthdate),
     ADDRESS(PERSONAL_DATA, "address", R.string.LC_address),
     CF(PERSONAL_DATA, "cf", R.string.LC_cf),
+    /* ----------------------------------------------- */
+    MEDICAL_RECORD(MEDICAL_DATA, "medicalRecord", R.string.LC_medical_record),
+    HEART_RATE(MEDICAL_DATA, "heartrate", R.string.LC_heart_rate),
     TEMPERATURE(MEDICAL_DATA, "bodyTemperature",R.string.LC_celsius_temperature),
     BLOOD_OXIGEN(MEDICAL_DATA, "spo2", R.string.LC_blood_oxigen),
-    HEART_RATE(MEDICAL_DATA, "heartrate", R.string.LC_heart_rate),
-    MEDICAL_RECORD(MEDICAL_DATA, "medicalRecord", R.string.LC_medical_record),
+    /* ----------------------------------------------- */
     POSITION(LOCATION, "position", R.string.LC_position);
 
     private final GroupCategory groupCategory;

@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,9 @@ public class GroupCategoryInfoFragment extends FragmentWithId implements StateVi
     private static final String FRAGMENT_ID = "GROUP_CATEGORY";
     private static final String GROUP_CATEGORY = "groupCategory";
     private static final String STATE = "state";
+    private static final List<LeafCategory> ORDER = Arrays.asList(LeafCategory.values());
+    private static final Comparator<Data> COMPARATOR =
+            (a,b) -> Integer.compare(ORDER.indexOf(a.getLeafCategory()), ORDER.indexOf(b.getLeafCategory()));
 
     public static GroupCategoryInfoFragment getInstance(final GroupCategory groupCategory, final State state) {
         final GroupCategoryInfoFragment fragment = new GroupCategoryInfoFragment();
@@ -72,6 +77,7 @@ public class GroupCategoryInfoFragment extends FragmentWithId implements StateVi
         listView.setLayoutManager(linearLayoutManager);
 
         data = state.getDataFromGroupCategory(groupCategory);
+        data.sort(COMPARATOR);
 
         adapter = new GroupCategoryInfoAdapter(getContext(), data);
         listView.setAdapter(adapter);
@@ -88,6 +94,7 @@ public class GroupCategoryInfoFragment extends FragmentWithId implements StateVi
     public void newData(final State state){
         data.clear();
         data.addAll(state.getDataFromGroupCategory(groupCategory));
+        data.sort(COMPARATOR);
         adapter.notifyDataSetChanged();
     }
 

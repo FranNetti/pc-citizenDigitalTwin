@@ -1,15 +1,17 @@
 package it.unibo.citizenDigitalTwin.ui.group_category_info;
 
 import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,6 +20,10 @@ import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 
 class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.InformationHolder> {
+
+    private static final List<CommunicationStandard> ORDER = Arrays.asList(CommunicationStandard.values());
+    private static final Comparator<Pair<CommunicationStandard, String>> COMPARATOR =
+            (a,b) -> Integer.compare(ORDER.indexOf(a.first), ORDER.indexOf(b.first));
 
     abstract static class InformationHolder extends RecyclerView.ViewHolder {
         public InformationHolder(@NonNull View itemView) {
@@ -47,14 +53,15 @@ class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.Informa
         }
     }
 
-    private final Map<CommunicationStandard, String> info;
-    private final List<CommunicationStandard> keys;
+    private final List<Pair<CommunicationStandard, String>> info;
     private final Context context;
 
     InformationAdapter(final Context context, final Map<CommunicationStandard, String> info){
-        this.info = info;
+        this.info = info.entrySet().stream()
+                .map(x -> new Pair<>(x.getKey(), x.getValue()))
+                .sorted(COMPARATOR)
+                .collect(Collectors.toList());
         this.context = context;
-        this.keys = new ArrayList<>(info.keySet());
     }
 
 
@@ -71,18 +78,18 @@ class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.Informa
     @Override
     public void onBindViewHolder(@NonNull final InformationHolder holder, final int position) {
         if(getItemCount() == 1){
-            info.forEach((k,v) -> ((SingleInformationHolder)holder).valueText.setText(v));
+            ((SingleInformationHolder)holder).valueText.setText(info.get(0).second);
         } else {
             final MultipleInformationHolder multiHolder = (MultipleInformationHolder) holder;
-            final CommunicationStandard infoType = keys.get(position);
-            multiHolder.informationTypeText.setText(infoType.getDisplayName(context));
-            multiHolder.informationValueText.setText(info.get(infoType));
+            final Pair<CommunicationStandard, String> info = this.info.get(position);
+            multiHolder.informationTypeText.setText(info.first.getDisplayName(context));
+            multiHolder.informationValueText.setText(info.second);
         }
     }
 
     @Override
     public int getItemCount() {
-        return keys.size();
+        return info.size();
     }
 
 }
