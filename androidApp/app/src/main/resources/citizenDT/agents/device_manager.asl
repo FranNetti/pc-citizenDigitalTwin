@@ -3,6 +3,8 @@
     sensor(DeviceName, SensorName)
 */
 
+gpsRequest(0).
+
 @start[atomic]
 +activate <-
     makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
@@ -11,10 +13,10 @@
     focus(GPS);
 	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Bluetooth], Communication);
 	focus(Communication);
-	subscribeForLocationUpdates;
 	!linkToView(Communication);
 	!observeState;
 	.print("Device Manager ready");
+	!!subscribeForLocationUpdates;
 	!!checkSensorData.
 
 +!linkToView(CommId) <-
@@ -33,8 +35,19 @@
     .wait(100);
     !observeState.
 
++!subscribeForLocationUpdates : gpsRequest(X) & X < 3 <-
+    subscribeForLocationUpdates(Result);
+    !checkIfLocationPermissionIsGranted(Result).
+
++!checkIfLocationPermissionIsGranted(true).
++!checkIfLocationPermissionIsGranted(false) <-
+    .wait(60000);
+    ?gpsRequest(X);
+    -+gpsRequest(X + 1);
+    !!subscribeForLocationUpdates.
+
 +!checkSensorData <-
-    .wait(2000);
+    .wait(30000);
     .findall(X,sensor(_,X),L);
     !askForData(L);
     !!checkSensorData.

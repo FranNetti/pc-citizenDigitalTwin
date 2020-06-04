@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import androidx.core.app.ActivityCompat;
 import cartago.OPERATION;
+import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
@@ -45,14 +46,7 @@ public class GPSArtifact extends JaCaArtifact {
     private boolean isListeningForLocationUpdates;
 
     void init() {
-        final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
-        if(Objects.nonNull(activity)){
-            ActivityCompat.requestPermissions(
-                    activity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQ_CODE
-            );
-        }
+        askForPermissionToUser();
 
         providerClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
         request = LocationRequest.create();
@@ -76,27 +70,31 @@ public class GPSArtifact extends JaCaArtifact {
 
     @SuppressLint("MissingPermission")
     @OPERATION
-    public void updatePosition(){
+    public void updatePosition(final OpFeedbackParam<Boolean> success){
         final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
         if (isLocationPermissionGranted()) {
-            // TODO there is no permission, ask it again to the user
+            askForPermissionToUser();
+            success.set(false);
         } else if(Objects.nonNull(activity)){
             providerClient.getLastLocation().addOnSuccessListener(activity, location -> {
                 if(Objects.nonNull(location)){
                     updateOrCreateLocationProperty(location);
                 }
             });
+            success.set(true);
         }
     }
 
     @SuppressLint("MissingPermission")
     @OPERATION
-    public void subscribeForLocationUpdates(){
+    public void subscribeForLocationUpdates(final OpFeedbackParam<Boolean> success){
         if (isLocationPermissionGranted()) {
-            // TODO there is no permission, ask it again to the user
+            askForPermissionToUser();
+            success.set(false);
         } else if(!isListeningForLocationUpdates) {
             providerClient.requestLocationUpdates(request, callback, Looper.getMainLooper());
             isListeningForLocationUpdates = true;
+            success.set(true);
         }
     }
 
@@ -104,6 +102,17 @@ public class GPSArtifact extends JaCaArtifact {
     public void unsubscribeFromLocationUpdates(){
         if(isListeningForLocationUpdates) {
             providerClient.removeLocationUpdates(callback);
+        }
+    }
+
+    private void askForPermissionToUser(){
+        final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+        if(Objects.nonNull(activity)){
+            ActivityCompat.requestPermissions(
+                    activity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQ_CODE
+            );
         }
     }
 
