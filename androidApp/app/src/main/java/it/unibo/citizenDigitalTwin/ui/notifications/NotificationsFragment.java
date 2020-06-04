@@ -26,17 +26,11 @@ import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 public class NotificationsFragment extends FragmentWithId implements NotificationAdapter.NotificationAdapterListener, BackHelper.BackListener {
 
     private static final String FRAGMENT_ID = "NOTIFICATIONS";
-    private static final String NOTIFICATIONS = "notifications";
     private static final String ARTIFACT = "artifact";
 
-    public static NotificationsFragment getInstance(final List<Notification> notifications, final MainUI.MainUIMediator artifact){
+    public static NotificationsFragment getInstance(final MainUI.MainUIMediator artifact){
         final NotificationsFragment fragment = new NotificationsFragment();
         final Bundle bundle = new Bundle();
-        if(Objects.nonNull(notifications)){
-            bundle.putSerializable(NOTIFICATIONS, new ArrayList<>(notifications));
-        }  else {
-            bundle.putSerializable(NOTIFICATIONS, new ArrayList<>());
-        }
         if(Objects.nonNull(artifact)) {
             bundle.putParcelable(ARTIFACT, artifact);
         }
@@ -56,7 +50,6 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(Objects.nonNull(getArguments())){
-            notifications = (List<Notification>)getArguments().getSerializable(NOTIFICATIONS);
             mainUIArtifact = getArguments().getParcelable(ARTIFACT);
         }
     }
@@ -76,6 +69,8 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
 
         listView.addItemDecoration(dividerItemDecoration);
         listView.setLayoutManager(linearLayoutManager);
+
+        notifications = new ArrayList<>();
 
         adapter = new NotificationAdapter(getContext(), notifications, this);
         listView.setAdapter(adapter);
@@ -97,12 +92,6 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
             adapter.notifyDataSetChanged();
         });
 
-        /* handle notifications updates */
-        if(notifications.size() > 0) {
-            showNotifications();
-        } else {
-            hideNotifications();
-        }
         return root;
     }
 
@@ -149,9 +138,15 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
         return false;
     }
 
-    public void newNotification(final Notification notification){
-        notifications.add(notification);
+    public void updateNotifications(final List<Notification> notifications){
+        this.notifications.clear();
+        this.notifications.addAll(notifications);
         adapter.notifyDataSetChanged();
+        if(notifications.size() > 0) {
+            showNotifications();
+        } else {
+            hideNotifications();
+        }
     }
 
     private void deselectNotifications(){

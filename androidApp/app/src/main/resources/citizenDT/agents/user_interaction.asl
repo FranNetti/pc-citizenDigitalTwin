@@ -54,9 +54,12 @@
     showResultOfDisconnectionToDevice(Result).
 
 /* Handle bluetooth changes */
-+bluetoothState(X): pageShown("DEVICES") <-
++bluetoothState(_): pageShown("DEVICES") <-
     ?connectedDevices(Devices);
     showConnectedDevices(Devices).
+
+/* Handle notifications changes */
++notifications(Notifications) <- showNotifications(Notifications).
 
 /* Handle user that changes page, acquiring the information needed */
 +pageShown("HOME") [artifact_name(Id,MainUI)] <-
@@ -75,7 +78,8 @@
     scanForDevices.
 
 +pageShown("NOTIFICATIONS") [artifact_name(Id,MainUI)] <-
-    .print("Notifications").
+    ?notifications(Notifications);
+    showNotifications(Notifications).
 
 +pageShown("SETTINGS") [artifact_name(Id,MainUI)] <-
     .print("Settings").

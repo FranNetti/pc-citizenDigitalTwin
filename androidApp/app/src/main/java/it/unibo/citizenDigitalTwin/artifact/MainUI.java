@@ -12,7 +12,6 @@ import android.widget.Toolbar;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,9 +22,6 @@ import cartago.OPERATION;
 import cartago.OUTPORT;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
-import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
@@ -68,7 +64,6 @@ public class MainUI extends ActivityArtifact {
     private static final String PAGE_SHOWN_PROP = "pageShown";
 
     private FragmentWithId currentFragment = null;
-    private List<Notification> notifications;
     private final MainUIMediator mediator = new MainUIMediator();
 
     public void init() {
@@ -127,17 +122,36 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
+    public void showNotifications(final List<Notification> notifications){
+        execute(() -> {
+            final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
+            final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
+            final int notificationToRead = (int)notifications.stream().filter(x -> !x.isRead()).count();
+            if(notificationToRead > 0) {
+                badge.setVisible(true);
+                badge.setNumber(notificationToRead);
+            } else {
+                badge.setVisible(false);
+                badge.clearNumber();
+            }
+            if(currentFragment instanceof NotificationsFragment){
+                ((NotificationsFragment)currentFragment).updateNotifications(notifications);
+            }
+        });
+    }
+
+    @OPERATION
     public void readNotification(final List<Notification> notifications){
         final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
         final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
-        final int notificationToRead = (int)this.notifications.stream().filter(x -> !x.isRead()).count();
+        /*final int notificationToRead = (int)this.notifications.stream().filter(x -> !x.isRead()).count();
         if(notificationToRead > 0) {
             badge.setVisible(true);
             badge.setNumber(notificationToRead);
         } else {
             badge.setVisible(false);
             badge.clearNumber();
-        }
+        }*/
     }
 
     @OPERATION
@@ -158,17 +172,6 @@ public class MainUI extends ActivityArtifact {
                 new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
                 GPS_BACKGROUND_REQ_CODE
         );
-        notifications = Arrays.asList(
-                new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
-                new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
-                new DataNotification("Paperino", Arrays.asList(LeafCategory.BIRTHDATE)),
-                new MessageNotification("Charles Leclerc", "Corriamo insieme!!!"),
-                new DataNotification("Pluto", Arrays.asList(LeafCategory.ADDRESS)),
-                new MessageNotification("Stefano Righini", "Vieni a recuperare i prodotti della mia terra"),
-                new DataNotification("Topolino", Arrays.asList(LeafCategory.SURNAME)),
-                new MessageNotification("Dottor Filippone", "Hai il Covid-19 coglione")
-        );
-
         initUI();
     }
 
@@ -180,15 +183,6 @@ public class MainUI extends ActivityArtifact {
 
             final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
             badge.setVisible(false);
-
-            final int notificationToRead = (int)notifications.stream().filter(x -> !x.isRead()).count();
-            if(notificationToRead > 0) {
-                badge.setVisible(true);
-                badge.setNumber(notificationToRead);
-            } else {
-                badge.setVisible(false);
-                badge.clearNumber();
-            }
 
             final Toolbar toolbar = (Toolbar) findUIElement(R.id.toolbar);
             ((Activity)getActivityContext()).setActionBar(toolbar);
@@ -208,7 +202,7 @@ public class MainUI extends ActivityArtifact {
                 fragment = DevicesFragment.getInstance(mediator);
                 break;
             case R.id.navigation_notifications:
-                fragment = NotificationsFragment.getInstance(notifications, mediator);
+                fragment = NotificationsFragment.getInstance(mediator);
                 break;
             case R.id.navigation_settings:
                 fragment = SettingsFragment.getInstance();

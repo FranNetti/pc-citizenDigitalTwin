@@ -7,6 +7,9 @@ import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.notification.DataNotification;
+import it.unibo.citizenDigitalTwin.data.notification.MessageNotification;
+import it.unibo.citizenDigitalTwin.data.notification.Notification;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
@@ -47,6 +50,16 @@ public class ConnectionManager extends JaCaArtifact {
                             .build()
             )
     );
+    private final List<Notification> notifications = Arrays.asList(
+                new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
+                new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
+                new DataNotification("Paperino", Arrays.asList(LeafCategory.BIRTHDATE)),
+                new MessageNotification("Charles Leclerc", "Corriamo insieme!!!"),
+                new DataNotification("Pluto", Arrays.asList(LeafCategory.ADDRESS)),
+                new MessageNotification("Stefano Righini", "Vieni a recuperare i prodotti della mia terra"),
+                new DataNotification("Topolino", Arrays.asList(LeafCategory.SURNAME)),
+                new MessageNotification("Dottor Filippone", "Hai il Covid-19 coglione")
+        );
 
     void init() {
         execInternalOp("generateData");
