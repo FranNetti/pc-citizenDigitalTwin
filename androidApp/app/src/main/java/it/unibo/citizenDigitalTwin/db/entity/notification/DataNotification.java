@@ -1,5 +1,6 @@
 package it.unibo.citizenDigitalTwin.db.entity.notification;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.room.ColumnInfo;
@@ -18,8 +19,8 @@ public class DataNotification extends Notification {
         this.changedCategories = categories;
     }
 
-    public DataNotification(final long id, final String sender, final List<LeafCategory> changedCategories, final boolean read) {
-        super(Type.DATA, id, sender, read);
+    public DataNotification(final long id, final Date date, final String sender, final List<LeafCategory> changedCategories, final boolean read) {
+        super(Type.DATA, id, date, sender, read);
         this.changedCategories = changedCategories;
     }
 

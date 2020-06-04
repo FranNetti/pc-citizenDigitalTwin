@@ -1,5 +1,7 @@
 package it.unibo.citizenDigitalTwin.db.entity.notification;
 
+import java.util.Date;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -15,8 +17,8 @@ public class MessageNotification extends Notification {
         this.message = message;
     }
 
-    public MessageNotification(final long id, final String sender, final String message, final boolean read){
-        super(Type.MESSAGE, id, sender, read);
+    public MessageNotification(final long id, final Date date, final String sender, final String message, final boolean read){
+        super(Type.MESSAGE, id, date, sender, read);
         this.message = message;
     }
 

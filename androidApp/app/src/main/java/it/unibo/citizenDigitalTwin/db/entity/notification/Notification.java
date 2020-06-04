@@ -1,6 +1,7 @@
 package it.unibo.citizenDigitalTwin.db.entity.notification;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
@@ -15,18 +16,21 @@ public class Notification implements Serializable {
     @Ignore                          private boolean selected;
     @Ignore                          private final Type type;
     @PrimaryKey(autoGenerate = true) private long id;
+    @ColumnInfo                      private Date date;
     @ColumnInfo                      private String sender;
     @ColumnInfo                      private boolean read;
 
     Notification(final Type type, final String sender){
         this.type = type;
         this.sender = sender;
+        this.date = new Date();
         selected = false;
         read = false;
     }
 
-    Notification(final Type type, final long id, final String sender, final boolean read){
+    Notification(final Type type, final long id, final Date date, final String sender, final boolean read){
         this(type, sender);
+        this.date = date;
         this.id = id;
         this.read = read;
     }
@@ -65,5 +69,13 @@ public class Notification implements Serializable {
 
     public Type getType() {
         return type;
+    }
+
+    public void setDate(final Date date) {
+        this.date = date;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

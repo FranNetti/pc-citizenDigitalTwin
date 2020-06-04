@@ -65,6 +65,8 @@ public class StateManager extends JaCaArtifact {
         dbNotifications.getAllDataNotifications().forEach(notifications -> {
             updatePropNotification(notifications, DataNotification.class);
         });
+
+        execInternalOp("pippo");
     }
 
     @OPERATION
@@ -103,6 +105,19 @@ public class StateManager extends JaCaArtifact {
         }
     }
 
+    @INTERNAL_OPERATION
+    void pippo(){
+        final List<DataNotification> dN = new ArrayList<>();
+        final List<MessageNotification> mN = new ArrayList<>();
+        notifications.forEach(x -> {
+            if(x instanceof MessageNotification){
+                dbNotifications.insertMessageNotification((MessageNotification)x);
+            } else {
+                dbNotifications.insertDataNotification((DataNotification)x);
+            }
+        });
+    }
+
     private void updatePropNotification(final List<? extends Notification> notifications, final Class<?> notClass){
         beginExternalSession();
         ObsProperty prop = getObsProperty(PROP_NOTIFICATIONS);
@@ -112,6 +127,7 @@ public class StateManager extends JaCaArtifact {
                 .collect(Collectors.toList());
         savedNotifications.removeAll(notificationToDelete);
         savedNotifications.addAll(notifications);
+        savedNotifications.sort((a,b) -> a.getDate().compareTo(b.getDate()));
         prop.updateValue(savedNotifications);
         endExternalSession(true);
     }

@@ -2,6 +2,7 @@ package it.unibo.citizenDigitalTwin.db;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,7 +14,6 @@ import java.util.Map;
 
 import androidx.room.TypeConverter;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
 
 public class Converters {
 
@@ -65,8 +65,10 @@ public class Converters {
     @TypeConverter
     public static String fromListToString(final List<LeafCategory> categoryList){
         final JSONObject object = new JSONObject();
+        final JSONArray array = new JSONArray();
         try{
-            object.put(LIST_LEAF_TAG, categoryList);
+            categoryList.forEach(x -> array.put(x.name()));
+            object.put(LIST_LEAF_TAG, array);
             return object.toString();
         } catch (final JSONException e){
             Log.e(TAG, "Error in fromListToString: " + e.getLocalizedMessage());
@@ -78,9 +80,15 @@ public class Converters {
     public static List<LeafCategory> fromStringToList(final String string){
         try{
             final JSONObject object = new JSONObject(string);
-            return (List<LeafCategory>)object.get(LIST_LEAF_TAG);
+            final List<LeafCategory> list = new ArrayList<>();
+            final JSONArray array = object.getJSONArray(LIST_LEAF_TAG);
+            final int length = array.length();
+            for(int x = 0; x < length; x++){
+                list.add(LeafCategory.valueOf(array.getString(x)));
+            }
+            return list;
         } catch (final Exception e){
-            Log.e(TAG, "Error in fromStringToMap: " + e.getLocalizedMessage());
+            Log.e(TAG, "Error in fromStringToList: " + e.getLocalizedMessage());
         }
         return new ArrayList<>();
     }
