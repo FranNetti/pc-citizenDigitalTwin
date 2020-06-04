@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.artifact.MainUI;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.data.notification.Notification;
+import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 

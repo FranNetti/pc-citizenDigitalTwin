@@ -22,7 +22,7 @@ import cartago.OPERATION;
 import cartago.OUTPORT;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
-import it.unibo.citizenDigitalTwin.data.notification.Notification;
+import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
@@ -138,20 +138,6 @@ public class MainUI extends ActivityArtifact {
                 ((NotificationsFragment)currentFragment).updateNotifications(notifications);
             }
         });
-    }
-
-    @OPERATION
-    public void readNotification(final List<Notification> notifications){
-        final BottomNavigationView navView = (BottomNavigationView) findUIElement(R.id.nav_view);
-        final BadgeDrawable badge = navView.getOrCreateBadge(R.id.navigation_notifications);
-        /*final int notificationToRead = (int)this.notifications.stream().filter(x -> !x.isRead()).count();
-        if(notificationToRead > 0) {
-            badge.setVisible(true);
-            badge.setNumber(notificationToRead);
-        } else {
-            badge.setVisible(false);
-            badge.clearNumber();
-        }*/
     }
 
     @OPERATION
@@ -277,7 +263,7 @@ public class MainUI extends ActivityArtifact {
 
         public void readNotification(final List<Notification> notifications){
             MainUI.this.beginExternalSession();
-            MainUI.this.readNotification(notifications);
+            signal("notificationsRead", notifications);
             MainUI.this.endExternalSession(true);
         }
     }

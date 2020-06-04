@@ -61,6 +61,9 @@
 /* Handle notifications changes */
 +notifications(Notifications) <- showNotifications(Notifications).
 
+/* Handle when notifications are read */
++notificationsRead(Notifications) <- setNotificationsRead(Notifications).
+
 /* Handle user that changes page, acquiring the information needed */
 +pageShown("HOME") [artifact_name(Id,MainUI)] <-
     ?state(State);
