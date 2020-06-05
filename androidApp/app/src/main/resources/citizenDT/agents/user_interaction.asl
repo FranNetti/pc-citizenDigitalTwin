@@ -1,13 +1,28 @@
 !readyUp.
 
 +!readyUp <-
-    !initializeGui;
-    .print("User interaction ready");
-    !!observeState.
+    !initializeLogin;
+    .print("User interaction ready").
+
++!initializeLogin <-
+    makeArtifact("loginUI", "it.unibo.citizenDigitalTwin.artifact.LoginUI",[],LoginUI);
+    focus(LoginUI).
 
 +!initializeGui <-
     makeArtifact("mainUI", "it.unibo.citizenDigitalTwin.artifact.MainUI",[],MainUI);
-    focus(MainUI).
+    focus(MainUI);
+    lookupArtifact("loginUI",LoginUI);
+    disposeArtifact(LoginUI).
+
++ui_ready [artifact_name(Id,LoginUI)] <-
+    .send(cdt_manager, tell, activate);
+    !!observeState.
+
++ui_ready [artifact_name(Id,MainUI)] <-
+    +viewReady;
+    .send(device_manager, tell, activate);
+    println("MainUI ready.");
+    !!observeDevices.
 
 +!observeState <-
     lookupArtifact("state", S);
@@ -16,13 +31,6 @@
 -!observeState <-
     .wait(100);
     !!observeState.
-
-+ui_ready [artifact_name(Id,MainUI)] <-
-    +viewReady;
-    .send(device_manager, tell, activate);
-    .send(cdt_manager, tell, activate);
-    println("MainUI ready.");
-    !!observeDevices.
 
 +!observeDevices <-
     lookupArtifact("devices", D);
@@ -33,6 +41,11 @@
 -!observeDevices <-
     .wait(100);
     !!observeDevices.
+
+/* Handle user login */
++loginButtonClicked(Username, Password) <- .send(cdt_manager, achieve, login(Username, Password)).
+
++loginFailed(Message) <- showLoginFailed(Message).
 
 /* Handle state change */
 +state(State): viewReady <- showNewState(State).
@@ -59,7 +72,7 @@
     showConnectedDevices(Devices).
 
 /* Handle notifications changes */
-+notifications(Notifications) <- showNotifications(Notifications).
++notifications(Notifications): viewReady <- showNotifications(Notifications).
 
 /* Handle when notifications are read */
 +notificationsRead(Notifications) <- setNotificationsRead(Notifications).
@@ -83,8 +96,5 @@
 +pageShown("NOTIFICATIONS") [artifact_name(Id,MainUI)] <-
     ?notifications(Notifications);
     showNotifications(Notifications).
-
-+pageShown("SETTINGS") [artifact_name(Id,MainUI)] <-
-    .print("Settings").
 
 +pageShown(X) [artifact_name(Id,MainUI)] <- .print(X).

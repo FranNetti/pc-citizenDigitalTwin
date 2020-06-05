@@ -1,6 +1,21 @@
 <resources>
 
+    /* -----------------Login Activity----------------- */
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be at least of 5 characters</string>
+    <string name="login_failed_title">Error</string>
+    <string name="login_failed_400">Error#LF400. Please report to the developers.</string>
+    <string name="login_failed_401">Username or password are wrong, try again.</string>
+    <string name="login_failed_500">An error occurred, please try again.</string>
+    <string name="login_failed_unknown">Unknown error, report to the developers. Error#LF</string>
+
+    /* -----------------Main Activity----------------- */
     <string name="app_name">CDT</string>
+    <string name="app_name_extended">Citizen Digital Twin</string>
     <string name="title_home">You</string>
     <string name="title_devices">Your Devices</string>
     <string name="title_notifications">Notifications</string>
@@ -34,7 +49,7 @@
     <string name="feeder_text">Produced by</string>
     <string name="date_text">In date</string>
 
-    /* -----------------Leaf categories-----------------*/
+    /* -----------------Leaf categories----------------- */
     <string name="LC_name">Name</string>
     <string name="LC_surname">Surname</string>
     <string name="LC_birthdate">Birth Date</string>
@@ -45,13 +60,15 @@
     <string name="LC_cf">Tax Code</string>
     <string name="LC_medical_record">Medical Record</string>
     <string name="LC_position">Last known position</string>
-    /* -----------------Group categories-----------------*/
+
+    /* -----------------Group categories----------------- */
     <string name="GC_medical_data">Medical Data</string>
     <string name="GC_location">Location</string>
     <string name="GC_personal_data">Personal Data</string>
     <string name="GC_licences">Your Licences</string>
     <string name="GC_legal_data">Legal Data</string>
-    /* -----------------Communication standard-----------------*/
+
+    /* -----------------Communication standard----------------- */
     <string name="value">Value</string>
     <string name="um">Unit of measure</string>
     <string name="lat">Latitude</string>

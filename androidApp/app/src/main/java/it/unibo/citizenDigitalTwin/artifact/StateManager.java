@@ -12,6 +12,7 @@ import cartago.OPERATION;
 import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.LoginResult;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
@@ -27,6 +28,9 @@ import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 public class StateManager extends JaCaArtifact {
 
     private static final String TAG = "[StateManager]";
+
+    private static final String PROP_LOGGED = "logged";
+    private static final String PROP_NOT_LOGGED = "loginFailed";
     private static final String PROP_STATE = "state";
     private static final String PROP_NOTIFICATIONS = "notifications";
 
@@ -67,6 +71,20 @@ public class StateManager extends JaCaArtifact {
         });
 
         execInternalOp("pippo");
+    }
+
+    @OPERATION
+    public void checkIfLogged(final LoginResult result){
+        if(result.isSuccessful()){
+            defineObsProperty(PROP_LOGGED, result.getUri().get());
+            if(hasObsProperty(PROP_NOT_LOGGED)){
+                removeObsProperty(PROP_NOT_LOGGED);
+            }
+        } else if(hasObsProperty(PROP_NOT_LOGGED)){
+            updateObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+        } else {
+            defineObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+        }
     }
 
     @OPERATION

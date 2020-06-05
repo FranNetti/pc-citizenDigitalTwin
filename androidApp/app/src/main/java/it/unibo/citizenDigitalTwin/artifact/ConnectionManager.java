@@ -8,6 +8,7 @@ import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
+import it.unibo.citizenDigitalTwin.data.connection.LoginResult;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
@@ -77,6 +78,11 @@ public class ConnectionManager extends JaCaArtifact {
     void authenticate(final String username, final String password, final OpFeedbackParam<Boolean> res) {
         //contatta server autenticazione e attende risposta
         res.set(true); // si è autenticato correttamente
+    }
+
+    @OPERATION
+    void doLogin(final String username, final String password, final OpFeedbackParam<LoginResult> result){
+        result.set(LoginResult.loginSuccessful("youWillPass"));
     }
 
     @INTERNAL_OPERATION
