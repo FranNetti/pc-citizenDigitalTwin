@@ -4,6 +4,7 @@
 BluetoothMsgService::BluetoothMsgService(String name, uint8_t pinTDX, uint8_t pinRDX, uint8_t pinState): MsgService(name) {
   this->channel = new SoftwareSerial(pinTDX, pinRDX);
   this->channel->begin(9600);
+  pinMode(pinState,INPUT);
   this->pinState = pinState;
 }
 

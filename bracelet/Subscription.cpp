@@ -2,7 +2,7 @@
 #include "Subscription.h"
 #include "MsgService.h"
 
-Subscription::Subscription(String subscriber, MsgService* msgService, uint8_t resourceId) {
+Subscription::Subscription(String subscriber, MsgService* msgService, ResourceId resourceId) {
   this->subscriber = subscriber;
   this->msgService = msgService;
   this->resourceId = resourceId;
@@ -15,6 +15,6 @@ MsgService* Subscription::getMsgService() {
   return this->msgService;
 }
 
-uint8_t Subscription::getResourceId() {
+ResourceId Subscription::getResourceId() {
   return this->resourceId;
 }

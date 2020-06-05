@@ -1,6 +1,7 @@
 #ifndef __MSG_SERVICE__
 #define __MSG_SERVICE__
 
+#include "Arduino.h"
 #include "Config.h"
 
 class MsgType {
@@ -18,6 +19,7 @@ class Msg {
     int dataLenght;
   public:
     Msg(String type, String resource, String sender, String* data, int lenght);
+    Msg(String type, String resource, String sender);
     String getType();
     String getResource();
     String getSender();
@@ -28,7 +30,7 @@ class Msg {
 
 class MsgService {
   private:
-    String queue[BUFFER_SIZE];
+    String queue[MSG_BUFFER_SIZE];
     int head;
     int tail;
     String name;

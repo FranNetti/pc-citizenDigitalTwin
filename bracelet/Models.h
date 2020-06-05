@@ -10,10 +10,10 @@ class Resource {
     static const String OXYGEN;
 };
 
-enum ResourceId {
+typedef enum {
   TEMPERATURE,
   HEART_RATE,
   OXYGEN
-};
+} ResourceId;
 
 #endif

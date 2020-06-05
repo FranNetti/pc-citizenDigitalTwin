@@ -12,6 +12,7 @@ Msg::Msg(String type, String resource, String sender, String* data, int lenght) 
   this->resource = resource;
   this->sender = sender;
 }
+Msg::Msg(String type, String resource, String sender): Msg(type, resource, sender, NULL, 0){}
 
 String Msg::getResource() {
   return this->resource;
@@ -50,7 +51,7 @@ String MsgService::getName() {
 String MsgService::receiveMsg() {
   if (this->head != -1) {
     String msg = this->queue[this->head];
-    this->head = (this->head + 1) % BUFFER_SIZE;
+    this->head = (this->head + 1) % MSG_BUFFER_SIZE;
     if (this->head > this->tail) {
       this->resetBuffer();
     }
@@ -72,10 +73,10 @@ void MsgService::resetBuffer() {
 }
 
 void MsgService::saveMsg(String msg) {
-  this->tail = (this->tail + 1) % BUFFER_SIZE;
+  this->tail = (this->tail + 1) % MSG_BUFFER_SIZE;
   this->queue[this->tail] = msg;
   if (this->tail == this->head || this->head == -1) {
-    this->head = (this->head + 1) % BUFFER_SIZE;
+    this->head = (this->head + 1) % MSG_BUFFER_SIZE;
   }
 }
 
@@ -84,12 +85,18 @@ void MsgService::channelEvent() {
     String content = "";
     while (this->isChannelAvailable()) {
       char ch = this->read();
+      Serial.println("[" + this->getName() + "] received: " + String(ch));
+      Serial.flush();
       if (ch == '\n') {
+        Serial.println("[" + this->getName() + "] received end line with content: " + content);
+        Serial.flush();
         this->saveMsg(content);
         content = "";
       } else {
         content += ch;
       }
     }
+    Serial.println("[" + this->getName() + "] received: " + content);
+    Serial.flush();
   }
 }

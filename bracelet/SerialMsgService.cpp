@@ -4,7 +4,6 @@
 
 SerialMsgService::SerialMsgService(String name): MsgService(name) {
   Serial.begin(9600);
-  while(!Serial) {}
 }
 
 void SerialMsgService::sendMsg(String msg){
@@ -33,5 +32,3 @@ bool SerialMsgService::isConnected() {
 char SerialMsgService::read() {
   return (char) Serial.read();
 }
-
-/*called automatically when serial has an avent*/

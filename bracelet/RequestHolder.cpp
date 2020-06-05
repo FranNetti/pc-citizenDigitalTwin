@@ -19,7 +19,8 @@ void RequestHolder::setRequest(Msg* msg, MsgService* msgService) {
 }
 
 void RequestHolder::removeRequest() {
-  Msg::freeMsg(this->msg);
+  if (this->msg != NULL)
+    Msg::freeMsg(this->msg);
   this->msg = NULL;
   this->answerMsgService = NULL;
 }

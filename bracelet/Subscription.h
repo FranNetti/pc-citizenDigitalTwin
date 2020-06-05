@@ -3,17 +3,18 @@
 
 #include "Arduino.h"
 #include "MsgService.h"
+#include "Models.h"
 
 class Subscription {
 private:
   String subscriber;
   MsgService* msgService;
-  uint8_t resourceId;
+  ResourceId resourceId;
 public:
-  Subscription(String subscriber, MsgService* msgService, uint8_t resourceId);
+  Subscription(String subscriber, MsgService* msgService, ResourceId resourceId);
   String getSubscriber();
   MsgService* getMsgService();
-  uint8_t getResourceId();
+  ResourceId getResourceId();
 };
 
 #endif
