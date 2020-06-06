@@ -1,7 +1,7 @@
 !readyUp.
 
 +!readyUp <-
-    !initializeLogin;
+    !initializeGui;
     .print("User interaction ready").
 
 +!initializeLogin <-
