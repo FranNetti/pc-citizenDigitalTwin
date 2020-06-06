@@ -1,11 +1,11 @@
 <resources>
 
     /* -----------------Login Activity----------------- */
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
+    <string name="prompt_email" translatable="false">Email</string>
+    <string name="prompt_password" translatable="false">Password</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_username">Not a valid mail</string>
     <string name="invalid_password">Password must be at least of 5 characters</string>
     <string name="login_failed_title">Error</string>
     <string name="login_failed_400">Error#LF400. Please report to the developers.</string>
@@ -14,8 +14,8 @@
     <string name="login_failed_unknown">Unknown error, report to the developers. Error#LF</string>
 
     /* -----------------Main Activity----------------- */
-    <string name="app_name">CDT</string>
-    <string name="app_name_extended">Citizen Digital Twin</string>
+    <string name="app_name" translatable="false">CDT</string>
+    <string name="app_name_extended" translatable="false">Citizen Digital Twin</string>
     <string name="title_home">You</string>
     <string name="title_devices">Your Devices</string>
     <string name="title_notifications">Notifications</string>
