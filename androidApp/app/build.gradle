@@ -75,5 +75,5 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.android.support:support-v4:28.0.0'
 
-    //implementation 'io.vertx:vertx-core:3.9.1'
+    implementation "com.squareup.okhttp3:okhttp:4.7.2"
 }
