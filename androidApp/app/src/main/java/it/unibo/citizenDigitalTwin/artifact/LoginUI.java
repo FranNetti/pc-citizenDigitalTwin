@@ -2,17 +2,14 @@ package it.unibo.citizenDigitalTwin.artifact;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.util.Patterns;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
@@ -68,11 +65,6 @@ public class LoginUI extends ActivityArtifact {
     private void signalLogin(final ProgressBar progressBar, final EditText username, final EditText password){
         final String email = username.getText().toString();
         final String pwd = password.getText().toString();
-
-        InputMethodManager inputManager = (InputMethodManager)
-                getActivityContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(((Activity)getActivityContext()).getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
 
         if(!isEmailValid(email)){
             username.setError(getActivityContext().getString(R.string.invalid_username));

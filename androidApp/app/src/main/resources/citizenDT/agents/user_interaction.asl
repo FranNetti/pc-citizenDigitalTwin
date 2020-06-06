@@ -19,7 +19,7 @@
     !!observeState.
 
 +ui_ready [artifact_name(Id,MainUI)] <-
-    +viewReady;
+    +mainViewReady;
     .send(device_manager, tell, activate);
     println("MainUI ready.");
     !!observeDevices.
@@ -44,17 +44,17 @@
 
 /* Handle user login */
 +loginButtonClicked(Username, Password) <- .send(cdt_manager, achieve, login(Username, Password)).
-
++logged(_) <- !!initializeGui.
 +loginFailed(Message) <- showLoginFailed(Message).
 
 /* Handle state change */
-+state(State): viewReady <- showNewState(State).
++state(State): mainViewReady <- showNewState(State).
 
 /* Handle discovered devices change */
-+discoveredDevices(Devices): viewReady <- showDiscoveredDevices(Devices).
++discoveredDevices(Devices): mainViewReady <- showDiscoveredDevices(Devices).
 
 /* Handle connected devices change */
-+connectedDevices(Devices): viewReady <- showConnectedDevices(Devices).
++connectedDevices(Devices): mainViewReady <- showConnectedDevices(Devices).
 
 /* Handle when user selects a device to connect to */
 +deviceSelected(Device, Model) <-
@@ -72,7 +72,7 @@
     showConnectedDevices(Devices).
 
 /* Handle notifications changes */
-+notifications(Notifications): viewReady <- showNotifications(Notifications).
++notifications(Notifications): mainViewReady <- showNotifications(Notifications).
 
 /* Handle when notifications are read */
 +notificationsRead(Notifications) <- setNotificationsRead(Notifications).
