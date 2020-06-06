@@ -14,11 +14,11 @@
     lookupArtifact("loginUI",LoginUI);
     disposeArtifact(LoginUI).
 
-+ui_ready [artifact_name(Id,LoginUI)] <-
++ui_ready [artifact_name(Id,loginUI)] <-
     .send(cdt_manager, tell, activate);
     !!observeState.
 
-+ui_ready [artifact_name(Id,MainUI)] <-
++ui_ready [artifact_name(Id,mainUI)] <-
     +mainViewReady;
     .send(device_manager, tell, activate);
     println("MainUI ready.");
