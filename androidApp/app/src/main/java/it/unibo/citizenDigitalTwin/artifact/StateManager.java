@@ -3,15 +3,13 @@ package it.unibo.citizenDigitalTwin.artifact;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.LoginResult;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
@@ -27,22 +25,14 @@ import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 public class StateManager extends JaCaArtifact {
 
     private static final String TAG = "[StateManager]";
+
+    private static final String PROP_LOGGED = "logged";
+    private static final String PROP_NOT_LOGGED = "loginFailed";
     private static final String PROP_STATE = "state";
     private static final String PROP_NOTIFICATIONS = "notifications";
 
     private DataDAO dbState;
     private NotificationDAO dbNotifications;
-
-    private final List<Notification> notifications = Arrays.asList(
-            new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
-            new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
-            new DataNotification("Paperino", Arrays.asList(LeafCategory.BIRTHDATE)),
-            new MessageNotification("Charles Leclerc", "Corriamo insieme!!!"),
-            new DataNotification("Pluto", Arrays.asList(LeafCategory.ADDRESS)),
-            new MessageNotification("Stefano Righini", "Vieni a recuperare i prodotti della mia terra"),
-            new DataNotification("Topolino", Arrays.asList(LeafCategory.SURNAME)),
-            new MessageNotification("Dottor Filippone", "Hai il Covid-19 coglione")
-    );
 
     public void init() {
         final AppDatabase db = AppDatabase.getInstance(getApplicationContext());
@@ -65,8 +55,20 @@ public class StateManager extends JaCaArtifact {
         dbNotifications.getAllDataNotifications().forEach(notifications -> {
             updatePropNotification(notifications, DataNotification.class);
         });
+    }
 
-        execInternalOp("pippo");
+    @OPERATION
+    public void checkIfLogged(final LoginResult result){
+        if(result.isSuccessful()){
+            defineObsProperty(PROP_LOGGED, result.getUri().get());
+            if(hasObsProperty(PROP_NOT_LOGGED)){
+                removeObsProperty(PROP_NOT_LOGGED);
+            }
+        } else if(hasObsProperty(PROP_NOT_LOGGED)){
+            updateObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+        } else {
+            defineObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+        }
     }
 
     @OPERATION
@@ -82,7 +84,21 @@ public class StateManager extends JaCaArtifact {
 
     @OPERATION
     public void addNotifications(final List<Notification> notifications){
-
+        final List<MessageNotification> msgNotifications = new ArrayList<>();
+        final List<DataNotification> dataNotifications = new ArrayList<>();
+        notifications.forEach(x -> {
+            switch (x.getType()){
+                case DATA: dataNotifications.add((DataNotification)x); break;
+                case MESSAGE: msgNotifications.add((MessageNotification)x); break;
+                default: Log.e(TAG, "Unhandled notification in addNotifications: " + x.getType());
+            }
+        });
+        if(!msgNotifications.isEmpty()){
+            dbNotifications.insertMessageNotifications(msgNotifications);
+        }
+        if(!dataNotifications.isEmpty()){
+            dbNotifications.insertDataNotifications(dataNotifications);
+        }
     }
 
     @OPERATION
@@ -103,19 +119,6 @@ public class StateManager extends JaCaArtifact {
         if(!dataNotifications.isEmpty()){
             dbNotifications.updateDataNotifications(dataNotifications);
         }
-    }
-
-    @INTERNAL_OPERATION
-    void pippo(){
-        final List<DataNotification> dN = new ArrayList<>();
-        final List<MessageNotification> mN = new ArrayList<>();
-        notifications.forEach(x -> {
-            if(x instanceof MessageNotification){
-                dbNotifications.insertMessageNotification((MessageNotification)x);
-            } else {
-                dbNotifications.insertDataNotification((DataNotification)x);
-            }
-        });
     }
 
     private void updatePropNotification(final List<? extends Notification> notifications, final Class<?> notClass){

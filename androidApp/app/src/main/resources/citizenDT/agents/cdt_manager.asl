@@ -1,3 +1,7 @@
++!login(Username,Password) <-
+    doLogin(Username, Password, LoginResult);
+    checkIfLogged(LoginResult).
+
 @start[atomic]
 +activate <-
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
