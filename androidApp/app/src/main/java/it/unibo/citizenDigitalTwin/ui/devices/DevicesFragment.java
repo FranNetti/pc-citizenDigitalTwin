@@ -110,8 +110,8 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
         }
     }
 
-    public void connectionFailed(){
-        showDialog(R.string.connection_failed);
+    public void connectionFailed(final String message){
+        showDialog(message);
     }
 
     public void disconnectionFailed(){
@@ -119,6 +119,10 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
     }
 
     private void showDialog(final int message){
+        showDialog(getContext().getString(message));
+    }
+
+    private void showDialog(final String message){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(message)
                 .setPositiveButton(android.R.string.ok, null);

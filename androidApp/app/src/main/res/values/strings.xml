@@ -44,6 +44,8 @@
     <string name="add_device_positive">Connect</string>
     <string name="add_device_error_text">This field must contain at least one character</string>
     <string name="connection_failed">The connection with the device has failed, try again.</string>
+    <string name="unhandled_device">The device is not handled by the system, please submit your device for future developments.</string>
+    <string name="connection_success">The connection has been established!.</string>
     <string name="disconnection_failed">The disconnection from the device has failed, try again.</string>
     <string name="expand_item">Expand element</string>
     <string name="feeder_text">Produced by</string>

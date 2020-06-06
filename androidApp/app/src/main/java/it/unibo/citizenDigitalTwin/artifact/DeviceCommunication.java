@@ -21,6 +21,7 @@ import cartago.ObsProperty;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.Observable;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.device.ConnectionResult;
 import it.unibo.citizenDigitalTwin.data.device.DeviceKnowledge;
 import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannel;
@@ -59,7 +60,7 @@ public class DeviceCommunication extends JaCaArtifact {
     }
 
     @OPERATION
-    public void connectToDevice(final Device device, final String model, final OpFeedbackParam<Boolean> success) {
+    public void connectToDevice(final Device device, final String model, final OpFeedbackParam<ConnectionResult> success) {
         final DeviceKnowledge deviceKnowledge = checkDeviceKnowledge();
         if(Objects.nonNull(deviceKnowledge)){
             //final AtomicBoolean successRes = new AtomicBoolean(false);
@@ -76,10 +77,10 @@ public class DeviceCommunication extends JaCaArtifact {
             if(successRes.get()){
                 success.set(handleNewDevice(device, deviceKnowledge));
             } else {
-                success.set(false);
+                success.set(ConnectionResult.FAILURE);
             }
         } else {
-            success.set(false);
+            success.set(ConnectionResult.UNHANDLED_DEVICE);
         }
     }
 
@@ -152,7 +153,7 @@ public class DeviceCommunication extends JaCaArtifact {
         }
     }
 
-    private boolean handleNewDevice(final Device device, final DeviceKnowledge knowledge){
+    private ConnectionResult handleNewDevice(final Device device, final DeviceKnowledge knowledge){
         final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
         device.setCategories(knowledge.getKnowledge().keySet());
         final List<Device> devices = (List<Device>)propDevices.getValue();
@@ -167,10 +168,10 @@ public class DeviceCommunication extends JaCaArtifact {
                 final String sensorName = baseName + count.getAndIncrement();
                 signal("newSensor", device.getName(), sensorName, channel, leafCategory, sensorKnowledge);
             }));
-            return true;
+            return ConnectionResult.SUCCESS;
         } catch (final Exception e) {
             Log.e(DEVICE_COMMUNICATION_TAG, "Error in handleNewDevice: " + e.getLocalizedMessage());
-            return false;
+            return ConnectionResult.FAILURE;
         }
     }
 

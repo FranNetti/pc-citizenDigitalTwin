@@ -22,6 +22,7 @@ import cartago.OPERATION;
 import cartago.OUTPORT;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
+import it.unibo.citizenDigitalTwin.data.device.ConnectionResult;
 import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
@@ -108,9 +109,9 @@ public class MainUI extends ActivityArtifact {
     }
 
     @OPERATION
-    public void showResultOfConnectionToDevice(final boolean success){
-        if(!success && currentFragment instanceof DevicesFragment){
-            execute(() -> ((DevicesFragment) currentFragment).connectionFailed());
+    public void showResultOfConnectionToDevice(final ConnectionResult result){
+        if(result != ConnectionResult.SUCCESS && currentFragment instanceof DevicesFragment){
+            execute(() -> ((DevicesFragment) currentFragment).connectionFailed(result.getMessage(getActivityContext())));
         }
     }
 
