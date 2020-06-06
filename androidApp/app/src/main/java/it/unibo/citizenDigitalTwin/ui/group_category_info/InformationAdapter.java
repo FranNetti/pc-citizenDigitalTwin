@@ -26,8 +26,12 @@ class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.Informa
             (a,b) -> Integer.compare(ORDER.indexOf(a.first), ORDER.indexOf(b.first));
 
     abstract static class InformationHolder extends RecyclerView.ViewHolder {
+
+        final View layout;
+
         public InformationHolder(@NonNull View itemView) {
             super(itemView);
+            this.layout = itemView;
         }
     }
 
@@ -55,13 +59,15 @@ class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.Informa
 
     private final List<Pair<CommunicationStandard, String>> info;
     private final Context context;
+    private final View.OnClickListener listener;
 
-    InformationAdapter(final Context context, final Map<CommunicationStandard, String> info){
+    InformationAdapter(final Context context, final View.OnClickListener listener, final Map<CommunicationStandard, String> info){
         this.info = info.entrySet().stream()
                 .map(x -> new Pair<>(x.getKey(), x.getValue()))
                 .sorted(COMPARATOR)
                 .collect(Collectors.toList());
         this.context = context;
+        this.listener = listener;
     }
 
 
@@ -77,6 +83,7 @@ class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.Informa
 
     @Override
     public void onBindViewHolder(@NonNull final InformationHolder holder, final int position) {
+        holder.layout.setOnClickListener(listener);
         if(getItemCount() == 1){
             ((SingleInformationHolder)holder).valueText.setText(info.get(0).second);
         } else {

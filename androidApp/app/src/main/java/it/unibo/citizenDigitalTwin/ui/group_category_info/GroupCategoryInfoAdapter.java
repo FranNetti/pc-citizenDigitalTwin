@@ -22,8 +22,8 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
 
     static class GroupCategoryInfoHolder extends RecyclerView.ViewHolder {
 
+        final ConstraintLayout layout;
         final ConstraintLayout contentLayout;
-        final ConstraintLayout headerLayout;
         final TextView leafCategoryName;
         final TextView feederName;
         final TextView dateText;
@@ -35,13 +35,13 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
         public GroupCategoryInfoHolder(final ConstraintLayout view) {
             super(view);
             expanded = false;
+            this.layout = view;
             this.contentLayout = view.findViewById(R.id.contentLayout);
             this.leafCategoryName = view.findViewById(R.id.leafCategoryName);
             this.expandImage = view.findViewById(R.id.expandElement);
             this.feederName = view.findViewById(R.id.feederName);
             this.dateText = view.findViewById(R.id.dateField);
             this.recyclerView = view.findViewById(R.id.informationRecyclerView);
-            this.headerLayout = view.findViewById(R.id.headerLayout);
         }
     }
 
@@ -65,10 +65,11 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
     public void onBindViewHolder(final GroupCategoryInfoHolder holder, final int position) {
         final Data data = dataList.get(position);
         holder.contentLayout.setVisibility(holder.expanded ? View.VISIBLE : View.GONE);
-        holder.headerLayout.setOnClickListener(v -> {
+        final View.OnClickListener listener = v -> {
             holder.expanded = !holder.expanded;
             GroupCategoryInfoAdapter.this.notifyDataSetChanged();
-        });
+        };
+        holder.layout.setOnClickListener(listener);
         final int arrowImage;
         if(holder.expanded){
             arrowImage = R.drawable.ic_baseline_keyboard_arrow_up_24;
@@ -87,7 +88,7 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
         holder.recyclerView.setLayoutManager(linearLayoutManager);
         holder.recyclerView.setHasFixedSize(true);
 
-        final InformationAdapter adapter = new InformationAdapter(context, data.getInformation());
+        final InformationAdapter adapter = new InformationAdapter(context, listener, data.getInformation());
         holder.recyclerView.setAdapter(adapter);
     }
 
