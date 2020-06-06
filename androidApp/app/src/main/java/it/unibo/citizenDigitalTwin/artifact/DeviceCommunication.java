@@ -27,6 +27,7 @@ import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannel;
 import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannels;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
+import it.unibo.citizenDigitalTwin.data.device.type.MockDevice;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
@@ -44,13 +45,20 @@ public class DeviceCommunication extends JaCaArtifact {
     private static final String PROP_CONNECTED_DEVICES = "connectedDevices";
     private static final String PROP_PAIRED_DEVICES = "pairedDevices";
     private static final String PROP_DISCOVERED_DEVICES = "discoveredDevices";
+    private static final String SIGNAL_NEW_SENSOR = "newSensor";
+    private static final String SIGNAL_DEVICE_DISCONNECTED = "deviceDisconnected";
     private static final int UPDATE_PAIRED_DEVICES_TIME = 30000;
 
     private List<ArtifactId> technologies;
     private boolean work;
 
-    void init(final ArtifactId technologies) {
-        this.technologies = Arrays.asList(technologies);
+    void init(final Object[] technologies) {
+        this.technologies = new ArrayList<>();
+        for(Object tec : technologies){
+            if(tec instanceof ArtifactId){
+                this.technologies.add((ArtifactId)tec);
+            }
+        }
         work = true;
 
         defineObsProperty(PROP_CONNECTED_DEVICES, new ArrayList<Device>());
@@ -61,11 +69,19 @@ public class DeviceCommunication extends JaCaArtifact {
 
     @OPERATION
     public void connectToDevice(final Device device, final String model, final OpFeedbackParam<ConnectionResult> success) {
-        final DeviceKnowledge deviceKnowledge = checkDeviceKnowledge();
+        final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
+        final List<Device> devices = (List<Device>)propDevices.getValue();
+        if(devices.contains(device)){
+            success.set(ConnectionResult.FAILURE);
+            return;
+        } else if(device instanceof MockDevice){
+            success.set(handleMockDevice((MockDevice) device));
+            return;
+        }
+        final DeviceKnowledge deviceKnowledge = checkDeviceKnowledge(model);
         if(Objects.nonNull(deviceKnowledge)){
-            //final AtomicBoolean successRes = new AtomicBoolean(false);
-            final AtomicBoolean successRes = new AtomicBoolean(true);
-            /*this.technologies.forEach(x -> {
+            final AtomicBoolean successRes = new AtomicBoolean(false);
+            this.technologies.forEach(x -> {
                 final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
                 try{
                     execLinkedOp(x, "connectDevice", device, op);
@@ -73,7 +89,7 @@ public class DeviceCommunication extends JaCaArtifact {
                 } catch (Exception e){
                     Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
                 }
-            });*/
+            });
             if(successRes.get()){
                 success.set(handleNewDevice(device, deviceKnowledge));
             } else {
@@ -86,23 +102,26 @@ public class DeviceCommunication extends JaCaArtifact {
 
     @OPERATION
     public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnected) {
-        /*final AtomicBoolean success = new AtomicBoolean(false);
-        this.technologies.forEach(x -> {
-            final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
-            try{
-                execLinkedOp(x, "disconnectDevice", device, op);
-                success.set(success.get() | op.get());
-            } catch (Exception e){
-                Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
-            }
-        });*/
-        final AtomicBoolean success = new AtomicBoolean(true);
+        final AtomicBoolean success = new AtomicBoolean(false);
+        if(device instanceof MockDevice){
+            success.set(true);
+        } else {
+            this.technologies.forEach(x -> {
+                final OpFeedbackParam<Boolean> op = new OpFeedbackParam<>();
+                try{
+                    execLinkedOp(x, "disconnectDevice", device, op);
+                    success.set(success.get() | op.get());
+                } catch (Exception e){
+                    Log.e(DEVICE_COMMUNICATION_TAG, "Error in scanDevices: " + e.getLocalizedMessage());
+                }
+            });
+        }
         if(success.get()){
             final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
             final List<Device> devices = (List<Device>)propDevices.getValue();
             devices.remove(device);
             propDevices.updateValue(devices);
-            signal("deviceDisconnected", device.getName());
+            signal(SIGNAL_DEVICE_DISCONNECTED, device.getName());
         }
         disconnected.set(success.get());
     }
@@ -111,6 +130,7 @@ public class DeviceCommunication extends JaCaArtifact {
     public void scanForDevices() {
         final List<Device> devices = new ArrayList<>();
         updateObsProperty(PROP_DISCOVERED_DEVICES, devices);
+        devices.add(new MockDevice());
         this.technologies.forEach(x -> {
             final OpFeedbackParam<Observable<Device>> op = new OpFeedbackParam<>();
             try{
@@ -166,7 +186,7 @@ public class DeviceCommunication extends JaCaArtifact {
             final String baseName = device.getName() + "-sensor";
             knowledge.getKnowledge().forEach(((leafCategory, sensorKnowledge) -> {
                 final String sensorName = baseName + count.getAndIncrement();
-                signal("newSensor", device.getName(), sensorName, channel, leafCategory, sensorKnowledge);
+                signal(SIGNAL_NEW_SENSOR, device.getName(), sensorName, channel, leafCategory, sensorKnowledge);
             }));
             return ConnectionResult.SUCCESS;
         } catch (final Exception e) {
@@ -175,7 +195,30 @@ public class DeviceCommunication extends JaCaArtifact {
         }
     }
 
-    private DeviceKnowledge checkDeviceKnowledge(){
+    private ConnectionResult handleMockDevice(final MockDevice device){
+        final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
+        final List<Device> devices = (List<Device>)propDevices.getValue();
+        devices.add(device);
+        propDevices.updateValue(devices);
+        try{
+            final DeviceChannel channel = DeviceChannels.createFromDevice(device);
+            channel.start();
+            final String sensorName = device.getName() + "-sensor";
+            signal(SIGNAL_NEW_SENSOR,
+                    device.getName(),
+                    sensorName,
+                    channel,
+                    device.getCategories().get(0),
+                    device.getSensorKnowledge()
+            );
+            return ConnectionResult.SUCCESS;
+        } catch (final Exception e) {
+            Log.e(DEVICE_COMMUNICATION_TAG, "Error in handleMockDevice: " + e.getLocalizedMessage());
+            return ConnectionResult.FAILURE;
+        }
+    }
+
+    private DeviceKnowledge checkDeviceKnowledge(final String model){
         final Map<LeafCategory, SensorKnowledge> knowledge = new HashMap<>();
         final SensorKnowledge tempKnowledge = new SensorKnowledge.SensorKnowledgeBuilder()
                 .sensorDataIdentifier("body/temperature")

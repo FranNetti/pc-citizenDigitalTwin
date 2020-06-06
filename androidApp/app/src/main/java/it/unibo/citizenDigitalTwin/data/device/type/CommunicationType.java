@@ -12,7 +12,8 @@ public enum CommunicationType {
 
     BT(R.drawable.ic_baseline_bluetooth_24),
     BLE(R.drawable.ic_baseline_bluetooth_24),
-    WIFI(R.drawable.ic_baseline_wifi_24);
+    WIFI(R.drawable.ic_baseline_wifi_24),
+    MOCK(R.drawable.ic_baseline_perm_data_setting_24);
 
     private final int displayIcon;
 
