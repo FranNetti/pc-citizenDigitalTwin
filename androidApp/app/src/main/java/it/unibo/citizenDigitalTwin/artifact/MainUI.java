@@ -16,10 +16,8 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.core.app.ActivityCompat;
-import cartago.ARTIFACT_INFO;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
-import cartago.OUTPORT;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.device.ConnectionResult;
@@ -29,7 +27,6 @@ import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
 import it.unibo.citizenDigitalTwin.ui.devices.DevicesFragment;
 import it.unibo.citizenDigitalTwin.ui.home.HomeFragment;
 import it.unibo.citizenDigitalTwin.ui.notifications.NotificationsFragment;
-import it.unibo.citizenDigitalTwin.ui.settings.SettingsFragment;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
 import it.unibo.citizenDigitalTwin.ui.util.StateViewer;
@@ -39,11 +36,6 @@ import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 /**
  * Artifact that represents the main view
  */
-@ARTIFACT_INFO(
-        outports = {
-                @OUTPORT(name = "deviceManagement")
-        }
-)
 public class MainUI extends ActivityArtifact {
 
     public static class MainActivity extends JaCaBaseActivity {
@@ -190,9 +182,6 @@ public class MainUI extends ActivityArtifact {
                 break;
             case R.id.navigation_notifications:
                 fragment = NotificationsFragment.getInstance(mediator);
-                break;
-            case R.id.navigation_settings:
-                fragment = SettingsFragment.getInstance();
                 break;
             default:
                 fragment = null;

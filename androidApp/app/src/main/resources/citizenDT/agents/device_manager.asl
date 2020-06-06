@@ -13,19 +13,10 @@ gpsRequest(0).
     focus(GPS);
 	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Bluetooth], Communication);
 	focus(Communication);
-	!linkToView(Communication);
 	!observeState;
 	.print("Device Manager ready");
 	!!subscribeForLocationUpdates;
 	!!checkSensorData.
-
-+!linkToView(CommId) <-
-	lookupArtifact("mainUI", MainUI);
-	linkArtifacts(MainUI,"deviceManagement",CommId).
-
--!linkToView(ID) <-
-	.wait(100)
-	!linkToView(ID).
 
 +!observeState <-
     lookupArtifact("state", S);
