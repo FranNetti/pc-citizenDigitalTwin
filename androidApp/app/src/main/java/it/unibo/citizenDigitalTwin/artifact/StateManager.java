@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import cartago.OPERATION;
 import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
-import it.unibo.citizenDigitalTwin.data.connection.LoginResult;
+import it.unibo.citizenDigitalTwin.data.connection.channel.response.LoginResult;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
@@ -65,9 +65,9 @@ public class StateManager extends JaCaArtifact {
                 removeObsProperty(PROP_NOT_LOGGED);
             }
         } else if(hasObsProperty(PROP_NOT_LOGGED)){
-            updateObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+            updateObsProperty(PROP_NOT_LOGGED, result.getErrorMessage(getApplicationContext()).get());
         } else {
-            defineObsProperty(PROP_NOT_LOGGED, result.getFailMessage(getApplicationContext()).get());
+            defineObsProperty(PROP_NOT_LOGGED, result.getErrorMessage(getApplicationContext()).get());
         }
     }
 

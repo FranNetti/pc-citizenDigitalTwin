@@ -7,11 +7,13 @@ gpsRequest(0).
 
 @start[atomic]
 +activate <-
+    makeArtifact("deviceKnowledge", "it.unibo.citizenDigitalTwin.artifact.DeviceKnowledgeArtifact", [], Knowledge);
+    focus(Knowledge);
     makeArtifact("bluetooth", "it.unibo.citizenDigitalTwin.artifact.BluetoothArtifact", [], Bluetooth);
     focus(Bluetooth);
     makeArtifact("GPS", "it.unibo.citizenDigitalTwin.artifact.GPSArtifact", [], GPS);
     focus(GPS);
-	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [[Bluetooth]], Communication);
+	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Knowledge, [Bluetooth]], Communication);
 	focus(Communication);
 	!observeState;
 	.print("Device Manager ready");
@@ -60,8 +62,8 @@ gpsRequest(0).
     -sensor(DeviceName, H);
     !!unsubscribeFromSensors(DeviceName, T).
 
-+newSensor(DeviceName, SensorName, Channel, LeafCategory, SensorKnowledge) <-
-    makeArtifact(SensorName, "it.unibo.citizenDigitalTwin.artifact.ExternalSensorArtifact", [DeviceName, Channel, LeafCategory, SensorKnowledge], Id);
++newSensor(DeviceName, SensorName, Channel, SensorKnowledge) <-
+    makeArtifact(SensorName, "it.unibo.citizenDigitalTwin.artifact.ExternalSensorArtifact", [DeviceName, Channel, SensorKnowledge], Id);
     focus(Id);
     +sensor(DeviceName,SensorName);
     sendDataRequest[artifact_id(Id)];

@@ -13,7 +13,7 @@ import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 public class MockDevice implements Device {
 
     private static final String MOCK_DEVICE_NAME = "Mock-device";
-    public static final String MOCK_DEVICE_SENSOR_DATA_IDENTIFIER = "\"body/temperature\"";
+    public static final String MOCK_DEVICE_SENSOR_DATA_IDENTIFIER = "body/temperature";
 
     @Override
     public String getName() {
@@ -37,6 +37,7 @@ public class MockDevice implements Device {
 
     public SensorKnowledge getSensorKnowledge(){
         return new SensorKnowledge.SensorKnowledgeBuilder()
+                .leafCategory(LeafCategory.TEMPERATURE)
                 .sensorDataIdentifier(MOCK_DEVICE_SENSOR_DATA_IDENTIFIER)
                 .reqDataMessage("get/body/temperature")
                 .subForDataMessage("subscribe/body/temperature")

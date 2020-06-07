@@ -1,4 +1,6 @@
-package it.unibo.citizenDigitalTwin.data.connection;
+package it.unibo.citizenDigitalTwin.data.connection.channel;
+
+import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 
 public class ChannelException extends Exception {
     private final ChannelResponse response;

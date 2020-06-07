@@ -1,4 +1,4 @@
-package it.unibo.citizenDigitalTwin.data.connection;
+package it.unibo.citizenDigitalTwin.data.connection.channel;
 
 import android.util.Log;
 import android.util.Pair;
@@ -16,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.Observable;
+import it.unibo.citizenDigitalTwin.data.connection.JsonSerializable;
+import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;

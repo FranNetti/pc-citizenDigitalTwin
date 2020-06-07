@@ -1,7 +1,6 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
 import cartago.OPERATION;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 import it.unibo.citizenDigitalTwin.data.device.communication.DeviceChannel;
@@ -20,14 +19,14 @@ public class ExternalSensorArtifact extends JaCaArtifact {
     private DeviceChannel channel;
     private SensorKnowledge knowledge;
 
-    void init(final String deviceName, final DeviceChannel channel, final LeafCategory leafCategory, final SensorKnowledge knowledge){
+    void init(final String deviceName, final DeviceChannel channel, final SensorKnowledge knowledge){
         final Feeder feeder = new Feeder("", deviceName);
 
         channel.subscribeToIncomingMessages(this, msg -> {
             if(msg.isPresent() && msg.getType().equals(knowledge.getSensorDataIdentifier())){
                 final Data newData = new DataBuilder()
                         .feeder(feeder)
-                        .leafCategory(leafCategory)
+                        .leafCategory(knowledge.getLeafCategory())
                         .addInformation(
                                 CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,
                                 msg.getValue()

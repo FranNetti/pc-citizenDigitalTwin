@@ -1,11 +1,11 @@
-package it.unibo.citizenDigitalTwin.data.connection;
+package it.unibo.citizenDigitalTwin.data.connection.channel.response;
 
 import org.json.JSONObject;
 
 import java.util.Optional;
 
-public class ChannelResponse {
-    private final int code;
+public class ChannelResponse extends Response {
+
     private final JSONObject data;
     private final String errorMessage;
 
@@ -22,19 +22,16 @@ public class ChannelResponse {
     }
 
     private ChannelResponse(int code, JSONObject data, String errorMessage) {
-        this.code = code;
+        super(code);
         this.data = data;
         this.errorMessage = errorMessage;
-    }
-
-    public int getCode() {
-        return code;
     }
 
     public Optional<JSONObject> getData() {
         return Optional.ofNullable(data);
     }
 
+    @Override
     public Optional<String> getErrorMessage() {
         return Optional.ofNullable(errorMessage);
     }

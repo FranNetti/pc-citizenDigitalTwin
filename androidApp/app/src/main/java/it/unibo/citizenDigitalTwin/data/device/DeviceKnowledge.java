@@ -1,25 +1,35 @@
 package it.unibo.citizenDigitalTwin.data.device;
 
-import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that contains which sensors the device has and how to communicate with them
  */
 public class DeviceKnowledge {
 
-    private final Map<LeafCategory, SensorKnowledge> knowledge;
+    private static final String DEVICE = "device";
 
-    public DeviceKnowledge(final Map<LeafCategory, SensorKnowledge> knowledge){
-        this.knowledge = knowledge;
+    private final List<SensorKnowledge> sensorKnowledgeList;
+
+    public DeviceKnowledge(final JSONObject object) throws JSONException {
+        sensorKnowledgeList = new ArrayList<>();
+        final JSONArray sensors = object.getJSONArray(DEVICE);
+        final int length = sensors.length();
+        for(int x = 0; x < length; x++){
+            sensorKnowledgeList.add(new SensorKnowledge(sensors.getJSONObject(x)));
+        }
     }
 
     /**
-     * Returns a map where at each leafCategory there is a sensor knowledge
-     * @return a map where at each leafCategory there is a sensor knowledge
+     * Returns a list containing all the information required to communicate with each sensor of the device
+     * @return a list containing all the information required to communicate with each sensor of the device
      */
-    public Map<LeafCategory, SensorKnowledge> getKnowledge() {
-        return knowledge;
+    public List<SensorKnowledge> getSensorKnowledge() {
+        return sensorKnowledgeList;
     }
 }
