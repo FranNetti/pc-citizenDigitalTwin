@@ -1,28 +1,25 @@
 package it.unibo.citizenDigitalTwin.data.connection.channel.response;
 
-import android.content.Context;
-
 import java.net.HttpURLConnection;
 import java.util.Optional;
 
-import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.device.DeviceKnowledge;
 
 public class DeviceKnowledgeResponse extends Response {
 
-    public static DeviceKnowledgeResponse successfulResponse(final Context context, final DeviceKnowledge knowledge){
+    public static DeviceKnowledgeResponse successfulResponse(final DeviceKnowledge knowledge){
         return new DeviceKnowledgeResponse(knowledge, HttpURLConnection.HTTP_OK);
     }
 
-    public static DeviceKnowledgeResponse failedResponse(final Context context, final int failCode){
+    public static DeviceKnowledgeResponse failedResponse(final int failCode){
         return new DeviceKnowledgeResponse(null, failCode);
     }
 
-    public static DeviceKnowledgeResponse applicationErrorResponse(final Context context){
+    public static DeviceKnowledgeResponse applicationErrorResponse(){
         return new DeviceKnowledgeResponse(null, APPLICATION_ERROR);
     }
 
-    private static final int APPLICATION_ERROR = 600;
+    public static final int APPLICATION_ERROR = 600;
 
     private final DeviceKnowledge knowledge;
 

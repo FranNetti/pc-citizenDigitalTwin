@@ -62,4 +62,5 @@
     <string name="lat">Latitudine</string>
     <string name="lng">Longitudine</string>
     <string name="title_home">Il tuo stato</string>
+    <string name="model_search_failed">Si è verificato un errore durante la ricerca delle informazioni sul modello inserito, riprova.</string>
 </resources>

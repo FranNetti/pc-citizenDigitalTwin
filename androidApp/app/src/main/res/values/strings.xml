@@ -50,6 +50,7 @@
     <string name="expand_item">Expand element</string>
     <string name="feeder_text">Produced by</string>
     <string name="date_text">In date</string>
+    <string name="model_search_failed">An error occurred while searching for the information about the model, try again.</string>
 
     /* -----------------Leaf categories----------------- */
     <string name="LC_name">Name</string>

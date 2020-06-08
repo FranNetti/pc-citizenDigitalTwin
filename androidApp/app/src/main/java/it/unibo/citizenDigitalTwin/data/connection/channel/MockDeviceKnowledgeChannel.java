@@ -13,6 +13,8 @@ import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelRespo
 
 public class MockDeviceKnowledgeChannel implements CommunicationChannel {
 
+    private static final String DEVICE_NAME = "sensor/braccialetto";
+
     @Override
     public CompletableFuture<ChannelResponse> patch(final String resource, final JsonSerializable data) {
         throw new UnsupportedOperationException();
@@ -21,15 +23,19 @@ public class MockDeviceKnowledgeChannel implements CommunicationChannel {
     @Override
     public CompletableFuture<ChannelResponse> get(final String resource) {
         final CompletableFuture<ChannelResponse> future = new CompletableFuture<>();
-        final String message = "{ 'device': [ " +
-                createMockSensorResponse(LeafCategory.TEMPERATURE, "body/temperature", "°C", "get/body/temperature", "subscribe/body/temperature") +
-                ", " + createMockSensorResponse(LeafCategory.BLOOD_OXIGEN, "body/oxygen", "%", "get/body/oxygen", "subscribe/body/oxygen") +
-                ", " + createMockSensorResponse(LeafCategory.HEART_RATE, "body/heartrate", "bpm", "get/body/heartrate", "subscribe/body/heartrate") +
-                " ] }";
-        try {
-            future.complete(ChannelResponse.successfulResponse(HttpURLConnection.HTTP_OK, new JSONObject(message)));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(resource.equals(DEVICE_NAME)){
+            final String message = "{ 'device': [ " +
+                    createMockSensorResponse(LeafCategory.TEMPERATURE, "body/temperature", "°C", "get/body/temperature", "subscribe/body/temperature") +
+                    ", " + createMockSensorResponse(LeafCategory.BLOOD_OXIGEN, "body/oxygen", "%", "get/body/oxygen", "subscribe/body/oxygen") +
+                    ", " + createMockSensorResponse(LeafCategory.HEART_RATE, "body/heartrate", "bpm", "get/body/heartrate", "subscribe/body/heartrate") +
+                    " ] }";
+            try {
+                future.complete(ChannelResponse.successfulResponse(HttpURLConnection.HTTP_OK, new JSONObject(message)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            future.complete(ChannelResponse.successfulResponse(HttpURLConnection.HTTP_NOT_FOUND, null));
         }
         return future;
     }

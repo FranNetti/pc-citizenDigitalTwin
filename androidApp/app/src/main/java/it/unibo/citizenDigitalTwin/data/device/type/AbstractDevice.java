@@ -29,6 +29,7 @@ abstract class AbstractDevice implements Device {
 
     @Override
     public void setCategories(final Collection<LeafCategory> categories){
+        this.categories.clear();
         this.categories.addAll(categories);
     }
 

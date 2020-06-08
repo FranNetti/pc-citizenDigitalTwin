@@ -32,16 +32,15 @@ public class DeviceKnowledgeArtifact extends JaCaArtifact {
         try {
             final ChannelResponse response = future.get();
             if(response.getData().isPresent()){
-                knowledge.set(DeviceKnowledgeResponse.successfulResponse(
-                        getApplicationContext(),
-                        new DeviceKnowledge(response.getData().get())
-                ));
+                knowledge.set(
+                        DeviceKnowledgeResponse.successfulResponse(new DeviceKnowledge(response.getData().get()))
+                );
             } else {
-                knowledge.set(DeviceKnowledgeResponse.failedResponse(getApplicationContext(), response.getCode()));
+                knowledge.set(DeviceKnowledgeResponse.failedResponse(response.getCode()));
             }
         } catch (final ExecutionException | InterruptedException | JSONException e) {
             Log.e(TAG, "Error in findDeviceKnowledge: " + e.getLocalizedMessage());
-            knowledge.set(DeviceKnowledgeResponse.applicationErrorResponse(getApplicationContext()));
+            knowledge.set(DeviceKnowledgeResponse.applicationErrorResponse());
         }
     }
 

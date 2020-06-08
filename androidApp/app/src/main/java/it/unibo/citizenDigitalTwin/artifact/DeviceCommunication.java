@@ -116,9 +116,10 @@ public class DeviceCommunication extends JaCaArtifact {
 
     @OPERATION
     public void scanForDevices() {
-        final List<Device> devices = new ArrayList<>();
-        updateObsProperty(PROP_DISCOVERED_DEVICES, devices);
-        devices.add(new MockDevice());
+        final List<Device> discoveredDevices = new ArrayList<>();
+        final List<Device> pairedDevices = (List<Device>)getObsProperty(PROP_PAIRED_DEVICES).getValue();
+        updateObsProperty(PROP_DISCOVERED_DEVICES, discoveredDevices);
+        discoveredDevices.add(new MockDevice());
         this.technologies.forEach(x -> {
             final OpFeedbackParam<Observable<Device>> op = new OpFeedbackParam<>();
             try{
@@ -126,10 +127,10 @@ public class DeviceCommunication extends JaCaArtifact {
                 final Observable<Device> observable = op.get();
                 if(Objects.nonNull(observable)){
                     observable.subscribe(DeviceCommunication.this, device -> {
-                        if(!devices.contains(device)){
-                            devices.add(device);
+                        if(!discoveredDevices.contains(device) && !pairedDevices.contains(device)){
+                            discoveredDevices.add(device);
                             beginExternalSession();
-                            updateObsProperty(PROP_DISCOVERED_DEVICES, devices);
+                            updateObsProperty(PROP_DISCOVERED_DEVICES, discoveredDevices);
                             endExternalSession(true);
                         }
                     });
