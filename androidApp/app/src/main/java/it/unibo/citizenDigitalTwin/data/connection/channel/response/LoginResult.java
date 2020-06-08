@@ -17,7 +17,9 @@ public class LoginResult extends Response {
         return new LoginResult(null, failCode);
     }
 
-    private static final int LOGIN_SUCCESS = 201;
+    public static final int LOGIN_SUCCESS = 201;
+    public static final int APPLICATION_ERROR = 600;
+    public static final int MALFORMED_RECEIVED_DATA = 601;
 
     private final String uri;
 

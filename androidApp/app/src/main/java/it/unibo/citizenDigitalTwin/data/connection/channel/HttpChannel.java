@@ -12,14 +12,15 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.Observable;
-import it.unibo.citizenDigitalTwin.data.connection.JsonSerializable;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,21 +34,35 @@ public class HttpChannel implements CommunicationChannel {
     private static final String TAG = "HTTP_CHANNEL";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    private final String baseUrl;
+    private final String restBaseUrl;
+    private final String wsBaseUrl;
     private final OkHttpClient client;
+
     private final Map<String, Pair<Observable<JSONObject>,WebSocket>> subscriptions;
 
     public HttpChannel(final String baseUrl) {
-        this.baseUrl = "http://" + baseUrl;
+        this.restBaseUrl = "http://" + baseUrl;
+        this.wsBaseUrl = "ws://" + baseUrl;
         this.client = new OkHttpClient();
         this.subscriptions = new HashMap<>();
     }
 
     @Override
-    public CompletableFuture<ChannelResponse> patch(final String resource, final JsonSerializable data) {
-        final RequestBody body = RequestBody.create(data.toJson().toString(), JSON);
+    public CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {
+        final RequestBody body = RequestBody.create(data.toString(), JSON);
         final Request request = request(resource)
                 .patch(body)
+                .build();
+        final CompletableFuture<ChannelResponse> result = new CompletableFuture<>();
+        client.newCall(request).enqueue(callback(result));
+        return result;
+    }
+
+    @Override
+    public CompletableFuture<ChannelResponse> post(String resource, JSONObject data) {
+        final RequestBody body = RequestBody.create(data.toString(), JSON);
+        final Request request = request(resource)
+                .post(body)
                 .build();
         final CompletableFuture<ChannelResponse> result = new CompletableFuture<>();
         client.newCall(request).enqueue(callback(result));
@@ -65,10 +80,10 @@ public class HttpChannel implements CommunicationChannel {
     }
 
     @Override
-    public CompletableFuture<Boolean> send(String resource, JsonSerializable data) {
+    public CompletableFuture<Boolean> send(String resource, JSONObject data) {
         createResourceChannelIfNecessary(resource);
         final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
-        final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toJson().toString());
+        final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
         futureResult.complete(result);
         return futureResult;
     }
@@ -88,7 +103,11 @@ public class HttpChannel implements CommunicationChannel {
     }
 
     private Request.Builder request(final String resource) {
-        return new Request.Builder().url(baseUrl+resource);
+        return new Request.Builder().url(restBaseUrl +resource);
+    }
+
+    private Request.Builder wsRequest(final String resource) {
+        return new Request.Builder().url(wsBaseUrl +resource);
     }
 
     private Callback callback(final CompletableFuture<ChannelResponse> result) {
@@ -132,7 +151,7 @@ public class HttpChannel implements CommunicationChannel {
 
     private void createResourceChannelIfNecessary(final String resource) {
         if (!subscriptions.containsKey(resource)) {
-            final Request request = request(resource).get().build();
+            final Request request = wsRequest(resource).build();
             final Observable<JSONObject> obs = new Observable<>();
             final WebSocket ws = client.newWebSocket(request, webSocketListener(obs));
             subscriptions.put(resource,Pair.create(obs,ws));

@@ -8,7 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.connection.JsonSerializable;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 
 public class MockDeviceKnowledgeChannel implements CommunicationChannel {
@@ -16,7 +15,12 @@ public class MockDeviceKnowledgeChannel implements CommunicationChannel {
     private static final String DEVICE_NAME = "sensor/braccialetto";
 
     @Override
-    public CompletableFuture<ChannelResponse> patch(final String resource, final JsonSerializable data) {
+    public CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompletableFuture<ChannelResponse> post(String resource, JSONObject data) {
         throw new UnsupportedOperationException();
     }
 
@@ -41,7 +45,7 @@ public class MockDeviceKnowledgeChannel implements CommunicationChannel {
     }
 
     @Override
-    public CompletableFuture<Boolean> send(final String resource, final JsonSerializable data) {
+    public CompletableFuture<Boolean> send(final String resource, final JSONObject data) {
         throw new UnsupportedOperationException();
     }
 

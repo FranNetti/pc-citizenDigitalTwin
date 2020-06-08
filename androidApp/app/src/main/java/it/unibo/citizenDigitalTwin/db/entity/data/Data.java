@@ -11,12 +11,25 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
+import it.unibo.citizenDigitalTwin.data.connection.JsonSerializable;
 import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
 @Entity(tableName = "state")
-public class Data implements Serializable {
+public class Data implements Serializable, JsonSerializable {
+
+    private static final String IDENTIFIER = "identifier";
+    private static final String FEEDER = "feeder";
+    private static final String TIMESTAMP = "timestamp";
+    private static final String DATA_CATEGORY = "data_category";
+    private static final String VALUE = "value";
+    private static final String NAME = "name";
 
     @PrimaryKey @NonNull @ColumnInfo(name = "leafCategory") private String leafCategoryName;
     @ColumnInfo private Date date;
@@ -74,6 +87,7 @@ public class Data implements Serializable {
         return leafCategory;
     }
 
+    @NotNull
     public String getLeafCategoryName() {
         return leafCategoryName;
     }
@@ -106,5 +120,26 @@ public class Data implements Serializable {
 
     public void setFeeder(Feeder feeder) {
         this.feeder = feeder;
+    }
+
+    @Override
+    public JSONObject toJson() throws JSONException {
+        final Object value;
+        if (information.keySet().size() == 1)
+            value = information.get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER);
+        else {
+            value = new JSONObject();
+            final JSONObject json = (JSONObject)value;
+            for (final Map.Entry<CommunicationStandard,String> info : information.entrySet()) {
+                json.put(info.getKey().getMessage(),info.getValue());
+            }
+        }
+
+        return new JSONObject()
+                .put(IDENTIFIER,identifier)
+                .put(FEEDER,feeder.toJson())
+                .put(TIMESTAMP,date.getTime())
+                .put(DATA_CATEGORY,new JSONObject().put(NAME,leafCategory.getIdentifier()))
+                .put(VALUE,value);
     }
 }

@@ -2,6 +2,10 @@
     doLogin(Username, Password, LoginResult);
     checkIfLogged(LoginResult).
 
++!refreshToken(Ttl) <-
+    .wait(Ttl);
+    refreshToken.
+
 @start[atomic]
 +activate <-
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
@@ -12,3 +16,5 @@
 
 +newState(State) <-
 	updateState(State).
+
++token(_,Ttl) <- !!refreshToken(Ttl).

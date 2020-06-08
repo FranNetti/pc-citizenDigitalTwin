@@ -5,7 +5,16 @@ import java.io.Serializable;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
-public class Feeder implements Serializable {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import it.unibo.citizenDigitalTwin.data.connection.JsonSerializable;
+
+public class Feeder implements Serializable, JsonSerializable {
+
+    private static final String IS_RESOURCE = "isResource";
+    private static final String NAME = "name";
+    private static final String URI = "uri";
 
     @ColumnInfo(name = "feeder_isResource") private boolean isResource;
     @ColumnInfo(name = "feeder_uri") private String uri;
@@ -44,5 +53,13 @@ public class Feeder implements Serializable {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    @Override
+    public JSONObject toJson() throws JSONException {
+        return new JSONObject()
+                .put(NAME,name)
+                .put(IS_RESOURCE,isResource)
+                .put(URI,uri);
     }
 }
