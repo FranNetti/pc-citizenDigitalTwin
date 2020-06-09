@@ -2,6 +2,7 @@ package it.unibo.citizenDigitalTwin.artifact;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Parcel;
@@ -102,15 +103,15 @@ public class MainUI extends ActivityArtifact {
 
     @OPERATION
     public void showResultOfConnectionToDevice(final ConnectionResult result){
-        if(result != ConnectionResult.SUCCESS && currentFragment instanceof DevicesFragment){
-            execute(() -> ((DevicesFragment) currentFragment).connectionFailed(result.getMessage(getActivityContext())));
+        if(result != ConnectionResult.SUCCESS){
+            showDialog(result.getMessage(getActivityContext()));
         }
     }
 
     @OPERATION
     public void showResultOfDisconnectionToDevice(final boolean success){
-        if(!success && currentFragment instanceof DevicesFragment){
-            execute(() -> ((DevicesFragment) currentFragment).disconnectionFailed());
+        if(!success){
+            showDialog(getActivityContext().getString(R.string.disconnection_failed));
         }
     }
 
@@ -206,6 +207,16 @@ public class MainUI extends ActivityArtifact {
     private void setTitle(){
         final Toolbar toolbar = (Toolbar) findUIElement(R.id.toolbar);
         toolbar.setTitle("");
+    }
+
+    private void showDialog(final String message){
+        execute(() -> {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivityContext());
+            builder.setMessage(message)
+                    .setPositiveButton(android.R.string.ok, null);
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+        });
     }
 
     public class MainUIMediator implements Parcelable {
