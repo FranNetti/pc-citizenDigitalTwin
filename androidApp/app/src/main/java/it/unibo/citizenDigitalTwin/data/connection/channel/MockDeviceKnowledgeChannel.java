@@ -4,15 +4,26 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 
-public class MockDeviceKnowledgeChannel implements CommunicationChannel {
+public class MockDeviceKnowledgeChannel implements HttpChannel {
 
     private static final String DEVICE_NAME = "sensor/braccialetto";
+
+    @Override
+    public void setDefaultHeaders(Map<Header, String> defaultHeaders) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void closeChannel(String resource) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {

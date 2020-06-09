@@ -1,160 +1,39 @@
 package it.unibo.citizenDigitalTwin.data.connection.channel;
 
-import android.util.Log;
 import android.util.Pair;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import it.unibo.citizenDigitalTwin.data.Observable;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 
-public class HttpChannel implements CommunicationChannel {
+public interface HttpChannel {
 
-    private static final String TAG = "HTTP_CHANNEL";
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    enum Header {
 
-    private final String restBaseUrl;
-    private final String wsBaseUrl;
-    private final OkHttpClient client;
+        AUTHORIZATION("Authorization");
 
-    private final Map<String, Pair<Observable<JSONObject>,WebSocket>> subscriptions;
+        private final String name;
 
-    public HttpChannel(final String baseUrl) {
-        this.restBaseUrl = "http://" + baseUrl;
-        this.wsBaseUrl = "ws://" + baseUrl;
-        this.client = new OkHttpClient();
-        this.subscriptions = new HashMap<>();
-    }
+        Header(final String name) {
+            this.name = name;
+        }
 
-    @Override
-    public CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {
-        final RequestBody body = RequestBody.create(data.toString(), JSON);
-        final Request request = request(resource)
-                .patch(body)
-                .build();
-        final CompletableFuture<ChannelResponse> result = new CompletableFuture<>();
-        client.newCall(request).enqueue(callback(result));
-        return result;
-    }
-
-    @Override
-    public CompletableFuture<ChannelResponse> post(String resource, JSONObject data) {
-        final RequestBody body = RequestBody.create(data.toString(), JSON);
-        final Request request = request(resource)
-                .post(body)
-                .build();
-        final CompletableFuture<ChannelResponse> result = new CompletableFuture<>();
-        client.newCall(request).enqueue(callback(result));
-        return result;
-    }
-
-    @Override
-    public CompletableFuture<ChannelResponse> get(final String resource) {
-        final Request request = request(resource)
-                .get()
-                .build();
-        final CompletableFuture<ChannelResponse> result = new CompletableFuture<>();
-        client.newCall(request).enqueue(callback(result));
-        return result;
-    }
-
-    @Override
-    public CompletableFuture<Boolean> send(String resource, JSONObject data) {
-        createResourceChannelIfNecessary(resource);
-        final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
-        final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
-        futureResult.complete(result);
-        return futureResult;
-    }
-
-    @Override
-    public void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data) {
-        createResourceChannelIfNecessary(resource);
-        Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, data);
-    }
-
-    @Override
-    public void unsubscribe(final Object subscriber, final String resource) {
-        subscriptions.computeIfPresent(resource, (res,subscription) -> {
-            subscription.first.unsubscribe(subscriber);
-            return subscription;
-        });
-    }
-
-    private Request.Builder request(final String resource) {
-        return new Request.Builder().url(restBaseUrl +resource);
-    }
-
-    private Request.Builder wsRequest(final String resource) {
-        return new Request.Builder().url(wsBaseUrl +resource);
-    }
-
-    private Callback callback(final CompletableFuture<ChannelResponse> result) {
-        return new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                result.completeExceptionally(exception(e.toString()));
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try {
-                    final JSONObject dataResult = new JSONObject(response.body().string());
-                    result.complete(ChannelResponse.successfulResponse(response.code(),dataResult));
-                } catch (final JSONException | NullPointerException e) {
-                    result.completeExceptionally(exception(e.toString()));
-                }
-            }
-
-        };
-    }
-
-    private WebSocketListener webSocketListener(final Observable<JSONObject> obs) {
-        return new WebSocketListener() {
-            @Override
-            public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-                super.onMessage(webSocket, text);
-                try {
-                    obs.set(new JSONObject(text));
-                } catch (final JSONException e) {
-                    Log.e(TAG,e.toString(),e);
-                }
-            }
-        };
-    }
-
-    private ChannelException exception(final String message) {
-        return new ChannelException(ChannelResponse.errorResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, message));
-    }
-
-    private void createResourceChannelIfNecessary(final String resource) {
-        if (!subscriptions.containsKey(resource)) {
-            final Request request = wsRequest(resource).build();
-            final Observable<JSONObject> obs = new Observable<>();
-            final WebSocket ws = client.newWebSocket(request, webSocketListener(obs));
-            subscriptions.put(resource,Pair.create(obs,ws));
+        public String getName() {
+            return name;
         }
     }
+
+    void setDefaultHeaders(Map<Header,String> defaultHeaders);
+    void closeChannel(String resource);
+    CompletableFuture<ChannelResponse> patch(String resource, JSONObject data);
+    CompletableFuture<ChannelResponse> post(String resource, JSONObject data);
+    CompletableFuture<ChannelResponse> get(String resource);
+    CompletableFuture<Boolean> send(String resource, JSONObject data);
+    void subscribe(Object subscriber, String resource, Consumer<JSONObject> data);
+    void unsubscribe(Object subscriber, String resource);
 }

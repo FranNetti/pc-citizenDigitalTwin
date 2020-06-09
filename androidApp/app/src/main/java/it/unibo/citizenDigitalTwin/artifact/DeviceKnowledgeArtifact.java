@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 import cartago.LINK;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
-import it.unibo.citizenDigitalTwin.data.connection.channel.CommunicationChannel;
+import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.MockDeviceKnowledgeChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.DeviceKnowledgeResponse;
 import it.unibo.citizenDigitalTwin.data.device.DeviceKnowledge;
@@ -20,7 +20,7 @@ public class DeviceKnowledgeArtifact extends JaCaArtifact {
     private static final String TAG = "[DeviceKnowledge]";
     private static final String SENSOR_RESOURCE = "sensor/";
 
-    private CommunicationChannel channel;
+    private HttpChannel channel;
 
     void init(){
         channel = new MockDeviceKnowledgeChannel();
