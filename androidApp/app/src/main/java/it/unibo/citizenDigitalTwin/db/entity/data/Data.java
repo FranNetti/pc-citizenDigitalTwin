@@ -1,7 +1,10 @@
 package it.unibo.citizenDigitalTwin.db.entity.data;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -23,6 +26,8 @@ import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 
 @Entity(tableName = "state")
 public class Data implements Serializable, JsonSerializable {
+
+    private static final String TAG = "[Data]";
 
     private static final String IDENTIFIER = "identifier";
     private static final String FEEDER = "feeder";
@@ -60,6 +65,16 @@ public class Data implements Serializable, JsonSerializable {
                 final LeafCategory dataCategory,
                 final Map<CommunicationStandard, String> information) {
         this("", date, feeder, dataCategory, information);
+    }
+
+    @Ignore
+    public Data(final JSONObject data) throws JSONException {
+        this(data.getString(IDENTIFIER),
+                new Date(data.getLong(TIMESTAMP)),
+                new Feeder(data.getJSONObject(FEEDER)),
+                data.getString(DATA_CATEGORY),
+                Data.decodeInformation(data.get(VALUE))
+        );
     }
 
     public Data(
@@ -131,7 +146,7 @@ public class Data implements Serializable, JsonSerializable {
             value = new JSONObject();
             final JSONObject json = (JSONObject)value;
             for (final Map.Entry<CommunicationStandard,String> info : information.entrySet()) {
-                json.put(info.getKey().getMessage(),info.getValue());
+                json.put(info.getKey().getIdentifier(),info.getValue());
             }
         }
 
@@ -141,5 +156,22 @@ public class Data implements Serializable, JsonSerializable {
                 .put(TIMESTAMP,date.getTime())
                 .put(DATA_CATEGORY,new JSONObject().put(NAME,leafCategory.getIdentifier()))
                 .put(VALUE,value);
+    }
+
+    private static Map<CommunicationStandard, String> decodeInformation(final Object obj) {
+        final Map<CommunicationStandard, String> information = new HashMap<>();
+        if (obj instanceof JSONObject) {
+            final JSONObject json = (JSONObject) obj;
+            json.keys().forEachRemaining(name -> {
+                try {
+                    information.put(CommunicationStandard.findByIdentifier(name).get(), json.getString(name));
+                } catch (final Exception e){
+                    Log.e(TAG, "Error in decodeInformation: " + e.getLocalizedMessage());
+                }
+            });
+        } else {
+            information.put(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,obj.toString());
+        }
+        return information;
     }
 }

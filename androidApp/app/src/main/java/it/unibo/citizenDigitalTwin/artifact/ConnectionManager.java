@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
-import cartago.ObsProperty;
 import cartago.OpFeedbackParam;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
@@ -49,9 +49,13 @@ public class ConnectionManager extends JaCaArtifact {
 
     private static final String PROP_TOKEN = "token";
     private static final String MSG_REFRESH_TOKEN_FAILED = "refreshTokenFailed";
+    private static final String MSG_NEW_STATE = "newState";
 
-    private static final String LOGIN_RES = "/citizens/login";
-    private static final String REFRESH_TOKEN_RES = "/citizens/refreshToken";
+    private static final String LOGIN_RES = "/login";
+    private static final String REFRESH_TOKEN_RES = "/refreshToken";
+    private static final String STATE_RES = "/state";
+    private static final String CDT_CHANNEL_BASE_PATH = "/citizens";
+    private static final String AUTHORIZATION_CHANNEL_BASE_PATH = "/citizens";
 
     private static final String ID = "id";
     private static final String VALUE = "value";
@@ -61,70 +65,32 @@ public class ConnectionManager extends JaCaArtifact {
     private static final String EXPIRATION_IN_MINUTE = "expirationInMinute";
     private static final String USER = "user";
     private static final String IDENTIFIER = "identifier";
-
-    private final Feeder fakeFeeder = new Feeder("/stefano", "Stefano Righini");
-    private List<List<Data>> fakeStates = Arrays.asList(
-            Arrays.asList(
-                    new DataBuilder()
-                            .leafCategory(LeafCategory.NAME)
-                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Stefano")
-                            .feeder(fakeFeeder)
-                            .build(),
-                    new DataBuilder()
-                            .leafCategory(LeafCategory.SURNAME)
-                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Righini")
-                            .feeder(fakeFeeder)
-                            .build()
-            ),
-            Arrays.asList(
-                    new DataBuilder()
-                            .leafCategory(LeafCategory.BIRTHDATE)
-                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "24-10-1996")
-                            .feeder(fakeFeeder)
-                            .build()
-            ),
-            Arrays.asList(
-                    new DataBuilder()
-                            .leafCategory(LeafCategory.ADDRESS)
-                            .addInformation(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER, "Via Luca Ghini 4")
-                            .feeder(fakeFeeder)
-                            .build()
-            )
-    );
-    private final List<Notification> notifications = Arrays.asList(
-                new DataNotification("Pippo e Minnie", Arrays.asList(LeafCategory.NAME)),
-                new MessageNotification("Cicciolina", "Vienimi a prendere fustacchione"),
-                new DataNotification("Paperino", Arrays.asList(LeafCategory.BIRTHDATE)),
-                new MessageNotification("Charles Leclerc", "Corriamo insieme!!!"),
-                new DataNotification("Pluto", Arrays.asList(LeafCategory.ADDRESS)),
-                new MessageNotification("Stefano Righini", "Vieni a recuperare i prodotti della mia terra"),
-                new DataNotification("Topolino", Arrays.asList(LeafCategory.SURNAME)),
-                new MessageNotification("Dottor Filippone", "Hai il Covid-19 coglione")
-        );
+    private static final String UPDATED = "updated";
 
     private HttpChannel cdtChannel;
     private HttpChannel authorizationChannel;
     private long id = 0L;
 
     void init(final String cdtUrl, final String authorizationUrl) {
-        execInternalOp("generateData");
-        cdtChannel = new OkHttpChannel(cdtUrl);
-        authorizationChannel = new OkHttpChannel(authorizationUrl);
+        cdtChannel = new OkHttpChannel(cdtUrl + CDT_CHANNEL_BASE_PATH);
+        authorizationChannel = new OkHttpChannel(authorizationUrl + AUTHORIZATION_CHANNEL_BASE_PATH);
     }
 
     @OPERATION
-    void send(final Data data) {
+    public void updateDigitalState(final String citizenId, final Data data) {
         try {
             final JSONObject json = new JSONObject()
-                    .put(ID,id++).put(VALUE,data.toJson());
-            cdtChannel.send("ciccio",json);
-        } catch (JSONException e) {
-            e.printStackTrace();
+                    .put(ID,id++)
+                    .put(VALUE,data.toJson());
+            cdtChannel.send("/"+citizenId+STATE_RES,json);
+            //TODO check result
+        } catch (final JSONException e) {
+            Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
         }
     }
 
     @OPERATION
-    void refreshToken() {
+    public void refreshToken() {
         try {
             final CompletableFuture<ChannelResponse> promise = authorizationChannel
                     .post(REFRESH_TOKEN_RES,new JSONObject())
@@ -137,30 +103,21 @@ public class ConnectionManager extends JaCaArtifact {
     }
 
     @OPERATION
-    void doLogin(final String username, final String password, final OpFeedbackParam<LoginResult> result, final OpFeedbackParam<Boolean> logged) {
-        /*try {
+    public void doLogin(final String username, final String password, final OpFeedbackParam<LoginResult> result, final OpFeedbackParam<Boolean> logged) {
+        try {
             final CompletableFuture<ChannelResponse> promise = authorizationChannel
                     .post(LOGIN_RES,new JSONObject().put(EMAIL,username).put(PASSWORD,password))
                     .exceptionally(throwable -> ((ChannelException) throwable).getResponse());
             final ChannelResponse response = promise.get();
-            checkLoginData(response,result);
+            logged.set(checkLoginData(response,result));
         } catch (final JSONException e) {
             Log.e(TAG,"Error in doLogin: " + e.getLocalizedMessage());
             result.set(LoginResult.loginFailed(LoginResult.APPLICATION_ERROR));
+            logged.set(false);
         } catch (final InterruptedException | ExecutionException e) {
             Log.e(TAG,"Error in doLogin: " + e.getLocalizedMessage());
             result.set(LoginResult.loginFailed(HttpURLConnection.HTTP_INTERNAL_ERROR));
-        }*/
-        result.set(LoginResult.loginSuccessful("pantofole"));
-    }
-
-    @INTERNAL_OPERATION
-    void generateData() {
-        final int length = fakeStates.size();
-        for (int i = 0; i < length; i++) {
-            await_time(WAIT_TIME);
-            final List<Data> state = fakeStates.get(i);
-            signal("newState",state);
+            logged.set(false);
         }
     }
 
@@ -178,13 +135,19 @@ public class ConnectionManager extends JaCaArtifact {
         }
     }
 
-    private void checkLoginData(final ChannelResponse response, final OpFeedbackParam<LoginResult> result) {
+    private boolean checkLoginData(final ChannelResponse response, final OpFeedbackParam<LoginResult> result) {
         try {
             final Optional<Pair<String,Integer>> token = getTokenData(response);
             if (token.isPresent()) {
                 defineObsProperty(PROP_TOKEN,token.get().first,token.get().second);
                 final JSONObject data = response.getData().get();
-                result.set(LoginResult.loginSuccessful(data.getJSONObject(USER).getString(IDENTIFIER)));
+                final String citizenId = data.getJSONObject(USER).getString(IDENTIFIER);
+                result.set(LoginResult.loginSuccessful(citizenId));
+                cdtChannel.subscribe(this,
+                        "/"+citizenId+STATE_RES,
+                        this::consumeNewData
+                );
+                return true;
             } else {
                 result.set(LoginResult.loginFailed(response.getCode()));
             }
@@ -192,6 +155,7 @@ public class ConnectionManager extends JaCaArtifact {
             Log.e(TAG,"Error in checkLoginData: " + e.getLocalizedMessage());
             result.set(LoginResult.loginFailed(LoginResult.MALFORMED_RECEIVED_DATA));
         }
+        return false;
     }
 
     private Optional<Pair<String,Integer>> getTokenData(final ChannelResponse response) throws JSONException, NoSuchElementException {
@@ -206,6 +170,21 @@ public class ConnectionManager extends JaCaArtifact {
             return Optional.of(Pair.create(token,ttl));
         }
         return Optional.empty();
+    }
+
+    private void consumeNewData(final JSONObject json) {
+        try {
+            if (json.has(UPDATED)) {
+                final Data data = new Data(json.getJSONObject(UPDATED));
+                beginExternalSession();
+                signal(MSG_NEW_STATE, Collections.singletonList(data));
+                endExternalSession(true);
+            } else if (json.has(ID) && json.has(VALUE)) {
+                //TODO handle update result
+            }
+        } catch (final JSONException e) {
+            Log.e(TAG,"Error in consumeNewData: " + e.getLocalizedMessage());
+        }
     }
 
 

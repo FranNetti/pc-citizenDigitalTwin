@@ -17,8 +17,8 @@ public class Feeder implements Serializable, JsonSerializable {
     private static final String URI = "uri";
 
     @ColumnInfo(name = "feeder_isResource") private boolean isResource;
-    @ColumnInfo(name = "feeder_uri") private String uri;
-    @ColumnInfo(name = "feeder_name") private String name;
+    @ColumnInfo(name = "feeder_uri", defaultValue = "") private String uri;
+    @ColumnInfo(name = "feeder_name", defaultValue = "") private String name;
 
     public Feeder(final boolean isResource, final String uri, final String name) {
         this.isResource = isResource;
@@ -29,6 +29,15 @@ public class Feeder implements Serializable, JsonSerializable {
     @Ignore
     public Feeder(final String uri, final String name) {
         this(true,uri,name);
+    }
+
+    @Ignore
+    public Feeder(final JSONObject json) throws JSONException {
+        this.isResource = json.getBoolean(IS_RESOURCE);
+        if (isResource)
+            this.uri = json.getString(URI);
+        else
+            this.name = json.getString(NAME);
     }
 
     public boolean isResource() {

@@ -30,6 +30,7 @@ public class StateManager extends JaCaArtifact {
     private static final String PROP_NOT_LOGGED = "loginFailed";
     private static final String PROP_STATE = "state";
     private static final String PROP_NOTIFICATIONS = "notifications";
+    private static final String MSG_NEW_GENERATED_DATA = "newGeneratedData";
 
     private DataDAO dbState;
     private NotificationDAO dbNotifications;
@@ -78,8 +79,10 @@ public class StateManager extends JaCaArtifact {
 
     @OPERATION
     public void updateStateFromSingleData(final Data newData){
-        //TODO set user uri in the feeder
+        if (hasObsProperty(PROP_LOGGED))
+            newData.getFeeder().setUri(getObsProperty(PROP_LOGGED).stringValue());
         dbState.insert(newData);
+        signal(MSG_NEW_GENERATED_DATA,newData);
     }
 
     @OPERATION
