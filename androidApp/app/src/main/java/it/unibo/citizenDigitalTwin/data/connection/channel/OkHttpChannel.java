@@ -49,6 +49,7 @@ public class OkHttpChannel implements HttpChannel {
 
     public OkHttpChannel(final String baseUrl, final Map<String,String> defaultHeaders) {
         this.restBaseUrl = "http://" + baseUrl;
+        System.out.println(restBaseUrl);
         this.wsBaseUrl = "ws://" + baseUrl;
         this.client = new OkHttpClient();
         this.subscriptions = new HashMap<>();
@@ -191,6 +192,12 @@ public class OkHttpChannel implements HttpChannel {
                     Log.e(TAG,e.toString(),e);
                 }
             }
+
+            @Override
+            public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
+                super.onOpen(webSocket, response);
+                System.out.println("sono aperto");
+            }
         };
     }
 
@@ -199,10 +206,15 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     private void createResourceChannelIfNecessary(final String resource) {
+        subscriptions.forEach((k,v) -> System.out.println(k));
         if (!subscriptions.containsKey(resource)) {
+            System.out.println("no resource contained");
             final Request request = wsRequest(resource).build();
             final Observable<JSONObject> obs = new Observable<>();
+            System.out.println("before ws creation");
             final WebSocket ws = client.newWebSocket(request, webSocketListener(resource,obs));
+            System.out.println("after ws creation");
+            System.out.println();
             subscriptions.put(resource,Pair.create(obs,ws));
         }
     }

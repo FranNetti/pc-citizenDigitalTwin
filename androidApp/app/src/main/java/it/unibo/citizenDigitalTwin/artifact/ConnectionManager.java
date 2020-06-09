@@ -73,7 +73,7 @@ public class ConnectionManager extends JaCaArtifact {
 
     void init(final String cdtUrl, final String authorizationUrl) {
         cdtChannel = new OkHttpChannel(cdtUrl + CDT_CHANNEL_BASE_PATH);
-        authorizationChannel = new OkHttpChannel(authorizationUrl + AUTHORIZATION_CHANNEL_BASE_PATH);
+        authorizationChannel = new OkHttpChannel(authorizationUrl);
     }
 
     @OPERATION
@@ -82,10 +82,13 @@ public class ConnectionManager extends JaCaArtifact {
             final JSONObject json = new JSONObject()
                     .put(ID,id++)
                     .put(VALUE,data.toJson());
-            cdtChannel.send("/"+citizenId+STATE_RES,json);
+            final CompletableFuture<Boolean> result = cdtChannel.send("/"+citizenId+STATE_RES,json);
+            System.out.println(result.get());
             //TODO check result
         } catch (final JSONException e) {
             Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
+        } catch (final Exception e) {
+            System.out.println("Error in send: " + e.getLocalizedMessage());
         }
     }
 
@@ -107,8 +110,14 @@ public class ConnectionManager extends JaCaArtifact {
         try {
             final CompletableFuture<ChannelResponse> promise = authorizationChannel
                     .post(LOGIN_RES,new JSONObject().put(EMAIL,username).put(PASSWORD,password))
-                    .exceptionally(throwable -> ((ChannelException) throwable).getResponse());
+                    .exceptionally(throwable -> {
+                        System.out.println("post exception ");
+                        ((ChannelException) throwable).getResponse().getErrorMessage().ifPresent(System.out::println);
+                        return ((ChannelException) throwable).getResponse();
+                    });
             final ChannelResponse response = promise.get();
+            System.out.println(response.getCode());
+            response.getData().ifPresent(System.out::println);
             logged.set(checkLoginData(response,result));
         } catch (final JSONException e) {
             Log.e(TAG,"Error in doLogin: " + e.getLocalizedMessage());
@@ -149,6 +158,7 @@ public class ConnectionManager extends JaCaArtifact {
                 );
                 return true;
             } else {
+                System.out.println("TOKEN NON PRESENT");
                 result.set(LoginResult.loginFailed(response.getCode()));
             }
         } catch (final NoSuchElementException | JSONException e) {
@@ -174,6 +184,7 @@ public class ConnectionManager extends JaCaArtifact {
 
     private void consumeNewData(final JSONObject json) {
         try {
+            System.out.println(json);
             if (json.has(UPDATED)) {
                 final Data data = new Data(json.getJSONObject(UPDATED));
                 beginExternalSession();

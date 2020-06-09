@@ -24,7 +24,7 @@ credentials("","").
 +activate <-
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
 	focus(StateManager);
-	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",["localhost:8080","localhost:8081"],ConnectionManager);
+	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",["192.168.88.252:8080","192.168.88.252:8081"],ConnectionManager);
 	focus(ConnectionManager);
 	.print("CDT Manager ready").
 
