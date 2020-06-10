@@ -78,30 +78,25 @@ public class StateManager extends JaCaArtifact {
     }
 
     @OPERATION
+    public void createNotifications(final List<Data> dataList){
+        final String myUri = hasObsProperty(PROP_LOGGED) ?
+                getObsProperty(PROP_LOGGED).stringValue() : "";
+        final List<DataNotification> notifications = dataList.stream()
+                .filter(x -> x.getFeeder().isResource() && !x.getFeeder().getUri().equals(myUri))
+                .collect(Collectors.groupingBy(x -> x.getFeeder().getUri(), Collectors.toSet()))
+                .entrySet()
+                .stream()
+                .map(x -> new DataNotification(x.getKey(), x.getValue().stream().map(Data::getLeafCategory).collect(Collectors.toList())))
+                .collect(Collectors.toList());
+        dbNotifications.insertDataNotifications(notifications);
+    }
+
+    @OPERATION
     public void updateStateFromSingleData(final Data newData){
         if (hasObsProperty(PROP_LOGGED))
             newData.getFeeder().setUri(getObsProperty(PROP_LOGGED).stringValue());
         dbState.insert(newData);
         signal(MSG_NEW_GENERATED_DATA,newData);
-    }
-
-    @OPERATION
-    public void addNotifications(final List<Notification> notifications){
-        final List<MessageNotification> msgNotifications = new ArrayList<>();
-        final List<DataNotification> dataNotifications = new ArrayList<>();
-        notifications.forEach(x -> {
-            switch (x.getType()){
-                case DATA: dataNotifications.add((DataNotification)x); break;
-                case MESSAGE: msgNotifications.add((MessageNotification)x); break;
-                default: Log.e(TAG, "Unhandled notification in addNotifications: " + x.getType());
-            }
-        });
-        if(!msgNotifications.isEmpty()){
-            dbNotifications.insertMessageNotifications(msgNotifications);
-        }
-        if(!dataNotifications.isEmpty()){
-            dbNotifications.insertDataNotifications(dataNotifications);
-        }
     }
 
     @OPERATION

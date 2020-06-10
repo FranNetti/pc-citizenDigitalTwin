@@ -20,7 +20,7 @@ public class ExternalSensorArtifact extends JaCaArtifact {
     private SensorKnowledge knowledge;
 
     void init(final String deviceName, final DeviceChannel channel, final SensorKnowledge knowledge){
-        final Feeder feeder = new Feeder("", deviceName);
+        final Feeder feeder = new Feeder(deviceName);
 
         channel.subscribeToIncomingMessages(this, msg -> {
             if(msg.isPresent() && msg.getType().equals(knowledge.getSensorDataIdentifier())){

@@ -79,7 +79,9 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
         holder.expandImage.setImageDrawable(context.getDrawable(arrowImage));
 
         holder.leafCategoryName.setText(data.getLeafCategory().getDisplayName(context));
-        holder.feederName.setText(data.getFeeder().getName());
+        final String feeder = data.getFeeder().getName().isEmpty() ?
+                data.getFeeder().getUri() : data.getFeeder().getName();
+        holder.feederName.setText(feeder);
 
         final DateFormat d = SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
         holder.dateText.setText(d.format(data.getDate()));

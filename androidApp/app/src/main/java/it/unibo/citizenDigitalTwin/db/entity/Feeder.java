@@ -27,17 +27,21 @@ public class Feeder implements Serializable, JsonSerializable {
     }
 
     @Ignore
-    public Feeder(final String uri, final String name) {
-        this(true,uri,name);
+    public Feeder(final String name) {
+        this(false,"",name);
     }
 
     @Ignore
     public Feeder(final JSONObject json) throws JSONException {
         this.isResource = json.getBoolean(IS_RESOURCE);
-        if (isResource)
+        if (isResource) {
             this.uri = json.getString(URI);
-        else
+            this.name = "";
+        }
+        else {
             this.name = json.getString(NAME);
+            this.uri = "";
+        }
     }
 
     public boolean isResource() {

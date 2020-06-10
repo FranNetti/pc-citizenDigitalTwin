@@ -1,5 +1,7 @@
 package it.unibo.citizenDigitalTwin.db.entity.notification;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -14,9 +16,9 @@ public class DataNotification extends Notification {
     @ColumnInfo private List<LeafCategory> changedCategories;
 
     @Ignore
-    public DataNotification(final String sender, final List<LeafCategory> categories) {
+    public DataNotification(final String sender, final Collection<LeafCategory> categories) {
         super(Type.DATA, sender);
-        this.changedCategories = categories;
+        this.changedCategories = new ArrayList<>(categories);
     }
 
     public DataNotification(final long id, final Date date, final String sender, final List<LeafCategory> changedCategories, final boolean read) {

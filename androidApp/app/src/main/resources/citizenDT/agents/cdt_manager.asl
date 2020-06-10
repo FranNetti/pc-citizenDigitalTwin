@@ -28,8 +28,9 @@ credentials("","").
 	focus(ConnectionManager);
 	.print("CDT Manager ready").
 
-+newState(State) <-
-	updateState(State).
++newState(NewData) <-
+	updateState(NewData);
+	createNotifications(NewData).
 
 +token(_,Ttl) <-
     -+attempts(0);
