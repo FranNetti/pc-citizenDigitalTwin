@@ -1,11 +1,8 @@
 package it.unibo.citizenDigitalTwin.data.connection.channel;
 
-import android.util.Pair;
-
 import org.json.JSONObject;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -15,7 +12,8 @@ public interface HttpChannel {
 
     enum Header {
 
-        AUTHORIZATION("Authorization");
+        AUTHORIZATION("Authorization"),
+        BEARER_TOKEN("Bearer ");
 
         private final String name;
 

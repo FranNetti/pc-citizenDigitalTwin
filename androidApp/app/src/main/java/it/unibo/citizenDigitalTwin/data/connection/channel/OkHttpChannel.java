@@ -49,7 +49,6 @@ public class OkHttpChannel implements HttpChannel {
 
     public OkHttpChannel(final String baseUrl, final Map<String,String> defaultHeaders) {
         this.restBaseUrl = "http://" + baseUrl;
-        System.out.println(restBaseUrl);
         this.wsBaseUrl = "ws://" + baseUrl;
         this.client = new OkHttpClient();
         this.subscriptions = new HashMap<>();
@@ -57,7 +56,7 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public void setDefaultHeaders(final Map<Header,String> defaultHeaders) {
+    public synchronized void setDefaultHeaders(final Map<Header,String> defaultHeaders) {
         this.defaultHeaders = Headers.of(
                 defaultHeaders.entrySet().stream()
                     .collect(Collectors.toMap(e -> e.getKey().getName(), Map.Entry::getValue))
@@ -72,7 +71,7 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {
+    public synchronized CompletableFuture<ChannelResponse> patch(final String resource, final JSONObject data) {
         final RequestBody body = RequestBody.create(data.toString(), JSON);
         final Request request = request(resource)
                 .patch(body)
@@ -83,7 +82,7 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public CompletableFuture<ChannelResponse> post(String resource, JSONObject data) {
+    public synchronized CompletableFuture<ChannelResponse> post(String resource, JSONObject data) {
         final RequestBody body = RequestBody.create(data.toString(), JSON);
         final Request request = request(resource)
                 .post(body)
@@ -94,7 +93,7 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public CompletableFuture<ChannelResponse> get(final String resource) {
+    public synchronized CompletableFuture<ChannelResponse> get(final String resource) {
         final Request request = request(resource)
                 .get()
                 .build();
@@ -104,7 +103,7 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public CompletableFuture<Boolean> send(String resource, JSONObject data) {
+    public synchronized CompletableFuture<Boolean> send(String resource, JSONObject data) {
         createResourceChannelIfNecessary(resource);
         final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
         final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
@@ -113,13 +112,13 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data) {
+    public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data) {
         createResourceChannelIfNecessary(resource);
         Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, data);
     }
 
     @Override
-    public void unsubscribe(final Object subscriber, final String resource) {
+    public synchronized void unsubscribe(final Object subscriber, final String resource) {
         subscriptions.computeIfPresent(resource, (res,subscription) -> {
             subscription.first.unsubscribe(subscriber);
             return subscription;
@@ -152,7 +151,7 @@ public class OkHttpChannel implements HttpChannel {
                     final JSONObject dataResult = new JSONObject(response.body().string());
                     result.complete(ChannelResponse.successfulResponse(response.code(),dataResult));
                 } catch (final JSONException | NullPointerException e) {
-                    result.completeExceptionally(exception(e.toString()));
+                    result.complete(ChannelResponse.successfulResponse(response.code(),new JSONObject()));
                 }
             }
 
@@ -196,7 +195,6 @@ public class OkHttpChannel implements HttpChannel {
             @Override
             public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
                 super.onOpen(webSocket, response);
-                System.out.println("sono aperto");
             }
         };
     }
@@ -206,15 +204,10 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     private void createResourceChannelIfNecessary(final String resource) {
-        subscriptions.forEach((k,v) -> System.out.println(k));
         if (!subscriptions.containsKey(resource)) {
-            System.out.println("no resource contained");
             final Request request = wsRequest(resource).build();
             final Observable<JSONObject> obs = new Observable<>();
-            System.out.println("before ws creation");
             final WebSocket ws = client.newWebSocket(request, webSocketListener(resource,obs));
-            System.out.println("after ws creation");
-            System.out.println();
             subscriptions.put(resource,Pair.create(obs,ws));
         }
     }

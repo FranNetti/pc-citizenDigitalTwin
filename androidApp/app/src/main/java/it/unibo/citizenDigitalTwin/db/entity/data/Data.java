@@ -29,10 +29,10 @@ public class Data implements Serializable, JsonSerializable {
 
     private static final String TAG = "[Data]";
 
-    private static final String IDENTIFIER = "identifier";
+    private static final String IDENTIFIER = "id";
     private static final String FEEDER = "feeder";
     private static final String TIMESTAMP = "timestamp";
-    private static final String DATA_CATEGORY = "data_category";
+    private static final String DATA_CATEGORY = "category";
     private static final String VALUE = "value";
     private static final String NAME = "name";
 
@@ -140,13 +140,15 @@ public class Data implements Serializable, JsonSerializable {
     @Override
     public JSONObject toJson() throws JSONException {
         final Object value;
-        if (information.keySet().size() == 1)
-            value = information.get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER);
-        else {
+        if (information.keySet().size() == 1) {
+            final String v = information.get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER);
+            value = CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getInferType(leafCategory,v);
+        } else {
             value = new JSONObject();
             final JSONObject json = (JSONObject)value;
             for (final Map.Entry<CommunicationStandard,String> info : information.entrySet()) {
-                json.put(info.getKey().getIdentifier(),info.getValue());
+                final CommunicationStandard key = info.getKey();
+                json.put(key.getIdentifier(),key.getInferType(leafCategory,info.getValue()));
             }
         }
 
@@ -154,7 +156,7 @@ public class Data implements Serializable, JsonSerializable {
                 .put(IDENTIFIER,identifier)
                 .put(FEEDER,feeder.toJson())
                 .put(TIMESTAMP,date.getTime())
-                .put(DATA_CATEGORY,new JSONObject().put(NAME,leafCategory.getIdentifier()))
+                .put(DATA_CATEGORY,leafCategory.getIdentifier())
                 .put(VALUE,value);
     }
 

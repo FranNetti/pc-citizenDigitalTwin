@@ -3,6 +3,7 @@ package it.unibo.citizenDigitalTwin.artifact;
 import android.util.Log;
 import android.util.Pair;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,22 +18,14 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.data.connection.channel.ChannelException;
 import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.OkHttpChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.LoginResult;
-import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
-import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
-import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
-import it.unibo.citizenDigitalTwin.db.entity.Feeder;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
-import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.Header;
 
@@ -70,25 +63,27 @@ public class ConnectionManager extends JaCaArtifact {
     private HttpChannel cdtChannel;
     private HttpChannel authorizationChannel;
     private long id = 0L;
+    private Map<Long,JSONArray> pendingUpdates;
 
     void init(final String cdtUrl, final String authorizationUrl) {
         cdtChannel = new OkHttpChannel(cdtUrl + CDT_CHANNEL_BASE_PATH);
         authorizationChannel = new OkHttpChannel(authorizationUrl);
+        pendingUpdates = new HashMap<>();
     }
 
     @OPERATION
     public void updateDigitalState(final String citizenId, final Data data) {
         try {
+            final JSONArray jsonValue = new JSONArray().put(data.toJson());
             final JSONObject json = new JSONObject()
-                    .put(ID,id++)
-                    .put(VALUE,data.toJson());
+                    .put(ID,id)
+                    .put(VALUE,jsonValue);
+            pendingUpdates.put(id++,jsonValue);
             final CompletableFuture<Boolean> result = cdtChannel.send("/"+citizenId+STATE_RES,json);
             System.out.println(result.get());
             //TODO check result
-        } catch (final JSONException e) {
-            Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
         } catch (final Exception e) {
-            System.out.println("Error in send: " + e.getLocalizedMessage());
+            Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
         }
     }
 
@@ -110,14 +105,8 @@ public class ConnectionManager extends JaCaArtifact {
         try {
             final CompletableFuture<ChannelResponse> promise = authorizationChannel
                     .post(LOGIN_RES,new JSONObject().put(EMAIL,username).put(PASSWORD,password))
-                    .exceptionally(throwable -> {
-                        System.out.println("post exception ");
-                        ((ChannelException) throwable).getResponse().getErrorMessage().ifPresent(System.out::println);
-                        return ((ChannelException) throwable).getResponse();
-                    });
+                    .exceptionally(throwable -> ((ChannelException) throwable).getResponse());
             final ChannelResponse response = promise.get();
-            System.out.println(response.getCode());
-            response.getData().ifPresent(System.out::println);
             logged.set(checkLoginData(response,result));
         } catch (final JSONException e) {
             Log.e(TAG,"Error in doLogin: " + e.getLocalizedMessage());
@@ -158,7 +147,6 @@ public class ConnectionManager extends JaCaArtifact {
                 );
                 return true;
             } else {
-                System.out.println("TOKEN NON PRESENT");
                 result.set(LoginResult.loginFailed(response.getCode()));
             }
         } catch (final NoSuchElementException | JSONException e) {
@@ -174,7 +162,7 @@ public class ConnectionManager extends JaCaArtifact {
             final int ttl = (int)(data.getInt(EXPIRATION_IN_MINUTE) * 60 * 1000 * TOKEN_TTL_REDUCTION_FACTOR);
             final String token = data.getString(TOKEN);
             final Map<Header,String> headers = new HashMap<>();
-            headers.put(AUTHORIZATION,token);
+            headers.put(AUTHORIZATION,BEARER_TOKEN.getName() + token);
             cdtChannel.setDefaultHeaders(headers);
             authorizationChannel.setDefaultHeaders(headers);
             return Optional.of(Pair.create(token,ttl));
@@ -191,7 +179,7 @@ public class ConnectionManager extends JaCaArtifact {
                 signal(MSG_NEW_STATE, Collections.singletonList(data));
                 endExternalSession(true);
             } else if (json.has(ID) && json.has(VALUE)) {
-                //TODO handle update result
+                pendingUpdates.remove(json.getLong(ID));
             }
         } catch (final JSONException e) {
             Log.e(TAG,"Error in consumeNewData: " + e.getLocalizedMessage());
