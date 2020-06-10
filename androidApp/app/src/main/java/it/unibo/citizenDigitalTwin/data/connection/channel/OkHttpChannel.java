@@ -11,9 +11,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,8 @@ import okhttp3.WebSocketListener;
 public class OkHttpChannel implements HttpChannel {
 
     private static final String TAG = "HTTP_CHANNEL";
+    private static final String WS_PROTOCOL = "ws://";
+    private static final String HTTP_PROTOCOL = "http://";
     private static final int CHANNEL_CLOSED = 800;
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
@@ -42,16 +47,18 @@ public class OkHttpChannel implements HttpChannel {
     private final OkHttpClient client;
 
     private final Map<String, Pair<Observable<JSONObject>,WebSocket>> subscriptions;
+    private final Map<String, List<BiConsumer<Throwable,String>>> failureHandlers;
 
     public OkHttpChannel(final String baseUrl) {
         this(baseUrl,new HashMap<>());
     }
 
     public OkHttpChannel(final String baseUrl, final Map<String,String> defaultHeaders) {
-        this.restBaseUrl = "http://" + baseUrl;
-        this.wsBaseUrl = "ws://" + baseUrl;
+        this.restBaseUrl = HTTP_PROTOCOL + baseUrl;
+        this.wsBaseUrl = WS_PROTOCOL + baseUrl;
         this.client = new OkHttpClient();
         this.subscriptions = new HashMap<>();
+        this.failureHandlers = new HashMap<>();
         this.defaultHeaders = Headers.of(defaultHeaders);
     }
 
@@ -66,7 +73,8 @@ public class OkHttpChannel implements HttpChannel {
     @Override
     public synchronized void closeChannel(final String resource) {
         if (this.subscriptions.containsKey(resource)) {
-            this.subscriptions.remove(resource).second.close(CHANNEL_CLOSED,null);
+            Objects.requireNonNull(this.subscriptions.remove(resource)).second.close(CHANNEL_CLOSED,null);
+            this.failureHandlers.remove(resource);
         }
     }
 
@@ -103,18 +111,27 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public synchronized CompletableFuture<Boolean> send(String resource, JSONObject data) {
-        createResourceChannelIfNecessary(resource);
+    public synchronized CompletableFuture<Boolean> send(final String resource, final JSONObject data) {
         final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
-        final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
-        futureResult.complete(result);
+        if (subscriptions.containsKey(resource)) {
+            final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
+            futureResult.complete(result);
+        } else {
+            futureResult.complete(false);
+        }
         return futureResult;
     }
 
     @Override
-    public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data) {
+    public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data, final BiConsumer<Throwable,String> onFailure) {
         createResourceChannelIfNecessary(resource);
         Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, data);
+        final List<BiConsumer<Throwable,String>> newList = new LinkedList<>();
+        newList.add(onFailure);
+        failureHandlers.merge(resource, newList,(oldL,newL) -> {
+           oldL.addAll(newL);
+           return oldL;
+        });
     }
 
     @Override
@@ -160,26 +177,16 @@ public class OkHttpChannel implements HttpChannel {
 
     private WebSocketListener webSocketListener(final String resource, final Observable<JSONObject> obs) {
         return new WebSocketListener() {
-            @Override
-            public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-                super.onClosed(webSocket, code, reason);
-            }
-
-            @Override
-            public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-                super.onClosing(webSocket, code, reason);
-            }
 
             @Override
             public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
                 super.onFailure(webSocket, t, response);
-                OkHttpChannel.this.subscriptions.computeIfPresent(resource, (res, data) -> {
-                    final WebSocket ws = client.newWebSocket(
-                            data.second.request(),
-                            webSocketListener(resource,data.first)
-                    );
-                    return Pair.create(obs,ws);
-                });
+                synchronized (OkHttpChannel.this) {
+                    Objects.requireNonNull(OkHttpChannel.this.failureHandlers.remove(resource))
+                            .forEach(x -> x.accept(t,resource));
+                    OkHttpChannel.this.subscriptions.remove(resource);
+                    webSocket.cancel();
+                }
             }
 
             @Override
@@ -190,11 +197,6 @@ public class OkHttpChannel implements HttpChannel {
                 } catch (final JSONException e) {
                     Log.e(TAG,e.toString(),e);
                 }
-            }
-
-            @Override
-            public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-                super.onOpen(webSocket, response);
             }
         };
     }

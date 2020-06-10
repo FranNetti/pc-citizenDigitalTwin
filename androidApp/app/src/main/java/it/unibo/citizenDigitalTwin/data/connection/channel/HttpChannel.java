@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
@@ -32,6 +33,6 @@ public interface HttpChannel {
     CompletableFuture<ChannelResponse> post(String resource, JSONObject data);
     CompletableFuture<ChannelResponse> get(String resource);
     CompletableFuture<Boolean> send(String resource, JSONObject data);
-    void subscribe(Object subscriber, String resource, Consumer<JSONObject> data);
+    void subscribe(Object subscriber, String resource, Consumer<JSONObject> data, BiConsumer<Throwable,String> onFailure);
     void unsubscribe(Object subscriber, String resource);
 }

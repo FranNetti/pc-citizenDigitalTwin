@@ -36,7 +36,6 @@ import static it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.He
  */
 public class ConnectionManager extends JaCaArtifact {
 
-    private static final long WAIT_TIME = 5000;
     private static final double TOKEN_TTL_REDUCTION_FACTOR = 0.8;
     private static final String TAG = "[ConnectionManager]";
 
@@ -59,6 +58,7 @@ public class ConnectionManager extends JaCaArtifact {
     private static final String USER = "user";
     private static final String IDENTIFIER = "identifier";
     private static final String UPDATED = "updated";
+    private static final String STATE_REGEX = "\\/[a-z|A-Z|0-9]+\\/state";
 
     private HttpChannel cdtChannel;
     private HttpChannel authorizationChannel;
@@ -143,7 +143,8 @@ public class ConnectionManager extends JaCaArtifact {
                 result.set(LoginResult.loginSuccessful(citizenId));
                 cdtChannel.subscribe(this,
                         "/"+citizenId+STATE_RES,
-                        this::consumeNewData
+                        this::consumeNewData,
+                        this::onChannelFailure
                 );
                 return true;
             } else {
@@ -183,6 +184,12 @@ public class ConnectionManager extends JaCaArtifact {
             }
         } catch (final JSONException e) {
             Log.e(TAG,"Error in consumeNewData: " + e.getLocalizedMessage());
+        }
+    }
+
+    private void onChannelFailure(final Throwable t, final String resource) {
+        if (resource.matches(STATE_REGEX)) {
+            cdtChannel.subscribe(this,resource,this::consumeNewData,this::onChannelFailure);
         }
     }
 
