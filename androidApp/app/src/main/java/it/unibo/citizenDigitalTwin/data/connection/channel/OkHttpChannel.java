@@ -46,7 +46,11 @@ public class OkHttpChannel implements HttpChannel {
     private Headers defaultHeaders;
     private final OkHttpClient client;
 
-    private final Map<String, Pair<Observable<JSONObject>,WebSocket>> subscriptions;
+    private enum ChannelState {
+        CREATED,OPENED,FAILED,NON_EXISTENT
+    }
+
+    private final Map<String, Pair<Observable<JSONObject>,Pair<WebSocket, ChannelState>>> subscriptions;
     private final Map<String, List<BiConsumer<Throwable,String>>> failureHandlers;
 
     public OkHttpChannel(final String baseUrl) {
@@ -73,7 +77,7 @@ public class OkHttpChannel implements HttpChannel {
     @Override
     public synchronized void closeChannel(final String resource) {
         if (this.subscriptions.containsKey(resource)) {
-            Objects.requireNonNull(this.subscriptions.remove(resource)).second.close(CHANNEL_CLOSED,null);
+            Objects.requireNonNull(this.subscriptions.remove(resource)).second.first.close(CHANNEL_CLOSED,null);
             this.failureHandlers.remove(resource);
         }
     }
@@ -113,8 +117,8 @@ public class OkHttpChannel implements HttpChannel {
     @Override
     public synchronized CompletableFuture<Boolean> send(final String resource, final JSONObject data) {
         final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
-        if (subscriptions.containsKey(resource)) {
-            final boolean result = Objects.requireNonNull(subscriptions.get(resource)).second.send(data.toString());
+        if (subscriptions.containsKey(resource) && subscriptions.get(resource).second.second == ChannelState.OPENED) {
+            final boolean result = subscriptions.get(resource).second.first.send(data.toString());
             futureResult.complete(result);
         } else {
             futureResult.complete(false);
@@ -124,7 +128,6 @@ public class OkHttpChannel implements HttpChannel {
 
     @Override
     public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data, final BiConsumer<Throwable,String> onFailure) {
-        createResourceChannelIfNecessary(resource);
         Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, data);
         final List<BiConsumer<Throwable,String>> newList = new LinkedList<>();
         newList.add(onFailure);
@@ -198,6 +201,22 @@ public class OkHttpChannel implements HttpChannel {
                     Log.e(TAG,e.toString(),e);
                 }
             }
+
+            @Override
+            public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
+                super.onOpen(webSocket, response);
+                synchronized (OkHttpChannel.this) {
+                    final Pair<Observable<JSONObject>,Pair<WebSocket, ChannelState>> value =
+                            Objects.requireNonNull(OkHttpChannel.this.subscriptions.get(resource));
+                    OkHttpChannel.this.subscriptions.put(
+                            resource,
+                            Pair.create(
+                                    value.first,
+                                    Pair.create(value.second.first, ChannelState.OPENED)
+                            )
+                    );
+                }
+            }
         };
     }
 
@@ -210,7 +229,7 @@ public class OkHttpChannel implements HttpChannel {
             final Request request = wsRequest(resource).build();
             final Observable<JSONObject> obs = new Observable<>();
             final WebSocket ws = client.newWebSocket(request, webSocketListener(resource,obs));
-            subscriptions.put(resource,Pair.create(obs,ws));
+            subscriptions.put(resource,Pair.create(obs,Pair.create(ws, ChannelState.CREATED)));
         }
     }
 }

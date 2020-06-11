@@ -98,3 +98,7 @@
     showNotifications(Notifications).
 
 +pageShown(X) [artifact_name(Id,MainUI)] <- .print(X).
+
++closing <-
+    .send(cdt_manager, tell, deactivate);
+    .send(device_manager, tell, deactivate).

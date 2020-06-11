@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +20,16 @@ import java.util.concurrent.ExecutionException;
 
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import it.unibo.citizenDigitalTwin.data.connection.channel.ChannelException;
 import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.OkHttpChannel;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.ChannelResponse;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.LoginResult;
+import it.unibo.citizenDigitalTwin.db.AppDatabase;
+import it.unibo.citizenDigitalTwin.db.dao.PendingUpdateDAO;
+import it.unibo.citizenDigitalTwin.db.entity.PendingUpdate;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.Header;
@@ -62,26 +67,46 @@ public class ConnectionManager extends JaCaArtifact {
 
     private HttpChannel cdtChannel;
     private HttpChannel authorizationChannel;
-    private long id = 0L;
-    private Map<Long,JSONArray> pendingUpdates;
+    private Long id = 0L;
+    private final Map<Long,JSONArray> pendingUpdates = new HashMap<>();
+    private PendingUpdateDAO pendingUpdatesDb;
+    private boolean hasToResendPendingUpdates;
 
     void init(final String cdtUrl, final String authorizationUrl) {
         cdtChannel = new OkHttpChannel(cdtUrl + CDT_CHANNEL_BASE_PATH);
         authorizationChannel = new OkHttpChannel(authorizationUrl);
-        pendingUpdates = new HashMap<>();
+        pendingUpdatesDb = AppDatabase.getInstance(getApplicationContext()).pendingUpdateDAO();
+        hasToResendPendingUpdates = true;
+        pendingUpdatesDb.getAll()
+                .flatMap(x -> Flowable.create(emitter -> {
+                        x.forEach(y -> emitter.onNext(y));
+                        emitter.onComplete();
+                    }, BackpressureStrategy.BUFFER)
+                )
+                .collectInto(new HashMap<Long,JSONArray>(),(map,obj) -> {
+                    final PendingUpdate update = (PendingUpdate)obj;
+                    map.put(update.getId(),update.getData());
+                })
+                .subscribe(map -> {
+                    synchronized (pendingUpdates) {
+                        pendingUpdates.clear();
+                        pendingUpdates.putAll(map);
+                    }
+                },error -> Log.e(TAG,"Error in init: " + error.getLocalizedMessage()));
+    }
+
+    @OPERATION
+    public void onClosing(final String citizenId) {
+        hasToResendPendingUpdates = false;
+        cdtChannel.closeChannel(stateResource(citizenId));
     }
 
     @OPERATION
     public void updateDigitalState(final String citizenId, final Data data) {
         try {
             final JSONArray jsonValue = new JSONArray().put(data.toJson());
-            final JSONObject json = new JSONObject()
-                    .put(ID,id)
-                    .put(VALUE,jsonValue);
-            pendingUpdates.put(id++,jsonValue);
-            final CompletableFuture<Boolean> result = cdtChannel.send("/"+citizenId+STATE_RES,json);
-            System.out.println(result.get());
-            //TODO check result
+            final String resource = stateResource(citizenId);
+            send(resource,jsonValue);
         } catch (final Exception e) {
             Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
         }
@@ -141,11 +166,13 @@ public class ConnectionManager extends JaCaArtifact {
                 final JSONObject data = response.getData().get();
                 final String citizenId = data.getJSONObject(USER).getString(IDENTIFIER);
                 result.set(LoginResult.loginSuccessful(citizenId));
+                final String resource = stateResource(citizenId);
                 cdtChannel.subscribe(this,
-                        "/"+citizenId+STATE_RES,
+                        resource,
                         this::consumeNewData,
                         this::onChannelFailure
                 );
+                resendAllPendingUpdates(resource);
                 return true;
             } else {
                 result.set(LoginResult.loginFailed(response.getCode()));
@@ -180,7 +207,9 @@ public class ConnectionManager extends JaCaArtifact {
                 signal(MSG_NEW_STATE, Collections.singletonList(data));
                 endExternalSession(true);
             } else if (json.has(ID) && json.has(VALUE)) {
-                pendingUpdates.remove(json.getLong(ID));
+                synchronized (pendingUpdates) {
+                    pendingUpdatesDb.delete(json.getLong(ID));
+                }
             }
         } catch (final JSONException e) {
             Log.e(TAG,"Error in consumeNewData: " + e.getLocalizedMessage());
@@ -189,8 +218,47 @@ public class ConnectionManager extends JaCaArtifact {
 
     private void onChannelFailure(final Throwable t, final String resource) {
         if (resource.matches(STATE_REGEX)) {
-            cdtChannel.subscribe(this,resource,this::consumeNewData,this::onChannelFailure);
+            cdtChannel.subscribe(this,
+                    resource,
+                    this::consumeNewData,
+                    this::onChannelFailure
+            );
+            resendAllPendingUpdates(resource);
         }
+    }
+
+    private void resendAllPendingUpdates(final String resource) {
+        if (hasToResendPendingUpdates) {
+            final List<JSONArray> toSend;
+            synchronized (pendingUpdates) {
+                toSend = new ArrayList<>(pendingUpdates.values());
+                pendingUpdatesDb.clear();
+            }
+            toSend.forEach(data -> send(resource,data));
+        }
+    }
+
+    private void send(final String resource, final JSONArray jsonValue) {
+        try {
+            final JSONObject json = new JSONObject();
+            synchronized (pendingUpdates) {
+                json.put(ID,id).put(VALUE,jsonValue);
+                pendingUpdatesDb.insert(new PendingUpdate(id++,jsonValue));
+            }
+            final CompletableFuture<Boolean> result = cdtChannel.send(resource,json);
+            if (!result.get()) {
+                synchronized (pendingUpdates) {
+                    pendingUpdatesDb.delete(json.getLong(ID));
+                }
+                send(resource,jsonValue);
+            }
+        } catch (final Exception e) {
+            Log.e(TAG,"Error in send: " + e.getLocalizedMessage());
+        }
+    }
+
+    private String stateResource(final String citizenId) {
+        return "/"+citizenId+STATE_RES;
     }
 
 

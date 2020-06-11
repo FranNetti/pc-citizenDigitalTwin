@@ -55,7 +55,7 @@ public class GPSArtifact extends JaCaArtifact {
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         isListeningForLocationUpdates = false;
 
-        feeder = new Feeder("", GPS_FEEDER);
+        feeder = new Feeder(GPS_FEEDER);
 
         callback = new LocationCallback(){
             @Override

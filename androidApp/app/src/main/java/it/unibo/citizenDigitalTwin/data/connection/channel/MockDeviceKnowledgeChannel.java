@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
@@ -61,7 +62,7 @@ public class MockDeviceKnowledgeChannel implements HttpChannel {
     }
 
     @Override
-    public void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data) {
+    public void subscribe(Object subscriber, String resource, Consumer<JSONObject> data, BiConsumer<Throwable, String> onFailure) {
         throw new UnsupportedOperationException();
     }
 

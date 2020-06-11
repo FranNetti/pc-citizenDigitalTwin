@@ -10,6 +10,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import it.unibo.citizenDigitalTwin.db.dao.DataDAO;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
+import it.unibo.citizenDigitalTwin.db.dao.PendingUpdateDAO;
+import it.unibo.citizenDigitalTwin.db.entity.PendingUpdate;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
 import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
@@ -18,7 +20,8 @@ import it.unibo.citizenDigitalTwin.db.entity.notification.MessageNotification;
         entities = {
             Data.class,
             DataNotification.class,
-            MessageNotification.class
+            MessageNotification.class,
+            PendingUpdate.class
         },
         version = 1,
         exportSchema = false
@@ -38,5 +41,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract DataDAO dataDao();
     public abstract NotificationDAO notificationDAO();
+    public abstract PendingUpdateDAO pendingUpdateDAO();
 
 }

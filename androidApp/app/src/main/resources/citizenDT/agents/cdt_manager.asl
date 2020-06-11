@@ -46,3 +46,7 @@ credentials("","").
 +newGeneratedData(Data) <-
     ?logged(CitizenId);
     updateDigitalState(CitizenId,Data).
+
++deactivate : logged(_) <-
+    ?logged(CitizenId);
+    onClosing(CitizenId).

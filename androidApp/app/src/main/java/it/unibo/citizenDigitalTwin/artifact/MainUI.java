@@ -56,6 +56,7 @@ public class MainUI extends ActivityArtifact {
     private static final int GPS_BACKGROUND_REQ_CODE = 13;
     private static final String MAIN_UI_TAG = "[MainUI]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
+    private static final String MSG_CLOSING = "closing";
 
     private FragmentWithId currentFragment = null;
     private final MainUIMediator mediator = new MainUIMediator();
@@ -63,6 +64,12 @@ public class MainUI extends ActivityArtifact {
     public void init() {
         super.init(MainActivity.class, R.layout.activity_main, true);
         defineObsProperty(PAGE_SHOWN_PROP, "");
+        bindOnStopEventToOp("onStop");
+    }
+
+    @OPERATION
+    public void onStop() {
+        signal(MSG_CLOSING);
     }
 
     @OPERATION

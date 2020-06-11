@@ -94,4 +94,19 @@ public class Converters {
         return new ArrayList<>();
     }
 
+    @TypeConverter
+    public static String fromJSONArrayToString(final JSONArray array){
+        return array.toString();
+    }
+
+    @TypeConverter
+    public static JSONArray fromStringToJSONArray(final String value){
+        try {
+            return new JSONArray(value);
+        } catch (final JSONException e) {
+            Log.e(TAG, "Error in fromStringToJSONArray: " + e.getLocalizedMessage());
+            return new JSONArray();
+        }
+    }
+
 }
