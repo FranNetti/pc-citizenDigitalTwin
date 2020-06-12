@@ -32,8 +32,16 @@ package object util {
       SystemUserImpl(email, username, password, identifier, role)
   }
 
-  implicit class RichString(string: String) {
-      def hasNoWhiteSpaces: Boolean = !string.isEmpty && string.trim.length > 0
+  implicit class RichString(value: String) {
+
+    def hasNoWhiteSpaces: Boolean = !value.isEmpty && value.trim.length > 0
+
+    def hasWhiteSpaces: Boolean = !hasNoWhiteSpaces
+
+    def firstLetterUppercase: String = {
+      val firstChar = value.charAt(0).toString
+      value.replaceFirst(firstChar, firstChar.toUpperCase)
+    }
   }
 
 }

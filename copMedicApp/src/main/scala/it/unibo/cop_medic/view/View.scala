@@ -1,7 +1,7 @@
 package it.unibo.cop_medic.view
 
 import it.unibo.cop_medic.controller.Controller
-import it.unibo.cop_medic.util.SystemUser
+import it.unibo.cop_medic.util.{LoginResult, SystemUser}
 import javax.swing.SwingUtilities
 
 import scala.concurrent.ExecutionContext
@@ -11,7 +11,11 @@ sealed trait LoginView {
   def loginFailed(error: String)
 }
 
-trait View extends LoginView {
+trait ViewController {
+  def handleLoginResult(result: LoginResult)
+}
+
+trait View {
   def show()
 }
 
@@ -19,11 +23,11 @@ object View {
 
   type ViewCreator = Controller => View
 
-  def apply(): ViewCreator = ViewController(_)
+  def apply(): ViewCreator = ViewControllerImpl(_)
 
   val defaultExecutionContext: ExecutionContext = new SwingExecutionContext();
 
-  private class SwingExecutionContext extends ExecutionContext {
+  class SwingExecutionContext extends ExecutionContext {
     override def execute(runnable: Runnable): Unit = SwingUtilities.invokeLater(runnable)
     override def reportFailure(cause: Throwable): Unit = throw cause
   }
