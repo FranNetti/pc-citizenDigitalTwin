@@ -51,12 +51,7 @@ public class Data implements Serializable, JsonSerializable {
             final Feeder feeder,
             final LeafCategory dataCategory,
             final Map<CommunicationStandard, String> information) {
-        this.identifier = identifier;
-        this.date = date;
-        this.feeder = feeder;
-        this.leafCategory = dataCategory;
-        this.leafCategoryName = dataCategory.getIdentifier();
-        this.information = information;
+        this(identifier,date,feeder,dataCategory.getIdentifier(),information);
     }
 
     @Ignore
@@ -82,8 +77,17 @@ public class Data implements Serializable, JsonSerializable {
             final Date date,
             final Feeder feeder,
             final String leafCategoryName,
-            final Map<CommunicationStandard, String> information) throws NoSuchElementException {
-        this(identifier, date, feeder, LeafCategory.findByLeafIdentifier(leafCategoryName).get(), information);
+            final Map<CommunicationStandard, String> information) throws IllegalArgumentException {
+        try {
+            this.identifier = identifier;
+            this.date = date;
+            this.feeder = feeder;
+            this.leafCategory = LeafCategory.findByLeafIdentifier(leafCategoryName).get();
+            this.leafCategoryName = leafCategoryName;
+            this.information = information;
+        } catch (final NoSuchElementException e) {
+            throw new IllegalArgumentException("Leaf category not found: " + leafCategoryName);
+        }
     }
 
     public String getIdentifier() {

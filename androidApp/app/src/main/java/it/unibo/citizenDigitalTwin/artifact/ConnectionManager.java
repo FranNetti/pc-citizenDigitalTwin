@@ -77,9 +77,10 @@ public class ConnectionManager extends JaCaArtifact {
         authorizationChannel = new OkHttpChannel(authorizationUrl);
         pendingUpdatesDb = AppDatabase.getInstance(getApplicationContext()).pendingUpdateDAO();
         hasToResendPendingUpdates = true;
+        pendingUpdatesDb.clear();
         pendingUpdatesDb.getAll()
                 .flatMap(x -> Flowable.create(emitter -> {
-                        x.forEach(y -> emitter.onNext(y));
+                        x.forEach(emitter::onNext);
                         emitter.onComplete();
                     }, BackpressureStrategy.BUFFER)
                 )
@@ -200,7 +201,7 @@ public class ConnectionManager extends JaCaArtifact {
 
     private void consumeNewData(final JSONObject json) {
         try {
-            System.out.println(json);
+            Log.d(TAG,"Message received: " + json);
             if (json.has(UPDATED)) {
                 final Data data = new Data(json.getJSONObject(UPDATED));
                 beginExternalSession();
@@ -211,7 +212,7 @@ public class ConnectionManager extends JaCaArtifact {
                     pendingUpdatesDb.delete(json.getLong(ID));
                 }
             }
-        } catch (final JSONException e) {
+        } catch (final JSONException | IllegalArgumentException e) {
             Log.e(TAG,"Error in consumeNewData: " + e.getLocalizedMessage());
         }
     }
