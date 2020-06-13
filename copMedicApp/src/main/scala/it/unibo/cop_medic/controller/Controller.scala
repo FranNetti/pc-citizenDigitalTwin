@@ -11,6 +11,7 @@ import it.unibo.cop_medic.model.channel.parser.Parsers
 import it.unibo.cop_medic.model.channel.rest.CitizenChannel
 import it.unibo.cop_medic.model.data.{Data, LeafCategory, Resource, Roles}
 import it.unibo.cop_medic.util.{AlreadyLogged, FailedLogin, LoginResult, SuccessfulLogin, SystemUser, UnsupportedRole}
+import it.unibo.cop_medic.view.SubscriptionFailed
 import it.unibo.cop_medic.view.View.ViewCreator
 import monix.execution.Scheduler
 import monix.reactive.Observable
@@ -37,6 +38,9 @@ object Controller {
 
   def apply(viewCreator: ViewCreator, hostAuthentication: String, hostService: String, executionContext: ExecutionContext): Controller =
     ControllerImpl(viewCreator, hostAuthentication, hostService, executionContext)
+
+  private implicit def fromAuthenticationInfoToTokenIdentifier(authenticationInfo: AuthenticationInfo): TokenIdentifier =
+    TokenIdentifier(authenticationInfo.token.token)
 
   private case class ControllerImpl(viewCreator: ViewCreator, hostAuthentication: String, hostService: String,
                                     implicit val executionContext: ExecutionContext) extends Controller {
@@ -74,10 +78,14 @@ object Controller {
       if(logged) {
         val channel = this lookForCitizenChannel user
         categories foreach { x =>
-          channel.observeState(TokenIdentifier(authenticationInfo.token.token), x) whenComplete {
+          channel.observeState(authenticationInfo, x) whenComplete {
             case Response(content) => content.foreach(observable.onNext)(monixContext)
-            case Fail(error) => System.err.println(error)
+            case Fail(error) => view showError SubscriptionFailed(error.toString)
           }
+        }
+        channel.readState(authenticationInfo) whenComplete {
+          case Response(content) => content.filter(x => categories.contains(x.category)).foreach(observable.onNext)
+          case Fail(error) => System.err.println("Error in subscribeTo: " + error)
         }
       }
       observable
@@ -91,7 +99,7 @@ object Controller {
         val feeder = Resource(authenticationInfo.user.identifier)
         val timestamp = new Date().getTime
         channel updateState(
-          TokenIdentifier(authenticationInfo.token.token),
+          authenticationInfo,
           data.map(x => Data(feeder = feeder, timestamp = timestamp, value = x._1, category = x._2, identifier = ""))
         ) whenComplete {
           case Response(content) =>

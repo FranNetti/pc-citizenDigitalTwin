@@ -115,11 +115,9 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
       leafCategoriesCheck.foreach(_.setSelected(false))
       citizenIdField.setText("")
       val future = controller.subscribeTo(user, categories.toSet).foreach { data =>
-        val newList = if (informationMap contains user) informationMap(user).map {
-          case d: Data if d.category.name == data.category.name => data
-          case x => x
+        val newList = if (informationMap contains user) {
+          data +: informationMap(user).filterNot(_.category.name == data.category.name)
         } else List(data)
-
         informationMap = informationMap + (user -> newList)
         refreshTable()
       }
@@ -137,6 +135,7 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
         citizenIdField.setText("")
         futureMap(user).foreach(_.cancel)
         futureMap = futureMap - user
+        //controller unsubscribeFrom user
         refreshTable()
       } else {
         showDialog(this, NOT_SUBSCRIBED_ERROR)

@@ -17,7 +17,11 @@ trait ViewController {
 
 trait View {
   def show()
+  def showError(error: ViewError)
 }
+
+sealed trait ViewError
+case class SubscriptionFailed(error: String) extends ViewError
 
 object View {
 
