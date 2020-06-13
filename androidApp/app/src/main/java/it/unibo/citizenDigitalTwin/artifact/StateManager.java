@@ -4,11 +4,14 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import cartago.OPERATION;
 import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.LoginResult;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
 import it.unibo.citizenDigitalTwin.db.entity.notification.DataNotification;
@@ -74,7 +77,16 @@ public class StateManager extends JaCaArtifact {
 
     @OPERATION
     public void updateState(final List<Data> dataList) {
-        dbState.insertAll(dataList);
+        final Map<LeafCategory,Data> state = ((State)getObsProperty(PROP_STATE).getValue()).getState();
+        final List<Data> validData = dataList.stream()
+                .filter(x -> !state.containsKey(x.getLeafCategory()) || state.get(x.getLeafCategory()).getDate().before(x.getDate()))
+                .collect(Collectors.groupingBy(Data::getLeafCategory,Collectors.toList()))
+                .entrySet().stream()
+                .map(x -> x.getValue().stream().max((a,b) -> Long.compare(a.getDate().getTime(),b.getDate().getTime())))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        dbState.insertAll(validData);
     }
 
     @OPERATION

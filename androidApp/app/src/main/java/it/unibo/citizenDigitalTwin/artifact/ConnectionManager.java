@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.IntStream;
 
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
@@ -63,6 +64,7 @@ public class ConnectionManager extends JaCaArtifact {
     private static final String USER = "user";
     private static final String IDENTIFIER = "identifier";
     private static final String UPDATED = "updated";
+    private static final String DATA = "data";
     private static final String STATE_REGEX = "\\/[a-z|A-Z|0-9]+\\/state";
 
     private HttpChannel cdtChannel;
@@ -77,7 +79,6 @@ public class ConnectionManager extends JaCaArtifact {
         authorizationChannel = new OkHttpChannel(authorizationUrl);
         pendingUpdatesDb = AppDatabase.getInstance(getApplicationContext()).pendingUpdateDAO();
         hasToResendPendingUpdates = true;
-        pendingUpdatesDb.clear();
         pendingUpdatesDb.getAll()
                 .flatMap(x -> Flowable.create(emitter -> {
                         x.forEach(emitter::onNext);
@@ -94,6 +95,20 @@ public class ConnectionManager extends JaCaArtifact {
                         pendingUpdates.putAll(map);
                     }
                 },error -> Log.e(TAG,"Error in init: " + error.getLocalizedMessage()));
+    }
+
+    @OPERATION
+    public void getDigitalState(final String citizenId) {
+        final String resource = stateResource(citizenId);
+        cdtChannel.get(resource)
+                .exceptionally(throwable -> ((ChannelException) throwable).getResponse())
+                .thenAcceptAsync(response -> {
+                    Log.d(TAG,"State response code: " + response.getCode());
+                    Log.d(TAG,"Is response successful: " + response.isSuccessful());
+                    if (response.isSuccessful()) {
+                        response.getData().ifPresent(this::handleNewState);
+                    }
+                });
     }
 
     @OPERATION
@@ -168,12 +183,12 @@ public class ConnectionManager extends JaCaArtifact {
                 final String citizenId = data.getJSONObject(USER).getString(IDENTIFIER);
                 result.set(LoginResult.loginSuccessful(citizenId));
                 final String resource = stateResource(citizenId);
+                resendAllPendingUpdates(resource);
                 cdtChannel.subscribe(this,
                         resource,
                         this::consumeNewData,
                         this::onChannelFailure
                 );
-                resendAllPendingUpdates(resource);
                 return true;
             } else {
                 result.set(LoginResult.loginFailed(response.getCode()));
@@ -260,6 +275,28 @@ public class ConnectionManager extends JaCaArtifact {
 
     private String stateResource(final String citizenId) {
         return "/"+citizenId+STATE_RES;
+    }
+
+    private void handleNewState(final JSONObject json) {
+        try {
+            Log.d(TAG,"State received: " + json);
+            if (json.has(DATA)) {
+                final JSONArray stateData = json.getJSONArray(DATA);
+                final List<Data> state = new ArrayList<>();
+                for (int i = 0; i < stateData.length(); i++) {
+                    try {
+                        state.add(new Data(stateData.getJSONObject(i)));
+                    } catch (final IllegalArgumentException e) {
+                        Log.e(TAG,"Error in handleNewState: " + e.getLocalizedMessage());
+                    }
+                }
+                beginExternalSession();
+                signal(MSG_NEW_STATE, state);
+                endExternalSession(true);
+            }
+        } catch (final JSONException e) {
+            Log.e(TAG,"Error in handleNewState: " + e.getLocalizedMessage());
+        }
     }
 
 

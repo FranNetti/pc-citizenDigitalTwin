@@ -116,6 +116,7 @@ public class OkHttpChannel implements HttpChannel {
 
     @Override
     public synchronized CompletableFuture<Boolean> send(final String resource, final JSONObject data) {
+        createResourceChannelIfNecessary(resource);
         final CompletableFuture<Boolean> futureResult = new CompletableFuture<>();
         if (subscriptions.containsKey(resource) && subscriptions.get(resource).second.second == ChannelState.OPENED) {
             final boolean result = subscriptions.get(resource).second.first.send(data.toString());

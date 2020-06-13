@@ -36,6 +36,9 @@ credentials("","").
     -+attempts(0);
     !!refreshToken(Ttl).
 
++logged(CitizenId) <-
+    getDigitalState(CitizenId).
+
 +refreshTokenFailed : maxAttempts(M) & attempts(X) & X < M <-
     -+attempts(X+1);
     refreshToken.
