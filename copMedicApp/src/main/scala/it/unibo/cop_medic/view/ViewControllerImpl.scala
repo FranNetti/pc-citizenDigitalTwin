@@ -5,8 +5,7 @@ import it.unibo.cop_medic.model.data.Roles
 import it.unibo.cop_medic.model.data.Roles._
 import it.unibo.cop_medic.util.{FailedLogin, LoginResult, SuccessfulLogin, UnsupportedRole}
 import it.unibo.cop_medic.view.View.SwingExecutionContext
-import it.unibo.cop_medic.view.frame.{LoginFrame, PoliceFrame}
-import it.unibo.cop_medic.view.frame.showDialog
+import it.unibo.cop_medic.view.frame.{LoginFrame, MedicFrame, PoliceFrame, showDialog}
 import javax.swing.JFrame
 
 private[view] class ViewControllerImpl(controller: Controller) extends View with ViewController {
@@ -23,7 +22,7 @@ private[view] class ViewControllerImpl(controller: Controller) extends View with
       applicationView =
         Roles.all.find(_.name == userInfo.role).map({
         case CopRole => PoliceFrame(POLICE_TITLE, controller)
-        case MedicRole => null
+        case MedicRole => MedicFrame(MEDIC_TITLE, controller)
       }).get
       loginView.setVisible(false)
       applicationView.setVisible(true)
@@ -40,6 +39,7 @@ object ViewControllerImpl {
 
   val TITLE = "CDT Application"
   val POLICE_TITLE = "Police Application"
+  val MEDIC_TITLE = "Medic Application"
   private val LOGIN_ERROR_MESSAGE = "An error occurred while logging in: "
   private val LOGIN_UNSUPPORTED_ROLE_MESSAGE = "The role you have is not supported by this application!"
   private val SUBSCRIPTION_ERROR = "Error while subscribing: "
