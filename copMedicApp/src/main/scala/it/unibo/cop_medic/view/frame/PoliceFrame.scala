@@ -14,7 +14,7 @@ import it.unibo.cop_medic.view.View
 import javax.swing.border.EmptyBorder
 import javax.swing.table.DefaultTableModel
 import javax.swing.{BoxLayout, JButton, JCheckBox, JFrame, JLabel, JPanel, JScrollPane, JTable}
-import monix.execution.{CancelableFuture, Scheduler}
+import monix.execution.Scheduler
 
 private [view] object PoliceFrame {
 
@@ -108,23 +108,18 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
 
   /* elements reaction logic */
   private var informationMap: Map[String, List[Data]] = Map()
-  private var futureMap: Map[String, List[CancelableFuture[Unit]]] = Map()
 
   citizenIdReceiveButton addActionListener ( _ => {
     handleBtnClick (onlyNotEmptyLists = true, (user, categories) => {
       leafCategoriesCheck.foreach(_.setSelected(false))
       citizenIdField.setText("")
-      val future = controller.subscribeTo(user, categories.toSet).foreach { data =>
+      controller.subscribeTo(user, categories.toSet).foreach { data =>
         val newList = if (informationMap contains user) {
           data +: informationMap(user).filterNot(_.category.name == data.category.name)
         } else List(data)
         informationMap = informationMap + (user -> newList)
         refreshTable()
       }
-      val futureList = List(future)
-      futureMap =
-        if(futureMap contains user)  futureMap + (user -> (futureMap(user) ++ futureList))
-        else futureMap + (user -> futureList)
     })
   })
 
@@ -133,9 +128,7 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
       if(informationMap contains user) {
         leafCategoriesCheck.foreach(_.setSelected(false))
         citizenIdField.setText("")
-        futureMap(user).foreach(_.cancel)
-        futureMap = futureMap - user
-        //controller unsubscribeFrom user
+        controller unsubscribeFrom user
         refreshTable()
       } else {
         showDialog(this, NOT_SUBSCRIBED_ERROR)

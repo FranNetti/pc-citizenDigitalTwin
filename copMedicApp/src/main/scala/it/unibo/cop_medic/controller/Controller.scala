@@ -13,7 +13,7 @@ import it.unibo.cop_medic.model.data.{Data, LeafCategory, Resource, Roles}
 import it.unibo.cop_medic.util.{AlreadyLogged, FailedLogin, LoginResult, SuccessfulLogin, SystemUser, UnsupportedRole}
 import it.unibo.cop_medic.view.SubscriptionFailed
 import it.unibo.cop_medic.view.View.ViewCreator
-import monix.execution.Scheduler
+import monix.execution.{CancelableFuture, Scheduler}
 import monix.reactive.Observable
 import monix.reactive.subjects.PublishSubject
 
@@ -53,6 +53,7 @@ object Controller {
     private var logged = false
     private var authenticationInfo: AuthenticationInfo = _
     private var citizenChannels: Map[User, CitizenChannel] = Map()
+    private var futureMap: Map[User, List[CancelableFuture[Unit]]] = Map()
     view.show()
 
     override def doLogin(username: String, password: String): Future[LoginResult] = {
@@ -79,7 +80,11 @@ object Controller {
         val channel = this lookForCitizenChannel user
         categories foreach { x =>
           channel.observeState(authenticationInfo, x) whenComplete {
-            case Response(content) => content.foreach(observable.onNext)(monixContext)
+            case Response(content) =>
+              val futureList = List(content.foreach(observable.onNext)(monixContext))
+              futureMap =
+                if(futureMap contains user)  futureMap + (user -> (futureMap(user) ++ futureList))
+                else futureMap + (user -> futureList)
             case Fail(error) => view showError SubscriptionFailed(error.toString)
           }
         }
@@ -91,7 +96,11 @@ object Controller {
       observable
     }
 
-    override def unsubscribeFrom(user: String): Unit = ???
+    override def unsubscribeFrom(user: String): Unit = {
+      futureMap(user).foreach(_.cancel)
+      futureMap = futureMap - user
+      citizenChannels = citizenChannels - user
+    }
 
     override def addNewData(data: Seq[(DataValue, LeafCategory)])(user: User): Unit =
       if(logged) {
