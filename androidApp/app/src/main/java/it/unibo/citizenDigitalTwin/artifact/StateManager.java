@@ -1,5 +1,8 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.stream.Collectors;
 import cartago.OPERATION;
 import cartago.ObsProperty;
 import it.unibo.citizenDigitalTwin.data.State;
+import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.LoginResult;
 import it.unibo.citizenDigitalTwin.db.dao.NotificationDAO;
@@ -34,9 +38,12 @@ public class StateManager extends JaCaArtifact {
     private static final String PROP_STATE = "state";
     private static final String PROP_NOTIFICATIONS = "notifications";
     private static final String MSG_NEW_GENERATED_DATA = "newGeneratedData";
+    private static final String FIRST_RUN = "first_run";
+    private static final String SHARED_PREFERENCES_ID = "it.unibo.cdt.stateManager";
 
     private DataDAO dbState;
     private NotificationDAO dbNotifications;
+    private boolean isFirstRun;
 
     public void init() {
         final AppDatabase db = AppDatabase.getInstance(getApplicationContext());
@@ -44,6 +51,7 @@ public class StateManager extends JaCaArtifact {
         this.dbNotifications = db.notificationDAO();
         defineObsProperty(PROP_STATE, new State());
         defineObsProperty(PROP_NOTIFICATIONS, new ArrayList<Notification>());
+        isFirstRun = isFirstRun();
 
         /* RxJava Flowable */
         dbState.getAll().map(State::new).forEach(state -> {
@@ -93,7 +101,10 @@ public class StateManager extends JaCaArtifact {
     public void createNotifications(final List<Data> dataList){
         final String myUri = hasObsProperty(PROP_LOGGED) ?
                 getObsProperty(PROP_LOGGED).stringValue() : "";
+        final Map<LeafCategory,Data> state = ((State)getObsProperty(PROP_STATE).getValue()).getState();
         final List<DataNotification> notifications = dataList.stream()
+                .filter(x -> x.getLeafCategory().getGroupCategory() != GroupCategory.PERSONAL_DATA || !isFirstRun)
+                .filter(x -> !state.containsKey(x.getLeafCategory()) || state.get(x.getLeafCategory()).getDate().before(x.getDate()))
                 .filter(x -> x.getFeeder().isResource() && !x.getFeeder().getUri().equals(myUri))
                 .collect(Collectors.groupingBy(x -> x.getFeeder().getUri(), Collectors.toSet()))
                 .entrySet()
@@ -143,6 +154,16 @@ public class StateManager extends JaCaArtifact {
         savedNotifications.sort((a,b) -> a.getDate().compareTo(b.getDate()));
         prop.updateValue(savedNotifications);
         endExternalSession(true);
+    }
+
+    private boolean isFirstRun() {
+        final SharedPreferences prefs = getApplicationContext()
+                .getSharedPreferences(SHARED_PREFERENCES_ID, Context.MODE_PRIVATE);
+        if (prefs.getBoolean(FIRST_RUN, true)) {
+            prefs.edit().putBoolean(FIRST_RUN, false).apply();
+            return true;
+        }
+        return false;
     }
 
 }
