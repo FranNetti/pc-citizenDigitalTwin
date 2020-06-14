@@ -7,8 +7,9 @@ import it.unibo.cop_medic.model.data.Roles.CopRole
 import it.unibo.cop_medic.model.data.{Data, LeafCategory, Roles}
 import it.unibo.cop_medic.util._
 import it.unibo.cop_medic.view.View
+import it.unibo.cop_medic.view.frame.panel.CitizenIdPanel
 import javax.swing.border.EmptyBorder
-import javax.swing.{BoxLayout, JButton, JCheckBox, JFrame, JLabel, JPanel, JScrollPane}
+import javax.swing.{BoxLayout, JCheckBox, JFrame, JPanel, JScrollPane}
 import monix.execution.Scheduler
 
 private [view] object PoliceFrame {
@@ -39,11 +40,6 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   private implicit val scheduler = Scheduler(View.defaultExecutionContext)
   private val leafCategoriesCheck = Roles.categoriesByRole(CopRole).map(x => LeafCategoryCheckBox(x.name, x.asInstanceOf[LeafCategory]))
 
-  private val citizenIdLabel = new JLabel(CITIZEN_ID_LABEL)
-  private val citizenIdField = createFieldWithHint(CITIZEN_ID_HINT, new Dimension(CITIZEN_FIELD_LENGTH, TEXT_HEIGHT))
-  private val citizenIdReceiveButton = new JButton(CITIZEN_ID_BTN_RECEIVE)
-  private val citizenIdStopButton = new JButton(CITIZEN_ID_BTN_STOP)
-
   /* Main panel */
   private val mainPanel = new JPanel
   mainPanel setBorder new EmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN)
@@ -51,15 +47,10 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   getContentPane add mainPanel
 
   /* citizen to observe panel */
-  private val citizenToObservePanel = new JPanel
-  citizenToObservePanel setLayout new BoxLayout(citizenToObservePanel, BoxLayout.LINE_AXIS)
-  citizenToObservePanel add citizenIdLabel
-  citizenToObservePanel add createHorizontalBox()
-  citizenToObservePanel add citizenIdField
-  citizenToObservePanel add createHorizontalBox()
-  citizenToObservePanel add citizenIdReceiveButton
-  citizenToObservePanel add createHorizontalBox()
-  citizenToObservePanel add citizenIdStopButton
+  private val citizenToObservePanel = CitizenIdPanel(
+    CITIZEN_ID_LABEL, CITIZEN_ID_HINT, new Dimension(CITIZEN_FIELD_LENGTH, TEXT_HEIGHT),
+    CITIZEN_ID_BTN_RECEIVE, CITIZEN_ID_BTN_STOP
+  )
   mainPanel add citizenToObservePanel
 
   /* categories panel */
@@ -69,9 +60,8 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   mainPanel add checkboxLayout
 
   /* table panel */
-  val (tableModel,table) = createTable(Seq("user", "id", "category", "feeder", "date", "value"))
+  val (table,tableModel) = createTable(Seq("user", "id", "category", "feeder", "date", "value"))
   val tablePane = new JScrollPane(table)
-  table setFillsViewportHeight true
   mainPanel add tablePane
 
   setSize(WIDTH, HEIGHT)
@@ -84,39 +74,32 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   /* elements reaction logic */
   private var informationMap: Map[String, List[Data]] = Map()
 
-  citizenIdReceiveButton addActionListener ( _ => {
-    handleBtnClick (onlyNotEmptyLists = true, (user, categories) => {
+  citizenToObservePanel handleReceiveButton (user => {
+    val list = leafCategoriesCheck.filter(_.isSelected).map(_.leafCategory)
+    if(list.isEmpty) {
+      citizenToObservePanel.field setText user
+      showDialog(this, SELECT_ONE_LEAF_ERROR)
+    }
+    else {
       leafCategoriesCheck.foreach(_.setSelected(false))
-      citizenIdField.setText("")
-      controller.subscribeTo(user, categories.toSet).foreach { data =>
+      controller.subscribeTo(user, list.toSet).foreach { data =>
         val newList = if (informationMap contains user) {
           data +: informationMap(user).filterNot(_.category.name == data.category.name)
         } else List(data)
         informationMap = informationMap + (user -> newList)
         refreshTable()
       }
-    })
-  })
+    }
+  }, EMPTY_TEXT_ERROR)
 
-  citizenIdStopButton addActionListener ( _ => {
-    handleBtnClick(onlyNotEmptyLists = false, (user, _) => {
-      if(informationMap contains user) {
-        leafCategoriesCheck.foreach(_.setSelected(false))
-        citizenIdField.setText("")
-        controller unsubscribeFrom user
-      } else {
-        showDialog(this, NOT_SUBSCRIBED_ERROR)
-      }
-    })
-  })
-
-  private def handleBtnClick(onlyNotEmptyLists: Boolean, onSuccess: (String, Seq[LeafCategory]) => Unit): Unit = {
-    val list = leafCategoriesCheck.filter(_.isSelected).map(_.leafCategory)
-    val user = citizenIdField.getText
-    if(user.hasWhiteSpaces) showDialog(this, EMPTY_TEXT_ERROR)
-    else if(onlyNotEmptyLists && list.isEmpty) showDialog(this, SELECT_ONE_LEAF_ERROR)
-    else onSuccess(user, list)
-  }
+  citizenToObservePanel handleStopButton (user => {
+    if(informationMap contains user) {
+      leafCategoriesCheck.foreach(_.setSelected(false))
+      controller unsubscribeFrom user
+    } else {
+      showDialog(this, NOT_SUBSCRIBED_ERROR)
+    }
+  }, EMPTY_TEXT_ERROR)
 
   private def refreshTable(): Unit = {
     val newList = informationMap.toSeq.sortBy(_._1).flatMap(x => {

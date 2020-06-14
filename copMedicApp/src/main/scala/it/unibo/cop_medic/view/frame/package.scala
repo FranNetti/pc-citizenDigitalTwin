@@ -22,64 +22,36 @@ package object frame {
   private val LABEL_DIM = new Dimension(100, TEXT_HEIGHT)
   private val FIELD_DIM = new Dimension(200, TEXT_HEIGHT)
 
-  def createLabel(text: String, labelDim: Dimension = LABEL_DIM): JLabel = {
-    val label = new JLabel(text)
-    label setSize labelDim
-    label setPreferredSize labelDim
-    label setMinimumSize labelDim
-    label setMaximumSize labelDim
-    label
-  }
+  def createLabel(text: String, labelDim: Dimension = LABEL_DIM): JLabel =
+    new JLabel(text) setComponentSize labelDim
 
-  def createField(fieldDim: Dimension = FIELD_DIM): JTextField = {
-    val field = new JTextField()
-    field setSize fieldDim
-    field setPreferredSize fieldDim
-    field setMinimumSize fieldDim
-    field setMaximumSize fieldDim
-    field
-  }
+  def createField(fieldDim: Dimension = FIELD_DIM): JTextField =
+    new JTextField() setComponentSize fieldDim
 
-  def createPasswordField(fieldDim: Dimension = FIELD_DIM): JPasswordField = {
-    val field = new JPasswordField()
-    field setSize fieldDim
-    field setPreferredSize fieldDim
-    field setMinimumSize fieldDim
-    field setMaximumSize fieldDim
-    field
-  }
+  def createPasswordField(fieldDim: Dimension = FIELD_DIM): JPasswordField =
+    new JPasswordField() setComponentSize fieldDim
 
   def createVerticalBox(boxHeight: Int = BOX_HEIGHT): Component = Box.createVerticalStrut(boxHeight)
 
   def createHorizontalBox(boxWidth: Int = BOX_WIDTH): Component = Box.createHorizontalStrut(boxWidth)
 
-  def createFieldWithHint(hintText: String, fieldDim: Dimension = FIELD_DIM): JTextField = {
-    val field = new HintTextField(hintText)
-    field setSize fieldDim
-    field setPreferredSize fieldDim
-    field setMinimumSize fieldDim
-    field setMaximumSize fieldDim
-    field
-  }
+  def createFieldWithHint(hintText: String, fieldDim: Dimension = FIELD_DIM): JTextField =
+    new HintTextField(hintText) setComponentSize fieldDim
 
   def showDialog(parent: Component, text: String): Unit = JOptionPane.showMessageDialog(parent, text)
 
-  def createTable(columns: Seq[String]): (DefaultTableModel, JTable) = {
+  def createTable(columns: Seq[String]): (JTable, DefaultTableModel) = {
     val tableModel = new DefaultTableModel()
     columns.foreach{tableModel.addColumn}
     val table = new JTable(tableModel)
     table setFillsViewportHeight true
-    (tableModel, table)
+    (table, tableModel)
   }
 
   def createComboBox(choices: Set[LeafCategory], dimension: Dimension): JComboBox[LeafCategory] = {
     val comboBox = new JComboBox(choices.toArray)
     comboBox.setRenderer(ComboBoxRenderer())
-    comboBox.setMaximumSize(dimension)
-    comboBox.setMinimumSize(dimension)
-    comboBox.setPreferredSize(dimension)
-    comboBox.setSize(dimension)
-    comboBox
+    comboBox setComponentSize dimension
   }
 
   def toTableFormat(info:(String,Data)) : Array[AnyRef] = {
@@ -133,6 +105,16 @@ package object frame {
                    cellHasFocus: Boolean): Component = {
       setText(value.name)
       this
+    }
+  }
+
+  implicit class RichComponent[X <: Component](component: X) {
+    def setComponentSize(dimension: Dimension): X = {
+      component.setMaximumSize(dimension)
+      component.setMinimumSize(dimension)
+      component.setPreferredSize(dimension)
+      component.setSize(dimension)
+      component
     }
   }
 
