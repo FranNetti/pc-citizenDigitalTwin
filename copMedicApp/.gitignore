@@ -1,7 +1,6 @@
 # Start Exclusions
 .directory
 *.directory
-androidApp/.idea/misc.xml
 # End Exclusions
 
 # Created by https://www.gitignore.io/api/git,java,gradle,android,eclipse,intellij,androidstudio
