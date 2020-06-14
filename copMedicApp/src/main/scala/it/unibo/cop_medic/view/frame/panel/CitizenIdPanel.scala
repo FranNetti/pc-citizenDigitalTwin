@@ -32,10 +32,10 @@ private[frame] class CitizenIdPanel(labelText: String, hintText: String, hintDim
   this add createHorizontalBox()
   this add stopButton
 
-  def handleReceiveButton(fun: String => Unit, emptyFieldError: String): Unit =
+  def handleReceiveButton(fun: String => Unit)(emptyFieldError: String): Unit =
     receiveButton addActionListener (_ => handleBtnClick(fun, emptyFieldError))
 
-  def handleStopButton(fun: String => Unit, emptyFieldError: String): Unit =
+  def handleStopButton(fun: String => Unit)(emptyFieldError: String): Unit =
     stopButton addActionListener (_ => handleBtnClick(fun, emptyFieldError))
 
   private def handleBtnClick(fun: String => Unit, emptyFieldError: String): Unit = {

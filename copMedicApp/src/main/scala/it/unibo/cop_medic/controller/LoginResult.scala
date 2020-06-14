@@ -1,4 +1,6 @@
-package it.unibo.cop_medic.util
+package it.unibo.cop_medic.controller
+
+import it.unibo.cop_medic.util.SystemUser
 
 sealed trait LoginResult
 

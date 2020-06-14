@@ -74,7 +74,7 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   /* elements reaction logic */
   private var informationMap: Map[String, List[Data]] = Map()
 
-  citizenToObservePanel handleReceiveButton (user => {
+  citizenToObservePanel.handleReceiveButton (user => {
     val list = leafCategoriesCheck.filter(_.isSelected).map(_.leafCategory)
     if(list.isEmpty) {
       citizenToObservePanel.field setText user
@@ -90,16 +90,16 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
         refreshTable()
       }
     }
-  }, EMPTY_TEXT_ERROR)
+  })(EMPTY_TEXT_ERROR)
 
-  citizenToObservePanel handleStopButton (user => {
+  citizenToObservePanel.handleStopButton {user =>
     if(informationMap contains user) {
       leafCategoriesCheck.foreach(_.setSelected(false))
       controller unsubscribeFrom user
     } else {
       showDialog(this, NOT_SUBSCRIBED_ERROR)
     }
-  }, EMPTY_TEXT_ERROR)
+  }(EMPTY_TEXT_ERROR)
 
   private def refreshTable(): Unit = {
     val newList = informationMap.toSeq.sortBy(_._1).flatMap(x => {

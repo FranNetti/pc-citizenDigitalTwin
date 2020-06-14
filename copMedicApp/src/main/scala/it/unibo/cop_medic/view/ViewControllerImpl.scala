@@ -1,9 +1,8 @@
 package it.unibo.cop_medic.view
 
-import it.unibo.cop_medic.controller.Controller
+import it.unibo.cop_medic.controller.{Controller, FailedLogin, LoginResult, SuccessfulLogin, UnsupportedRole}
 import it.unibo.cop_medic.model.data.Roles
 import it.unibo.cop_medic.model.data.Roles._
-import it.unibo.cop_medic.util.{FailedLogin, LoginResult, SuccessfulLogin, UnsupportedRole}
 import it.unibo.cop_medic.view.View.SwingExecutionContext
 import it.unibo.cop_medic.view.frame.{LoginFrame, MedicFrame, PoliceFrame, showDialog}
 import javax.swing.JFrame

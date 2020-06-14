@@ -9,8 +9,8 @@ import it.unibo.cop_medic.model.channel.{AuthenticationInfo, AuthenticationServi
 import it.unibo.cop_medic.model.channel.data.{Fail, Response}
 import it.unibo.cop_medic.model.channel.parser.Parsers
 import it.unibo.cop_medic.model.channel.rest.CitizenChannel
-import it.unibo.cop_medic.model.data.{Data, LeafCategory, Resource, Roles}
-import it.unibo.cop_medic.util.{AlreadyLogged, FailedLogin, LoginResult, SuccessfulLogin, SystemUser, UnsupportedRole}
+import it.unibo.cop_medic.model.data.{Categories, Data, LeafCategory, Resource, Roles}
+import it.unibo.cop_medic.util.SystemUser
 import it.unibo.cop_medic.view.SubscriptionFailed
 import it.unibo.cop_medic.view.View.ViewCreator
 import monix.execution.{CancelableFuture, Scheduler}
@@ -18,6 +18,7 @@ import monix.reactive.Observable
 import monix.reactive.subjects.PublishSubject
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.duration._
 import scala.io.Source
 
 sealed trait Controller {
@@ -28,7 +29,7 @@ sealed trait Controller {
   def doLogin(username: String, password: String): Future[LoginResult]
   def subscribeTo(user: User, categories: Set[LeafCategory]): Observable[Data]
   def unsubscribeFrom(user: String)
-  def addNewData(data: Seq[(DataValue, LeafCategory)])(user: User): Unit
+  def addNewData(data: Seq[(Seq[DataValue], LeafCategory)])(user: User): Future[InsertResult]
 
 }
 
@@ -64,6 +65,7 @@ object Controller {
               case Response(auth: AuthenticationInfo) if isRoleSupported(auth.user) =>
                 logged = true
                 authenticationInfo = auth
+                this backgroundTokenRefresh()
                 promise success SuccessfulLogin(auth.user)
               case Response(_) => promise success UnsupportedRole
               case Fail(error) => promise success FailedLogin(error.toString)
@@ -102,19 +104,28 @@ object Controller {
       citizenChannels = citizenChannels - user
     }
 
-    override def addNewData(data: Seq[(DataValue, LeafCategory)])(user: User): Unit =
-      if(logged) {
+    override def addNewData(data: Seq[(Seq[DataValue], LeafCategory)])(user: User): Future[InsertResult] = {
+      val promise = Promise[InsertResult]()
+      if (logged) {
         val channel = this lookForCitizenChannel user
         val feeder = Resource(authenticationInfo.user.identifier)
         val timestamp = new Date().getTime
-        channel updateState(
-          authenticationInfo,
-          data.map(x => Data(feeder = feeder, timestamp = timestamp, value = x._1, category = x._2, identifier = ""))
-        ) whenComplete {
-          case Response(content) =>
-          case Fail(error) =>
+        try {
+          val formattedData: Seq[Data] = data.map(x =>
+            Data(feeder = feeder, timestamp = timestamp, value = formatData(x._2, x._1), category = x._2, identifier = "")
+          )
+          channel updateState(authenticationInfo, formattedData) whenComplete {
+            case Response(_) => promise success SuccessfulInsert
+            case Fail(error) => promise success FailedInsert(error.toString)
+          }
+        } catch {
+            case e: Exception => promise failure e
         }
+      } else {
+        promise success FailedInsert("You're not logged")
       }
+      promise.future
+    }
 
     private def isRoleSupported(user: SystemUser): Boolean = user.role match {
       case Roles.CopRole.name | Roles.MedicRole.name => true
@@ -128,6 +139,27 @@ object Controller {
         citizenChannels = citizenChannels + (user -> newChannel)
         newChannel
       }
+    }
+
+    private def formatData(leafCategory: LeafCategory, values: Seq[String]): Any = leafCategory match {
+      case Categories.bodyTemperatureCategory => (values.head.toDouble, "°C")
+      case Categories.bloodOxygenCategory | Categories.heartrateCategory => values.head.toDouble
+      case Categories.positionCategory => (values.head.toDouble, values(1).toDouble)
+      case Categories.medicalRecordCategory => values
+      case _ => values.head
+    }
+
+    private def backgroundTokenRefresh(): Unit = {
+      new Thread(() => {
+        while(true) {
+          val expirationTime = authenticationInfo.token.expirationInMinute.minutes
+          val timeToWait = expirationTime - 1.minute
+          Thread.sleep(timeToWait.toMillis)
+          authenticationChannel refresh authenticationInfo whenComplete {
+            case Response(newToken) => authenticationInfo = AuthenticationInfo(newToken, authenticationInfo.user)
+          }
+        }
+      }).start()
     }
 
   }

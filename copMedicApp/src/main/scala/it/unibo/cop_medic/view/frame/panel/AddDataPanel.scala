@@ -4,6 +4,7 @@ import java.awt.Dimension
 
 import it.unibo.cop_medic.model.data.LeafCategory
 import it.unibo.cop_medic.view.frame._
+import it.unibo.cop_medic.util._
 import javax.swing.{BoxLayout, JButton, JLabel, JPanel}
 
 private[frame] object AddDataPanel {
@@ -26,27 +27,37 @@ private[frame] class AddDataPanel(categories: Set[LeafCategory], citizenFieldWid
 
   import AddDataPanel._
 
-  private val addDataCitLabel = new JLabel(ADD_DATA_CIT_LABEL)
-  private val addDataValLabel = new JLabel(ADDA_DATA_VAL_LABEL)
-  private val addDataCatLabel = new JLabel(ADD_DATA_CAT_LABEL)
-  private val addDataCitField = createFieldWithHint(ADD_DATA_CIT_HINT, citizenFieldWidth)
-  private val addDataValField = createField(dataFieldWidth)
-  private val addDataCatChoice = createComboBox(categories, categoriesFieldWidth)
+  private val citizenLabel = new JLabel(ADD_DATA_CIT_LABEL)
+  private val valueLabel = new JLabel(ADDA_DATA_VAL_LABEL)
+  private val categoryLabel = new JLabel(ADD_DATA_CAT_LABEL)
+  private val citizenField = createFieldWithHint(ADD_DATA_CIT_HINT, citizenFieldWidth)
+  private val valueField = createField(dataFieldWidth)
+  private val categoryChoice = createComboBox(categories, categoriesFieldWidth)
   private val addDataButton = new JButton(ADD_DATA_BTN_GENERATE)
 
   this setLayout new BoxLayout(this, BoxLayout.LINE_AXIS)
-  this add addDataCitLabel
+  this add citizenLabel
   this add createHorizontalBox()
-  this add addDataCitField
+  this add citizenField
   this add createHorizontalBox()
-  this add addDataValLabel
+  this add valueLabel
   this add createHorizontalBox()
-  this add addDataValField
+  this add valueField
   this add createHorizontalBox()
-  this add addDataCatLabel
+  this add categoryLabel
   this add createHorizontalBox()
-  this add addDataCatChoice
+  this add categoryChoice
   this add createHorizontalBox(10)
   this add addDataButton
+
+  def handleAddNewData(fun: (String, String, LeafCategory) => Unit)(emptyCitizenError: String, emptyValueError: String): Unit =
+    addDataButton addActionListener (_ => {
+      val citizenId = citizenField.getText
+      val value = valueField.getText
+      val category = categoryChoice.getSelectedItem.asInstanceOf[LeafCategory]
+      if(citizenId.hasWhiteSpaces) showDialog(getParent, emptyCitizenError)
+      else if(value.hasWhiteSpaces) showDialog(getParent, emptyValueError)
+      else fun(citizenId, value, category)
+    })
 
 }

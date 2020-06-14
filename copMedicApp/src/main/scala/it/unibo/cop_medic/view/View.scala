@@ -1,7 +1,7 @@
 package it.unibo.cop_medic.view
 
-import it.unibo.cop_medic.controller.Controller
-import it.unibo.cop_medic.util.{LoginResult, SystemUser}
+import it.unibo.cop_medic.controller.{Controller, LoginResult}
+import it.unibo.cop_medic.util.SystemUser
 import javax.swing.SwingUtilities
 
 import scala.concurrent.ExecutionContext

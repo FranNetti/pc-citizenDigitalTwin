@@ -1,14 +1,12 @@
 package it.unibo.cop_medic.view.frame
 
-import java.awt.{Component, Dimension}
-
 import it.unibo.cop_medic.controller.Controller
 import it.unibo.cop_medic.util
 import it.unibo.cop_medic.view.{View, ViewController}
 import javax.swing.border.EmptyBorder
 import javax.swing._
 
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 private[view] object LoginFrame {
 
@@ -21,6 +19,7 @@ private[view] object LoginFrame {
   private val EMAIL_LABEL_TEXT = "Email"
   private val PWD_LABEL_TEXT = "Password"
   private val EMPTY_FIELD_ERROR = "The fields cannot be empty!"
+  private val LOGIN_ERROR = "Error during login: "
 }
 
 private[view] class LoginFrame(title: String, controller: Controller, viewController: ViewController) extends JFrame {
@@ -69,6 +68,7 @@ private[view] class LoginFrame(title: String, controller: Controller, viewContro
     if (emailField.getText.hasNoWhiteSpaces && password.hasNoWhiteSpaces) {
       controller.doLogin(emailField.getText, password).onComplete {
         case Success(result) => viewController.handleLoginResult(result)
+        case Failure(exception) => showDialog(this, LOGIN_ERROR + exception)
       }(View.defaultExecutionContext)
     } else {
      showDialog(this, EMPTY_FIELD_ERROR)

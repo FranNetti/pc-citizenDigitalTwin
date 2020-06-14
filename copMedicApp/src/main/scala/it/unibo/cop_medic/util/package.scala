@@ -2,13 +2,6 @@ package it.unibo.cop_medic
 
 package object util {
 
-  object Role extends Enumeration {
-    type Role = Role.Value
-    val CITIZEN: Value = Value("citizen")
-    val POLICE_MAN: Value = Value("policeman")
-    val MEDIC: Value = Value("medic")
-  }
-
   /**
    * the representation of an user logged in the system.
    * It has:

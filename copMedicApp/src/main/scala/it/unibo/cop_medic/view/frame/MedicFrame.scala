@@ -2,7 +2,7 @@ package it.unibo.cop_medic.view.frame
 
 import java.awt.Dimension
 
-import it.unibo.cop_medic.controller.Controller
+import it.unibo.cop_medic.controller.{Controller, FailedInsert, SuccessfulInsert}
 import it.unibo.cop_medic.model.data.Roles.MedicRole
 import it.unibo.cop_medic.model.data.{Categories, Data, LeafCategory, Roles}
 import it.unibo.cop_medic.view.View
@@ -10,6 +10,8 @@ import it.unibo.cop_medic.view.frame.panel.{AddDataPanel, CitizenIdPanel}
 import javax.swing.border.EmptyBorder
 import javax.swing.{BoxLayout, JFrame, JPanel, JScrollPane}
 import monix.execution.Scheduler
+
+import scala.util.{Failure, Success}
 
 private [view] object MedicFrame {
 
@@ -29,7 +31,12 @@ private [view] object MedicFrame {
   private val CITIZEN_ID_BTN_RECEIVE = "RECEIVE UPDATES"
   private val CITIZEN_ID_BTN_STOP = "STOP UPDATES"
   private val EMPTY_TEXT_ERROR = "The user id must not be empty!"
+  private val EMPTY_VALUE_ERROR = "The value field must not be empty!"
   private val NOT_SUBSCRIBED_ERROR = "You didn't subscribed for updates from this user!"
+  private val SUCCESSFUL_INSERT = "Data successfully created!"
+  private val FAILED_INSERT_ERROR = "An error occurred during the operation: "
+  private val NUMBER_FORMAT_ERROR = "The value is not a number!"
+
 }
 
 
@@ -76,7 +83,7 @@ private [view] class MedicFrame(title: String, controller: Controller) extends J
   /* elements reaction logic */
   private var informationMap: Map[String, List[Data]] = Map()
 
-  citizenToObservePanel handleReceiveButton (user => {
+  citizenToObservePanel.handleReceiveButton {user =>
     controller.subscribeTo(user, categoriesToObserve).foreach { data =>
       val newList = if (informationMap contains user) {
         data +: informationMap(user).filterNot(_.category.name == data.category.name)
@@ -84,15 +91,27 @@ private [view] class MedicFrame(title: String, controller: Controller) extends J
       informationMap = informationMap + (user -> newList)
       refreshTable()
     }
-  }, EMPTY_TEXT_ERROR)
+  }(EMPTY_TEXT_ERROR)
 
-  citizenToObservePanel handleStopButton (user => {
+  citizenToObservePanel.handleStopButton {user =>
     if(informationMap contains user) {
       controller unsubscribeFrom user
     } else {
       showDialog(this, NOT_SUBSCRIBED_ERROR)
     }
-  }, EMPTY_TEXT_ERROR)
+  }(EMPTY_TEXT_ERROR)
+
+  addDataPanel.handleAddNewData ((citizenId,value,category) => {
+    val seqValue = if(category == Categories.medicalRecordCategory) {
+      value.split(",").toSeq
+    } else Seq(value)
+    controller.addNewData(Seq((seqValue, category)))(citizenId).onComplete {
+      case Success(SuccessfulInsert) => showDialog(this, SUCCESSFUL_INSERT)
+      case Success(FailedInsert(error)) => showDialog(this, FAILED_INSERT_ERROR + error)
+      case Failure(e: NumberFormatException) => showDialog(this, NUMBER_FORMAT_ERROR)
+      case Failure(exception) => showDialog(this, FAILED_INSERT_ERROR + exception)
+    }
+  })(EMPTY_TEXT_ERROR, EMPTY_VALUE_ERROR)
 
   private def refreshTable(): Unit = {
     val newList = informationMap.toSeq.sortBy(_._1).flatMap(x => {
