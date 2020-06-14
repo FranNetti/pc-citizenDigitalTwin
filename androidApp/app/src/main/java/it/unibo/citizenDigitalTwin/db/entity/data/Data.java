@@ -1,6 +1,7 @@
 package it.unibo.citizenDigitalTwin.db.entity.data;
 
 import android.util.Log;
+import android.util.Pair;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,6 +17,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,7 +36,6 @@ public class Data implements Serializable, JsonSerializable {
     private static final String TIMESTAMP = "timestamp";
     private static final String DATA_CATEGORY = "category";
     private static final String VALUE = "value";
-    private static final String NAME = "name";
 
     @PrimaryKey @NonNull @ColumnInfo(name = "leafCategory") private String leafCategoryName;
     @ColumnInfo private Date date;
@@ -63,7 +64,7 @@ public class Data implements Serializable, JsonSerializable {
     }
 
     @Ignore
-    public Data(final JSONObject data) throws JSONException {
+    public Data(final JSONObject data) throws JSONException, IllegalArgumentException {
         this(data.getString(IDENTIFIER),
                 new Date(data.getLong(TIMESTAMP)),
                 new Feeder(data.getJSONObject(FEEDER)),
@@ -78,16 +79,13 @@ public class Data implements Serializable, JsonSerializable {
             final Feeder feeder,
             final String leafCategoryName,
             final Map<CommunicationStandard, String> information) throws IllegalArgumentException {
-        try {
             this.identifier = identifier;
             this.date = date;
             this.feeder = feeder;
-            this.leafCategory = LeafCategory.findByLeafIdentifier(leafCategoryName).get();
+            this.leafCategory = LeafCategory.findByLeafIdentifier(leafCategoryName)
+                    .orElseThrow(() -> new IllegalArgumentException("Leaf category not found: " + leafCategoryName));
             this.leafCategoryName = leafCategoryName;
             this.information = information;
-        } catch (final NoSuchElementException e) {
-            throw new IllegalArgumentException("Leaf category not found: " + leafCategoryName);
-        }
     }
 
     public String getIdentifier() {
@@ -169,15 +167,30 @@ public class Data implements Serializable, JsonSerializable {
         if (obj instanceof JSONObject) {
             final JSONObject json = (JSONObject) obj;
             json.keys().forEachRemaining(name -> {
-                try {
-                    information.put(CommunicationStandard.findByIdentifier(name).get(), json.getString(name));
-                } catch (final Exception e){
-                    Log.e(TAG, "Error in decodeInformation: " + e.getLocalizedMessage());
-                }
+                final Pair<CommunicationStandard, String> value = getValue(obj,name);
+                information.put(value.first, value.second);
             });
         } else {
-            information.put(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,obj.toString());
+            final Pair<CommunicationStandard, String> value = getValue(obj);
+            information.put(value.first, value.second);
         }
         return information;
     }
+
+    private static Pair<CommunicationStandard,String> getValue(final Object obj, final String communicationStandard) {
+            try {
+                if (obj instanceof JSONObject)
+                    return CommunicationStandard.decodeValue((JSONObject)obj,communicationStandard);
+                else if (obj instanceof JSONArray)
+                    return CommunicationStandard.decodeValue((JSONArray)obj);
+            } catch (final JSONException e) {
+                Log.e(TAG, "Error in decodeInformation: " + e.getLocalizedMessage());
+            }
+            return Pair.create(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,obj.toString());
+    }
+
+    private static Pair<CommunicationStandard,String> getValue(final Object obj) {
+        return getValue(obj,"");
+    }
+
 }

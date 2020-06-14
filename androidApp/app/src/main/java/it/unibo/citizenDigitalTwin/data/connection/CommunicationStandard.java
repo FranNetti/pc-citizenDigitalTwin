@@ -1,6 +1,11 @@
 package it.unibo.citizenDigitalTwin.data.connection;
 
 import android.content.Context;
+import android.util.Pair;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -15,6 +20,8 @@ public enum CommunicationStandard {
     DEFAULT_UNIT_OF_MEASURE_IDENTIFIER("um", R.string.um),
     LATITUDE("lat", R.string.lat, CommunicationStandard::positionDataToDouble),
     LONGITUDE("lng", R.string.lng, CommunicationStandard::positionDataToDouble);
+
+    private static final String SEPARATOR = ",";
 
     private final String identifier;
     private final int displayName;
@@ -53,14 +60,36 @@ public enum CommunicationStandard {
     }
 
     private static Object singleValueToObject(final LeafCategory category, final String value) {
-        switch(category) {
+        switch (category) {
             case HEART_RATE:
             case BLOOD_OXIGEN:
                 return Integer.parseInt(value);
             case TEMPERATURE:
                 return Double.parseDouble(value);
+            case MEDICAL_RECORD:
+                final JSONArray array = new JSONArray();
+                Stream.of(value.split(SEPARATOR)).map(String::trim).forEach(array::put);
+                return array;
             default:
                 return value;
         }
+    }
+
+    public static Pair<CommunicationStandard,String> decodeValue(final JSONObject json, final String name) throws JSONException, IllegalArgumentException {
+        final CommunicationStandard communicationStandard = CommunicationStandard
+                .findByIdentifier(name)
+                .orElseThrow(() -> new IllegalArgumentException("Communication Standard not found: " + name));
+        return Pair.create(communicationStandard,json.getString(name));
+    }
+
+    public static Pair<CommunicationStandard,String> decodeValue(final JSONArray json) throws JSONException {
+        final StringBuilder value = new StringBuilder();
+        final int length = json.length();
+        if (length > 0)
+            value.append(json.get(0));
+        for (int i = 1; i < length; i++) {
+            value.append(SEPARATOR).append(" ").append(json.get(i));
+        }
+        return Pair.create(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,value.toString());
     }
 }
