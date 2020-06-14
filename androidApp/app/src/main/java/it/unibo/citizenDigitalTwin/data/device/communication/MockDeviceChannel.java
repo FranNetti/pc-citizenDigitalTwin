@@ -2,7 +2,8 @@ package it.unibo.citizenDigitalTwin.data.device.communication;
 
 import org.json.JSONException;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -26,7 +27,7 @@ public class MockDeviceChannel implements DeviceChannel {
         msgReceivedObservable = new Observable<>();
         t = new Thread(() -> {
             double v = new Random().nextDouble() * (MAX_TEMP_VALUE - MIN_TEMP_VALUE) + MIN_TEMP_VALUE;
-            final DecimalFormat df = new DecimalFormat();
+            final NumberFormat df = NumberFormat.getInstance(Locale.ENGLISH);
             df.setMaximumFractionDigits(2);
             while(true) {
                 try {
