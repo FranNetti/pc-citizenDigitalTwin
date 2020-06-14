@@ -1,6 +1,5 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -87,7 +86,7 @@ public class StateManager extends JaCaArtifact {
     public void updateState(final List<Data> dataList) {
         final Map<LeafCategory,Data> state = ((State)getObsProperty(PROP_STATE).getValue()).getState();
         final List<Data> validData = dataList.stream()
-                .filter(x -> !state.containsKey(x.getLeafCategory()) || state.get(x.getLeafCategory()).getDate().before(x.getDate()))
+                .filter(x -> this.isMoreRecentThanStoredData(x, state))
                 .collect(Collectors.groupingBy(Data::getLeafCategory,Collectors.toList()))
                 .entrySet().stream()
                 .map(x -> x.getValue().stream().max((a,b) -> Long.compare(a.getDate().getTime(),b.getDate().getTime())))
@@ -104,7 +103,7 @@ public class StateManager extends JaCaArtifact {
         final Map<LeafCategory,Data> state = ((State)getObsProperty(PROP_STATE).getValue()).getState();
         final List<DataNotification> notifications = dataList.stream()
                 .filter(x -> x.getLeafCategory().getGroupCategory() != GroupCategory.PERSONAL_DATA || !isFirstRun)
-                .filter(x -> !state.containsKey(x.getLeafCategory()) || state.get(x.getLeafCategory()).getDate().before(x.getDate()))
+                .filter(x -> this.isMoreRecentThanStoredData(x, state))
                 .filter(x -> x.getFeeder().isResource() && !x.getFeeder().getUri().equals(myUri))
                 .collect(Collectors.groupingBy(x -> x.getFeeder().getUri(), Collectors.toSet()))
                 .entrySet()
@@ -164,6 +163,10 @@ public class StateManager extends JaCaArtifact {
             return true;
         }
         return false;
+    }
+
+    private boolean isMoreRecentThanStoredData(final Data newData, final Map<LeafCategory,Data> state){
+        return !state.containsKey(newData.getLeafCategory()) || state.get(newData.getLeafCategory()).getDate().before(newData.getDate());
     }
 
 }

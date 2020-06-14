@@ -13,11 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
-import it.unibo.citizenDigitalTwin.ui.group_category_info.GroupCategoryInfoFragment;
 
 public class GroupCategoryAdapter extends RecyclerView.Adapter<GroupCategoryAdapter.GroupCategoryHolder> {
 

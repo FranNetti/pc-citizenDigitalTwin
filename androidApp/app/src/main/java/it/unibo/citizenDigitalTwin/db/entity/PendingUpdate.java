@@ -1,8 +1,6 @@
 package it.unibo.citizenDigitalTwin.db.entity;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.json.JSONArray;

@@ -17,7 +17,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.IntStream;
 
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
@@ -53,7 +52,6 @@ public class ConnectionManager extends JaCaArtifact {
     private static final String REFRESH_TOKEN_RES = "/refreshToken";
     private static final String STATE_RES = "/state";
     private static final String CDT_CHANNEL_BASE_PATH = "/citizens";
-    private static final String AUTHORIZATION_CHANNEL_BASE_PATH = "/citizens";
 
     private static final String ID = "id";
     private static final String VALUE = "value";
