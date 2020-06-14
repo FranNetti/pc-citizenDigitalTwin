@@ -1,6 +1,8 @@
 maxAttempts(3).
 attempts(0).
 credentials("","").
+citizenService("192.168.1.3:8080").
+authenticationService("192.168.1.3:8081").
 
 +!login(Username,Password) <-
     -+credentials(Username,Password);
@@ -24,7 +26,9 @@ credentials("","").
 +activate <-
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
 	focus(StateManager);
-	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",["192.168.1.23:8080","192.168.1.23:8081"],ConnectionManager);
+	?citizenService(CitizenServiceAddress)
+	?authenticationService(AuthenticationServiceAddress)
+	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",[CitizenServiceAddress,AuthenticationServiceAddress],ConnectionManager);
 	focus(ConnectionManager);
 	.print("CDT Manager ready").
 
