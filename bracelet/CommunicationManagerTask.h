@@ -8,6 +8,9 @@
 
 typedef enum { WORKING, HANDLE_PARTIAL_MESSAGE } CommunicationState;
 
+/**
+ * Accept all the incoming requests from external agents.
+ */
 class CommunicationManagerTask: public AbstractTask {
 private:
   CommunicationState state;
@@ -23,6 +26,11 @@ private:
   bool completeMsg(Msg* msg, MsgService* service);
 public:
   CommunicationManagerTask(RequestHolder* request, int numberOfMsgServices);
+  /**
+   * Add a new external agent from whom receive requests.
+   * @params msgService MsgService with which communicate with the external agent
+   * @return true if the operation was successful and false otherwise
+   */
   bool addMsgService(MsgService* msgService);
   void tick();
 };

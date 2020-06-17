@@ -4,6 +4,9 @@
 #include "Arduino.h"
 #include "MsgService.h"
 
+/**
+ * MsgService that use the Arduino Serial.
+ */
 class SerialMsgService: public MsgService {
 
 protected:

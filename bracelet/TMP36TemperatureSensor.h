@@ -3,6 +3,9 @@
 
 #include "BodyThermometer.h"
 
+/**
+ * Encapsulate the technology and the logic used to work with the TMP36 sensor.
+ */
 class TMP36TemperatureSensor: public BodyThermometer {
 
 public:

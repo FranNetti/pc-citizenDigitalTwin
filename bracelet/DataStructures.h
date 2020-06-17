@@ -1,6 +1,10 @@
 #ifndef __DATA_STRUCTURES__
 #define __DATA_STRUCTURES__
 
+/**
+ * Simple class to use a circular array of objects.
+ * This class encapsulate the all logic of the circular array.
+ */
 template<typename X>
 class CircularArray {
 private:

@@ -8,6 +8,9 @@
 #include "heartRate.h"
 #include "spo2_algorithm.h"
 
+/**
+ * Encapsulate the technology and the logic used to work with the MAX30102 sensor.
+ */
 class MAX30102PulseOximeterSensor: public BodyOximeter, public BodyHeartRateMonitor {
 private:
   MAX30105 particleSensor;

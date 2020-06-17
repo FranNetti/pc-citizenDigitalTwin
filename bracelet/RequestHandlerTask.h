@@ -7,6 +7,9 @@
 #include "RequestHolder.h"
 #include "Subscription.h"
 
+/**
+ * Satisfy all the incoming requests from the Communication Manager if able to.
+ */
 typedef enum { HANDLE_REQUEST } RequestHandlerState;
 
 class RequestHandlerTask: public AbstractTask {

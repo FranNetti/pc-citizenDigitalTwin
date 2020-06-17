@@ -4,6 +4,9 @@
 #include "Task.h"
 #include "BluetoothMsgService.h"
 
+/**
+ * Task to catch Bluetooth events of a BluetoothMsgService.
+ */
 class BluetoothEventCatcher: public AbstractTask {
 private:
   BluetoothMsgService* bluetoothMsgService;

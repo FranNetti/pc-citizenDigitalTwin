@@ -3,6 +3,10 @@
 
 #include "Config.h"
 
+/**
+ * Simple static class to give to the Resources some static properties.
+ * In this case are defined teh resource names/identifiers.
+ */
 class Resource {
   public:
     static const String TEMPERATURE;
@@ -10,6 +14,9 @@ class Resource {
     static const String OXYGEN;
 };
 
+/**
+ * Represents the available Resources.
+ */
 typedef enum {
   TEMPERATURE,
   HEART_RATE,

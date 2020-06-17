@@ -81,6 +81,9 @@ public:
   void work();
 };
 
+/**
+ * Manage and collect the resources throw the Resource Collectors and let the others components to retrieve the resources values.
+ */
 class ResourceManagerTask: public AbstractTask {
 private:
   StringResourceCollector** resources;

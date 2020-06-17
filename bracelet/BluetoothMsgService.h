@@ -5,6 +5,9 @@
 #include "SoftwareSerial.h"
 #include "MsgService.h"
 
+/**
+ * MsgService that use the BluetoothTechnology.
+ */
 class BluetoothMsgService: public MsgService {
 
 private:
