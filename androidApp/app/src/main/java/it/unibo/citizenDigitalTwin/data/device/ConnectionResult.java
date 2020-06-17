@@ -7,6 +7,9 @@ import java.net.HttpURLConnection;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.connection.channel.response.DeviceKnowledgeResponse;
 
+/**
+ * The possible results generated when trying to connecting to a device.
+ */
 public enum ConnectionResult {
 
     SUCCESS(R.string.connection_success),

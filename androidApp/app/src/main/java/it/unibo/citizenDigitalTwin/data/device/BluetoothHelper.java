@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import androidx.core.app.ActivityCompat;
 
 /**
- * Helper class for the Bluetooth use
+ * Helper class for the Bluetooth use.
  */
 public class BluetoothHelper {
 
@@ -43,7 +43,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Register an activity for changes in Bluetooth state
+     * Register an activity for changes in Bluetooth state.
      * @param activity the activity you want to register
      * @param consumer a consumer that handles the new Bluetooth state
      * @return an id that identifies the observe operation
@@ -73,7 +73,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Ask the user to turn on the Bluetooth
+     * Ask the user to turn on the Bluetooth.
      * @param activity the running activity
      * @param operationIdentifier the operation identifier to use for the method 'Activity.onActivityResult'
      */
@@ -84,7 +84,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Start a Bluetooth scan for the available devices
+     * Start a Bluetooth scan for the available devices.
      * @param adapter the Bluetooth adapter
      * @param activity the running activity
      * @param consumer a consumer that handles the device discovered
@@ -112,7 +112,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Enable the Bluetooth discoverability for the application device
+     * Enable the Bluetooth discoverability for the application device.
      * @param activity the running activity
      */
     public static void enableDeviceDiscoverability(final Activity activity){
@@ -123,7 +123,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Connect to a bluetooth device
+     * Connect to a bluetooth device.
      * @param adapter the bluetooth adapter
      * @param device the device to connect to
      * @return if the connection has been established or not
@@ -142,7 +142,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Close the bluetooth connection to a device
+     * Close the bluetooth connection to a device.
      * @param socket the bluetooth socket for the communication
      */
     public static void closeBluetoothConnection(final BluetoothSocket socket){
@@ -154,7 +154,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Unregister from the scan of available devices
+     * Unregister from the scan of available devices.
      * @param activity the running activity, from whom started the request
      * @param consumerId the id returned by {@link #scanAvailableDevices}
      */
@@ -164,7 +164,7 @@ public class BluetoothHelper {
     }
 
     /**
-     * Unregister from all the services
+     * Unregister from all the services.
      * @param activity the running activity, from whom started the request
      */
     public static void unregisterFromBroadcasts(final Activity activity){

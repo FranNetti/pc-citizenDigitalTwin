@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
 import it.unibo.citizenDigitalTwin.R;
 
 /**
- * Type of communication with a device
+ * Type of communication with a device.
  */
 public enum CommunicationType {
 
