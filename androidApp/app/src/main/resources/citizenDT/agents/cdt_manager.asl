@@ -1,8 +1,8 @@
 maxAttempts(3).
 attempts(0).
 credentials("","").
-citizenService("192.168.1.3:8080").
-authenticationService("192.168.1.3:8081").
+citizenService("192.168.88.252:8080").
+authenticationService("192.168.88.252:8081").
 
 +!login(Username,Password) <-
     -+credentials(Username,Password);

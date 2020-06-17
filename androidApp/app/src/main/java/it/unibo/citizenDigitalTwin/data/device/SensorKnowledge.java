@@ -10,7 +10,7 @@ import it.unibo.citizenDigitalTwin.data.Builder;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
 /**
- * Class that contains all the information needed to communicate with a device's sensor
+ * Class that contains all the information needed to communicate with a device's sensor.
  */
 public class SensorKnowledge {
 
@@ -61,22 +61,42 @@ public class SensorKnowledge {
         }
     }
 
+    /**
+     * Get the sensor leaf category.
+     * @return the leaf category
+     */
     public LeafCategory getLeafCategory() {
         return leafCategory;
     }
 
+    /**
+     * Get the sensor data type/identifier.
+     * @return the sensor data type/identifier
+     */
     public String getSensorDataIdentifier() {
         return sensorDataIdentifier;
     }
 
+    /**
+     * Get the unit of measure.
+     * @return the unit of measure
+     */
     public String getUnitOfMeasure() {
         return unitOfMeasure;
     }
 
+    /**
+     * Get the message to send in order to get the resource value.
+     * @return the message to send
+     */
     public Optional<String> getReqDataMessage() {
         return Objects.nonNull(reqDataMessage) && !reqDataMessage.isEmpty() ? Optional.of(reqDataMessage) : Optional.empty();
     }
 
+    /**
+     * Get the message to send in order to get subscribed to the resource.
+     * @return the message to send
+     */
     public Optional<String> getSubForDataMessage() {
         return Objects.nonNull(subForDataMessage) && !subForDataMessage.isEmpty() ? Optional.of(subForDataMessage) : Optional.empty();
     }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class that contains which sensors the device has and how to communicate with them
+ * Class that contains which sensors the device has and how to communicate with them.
  */
 public class DeviceKnowledge {
 
@@ -26,7 +26,7 @@ public class DeviceKnowledge {
     }
 
     /**
-     * Returns a list containing all the information required to communicate with each sensor of the device
+     * Returns a list containing all the information required to communicate with each sensor of the device.
      * @return a list containing all the information required to communicate with each sensor of the device
      */
     public List<SensorKnowledge> getSensorKnowledge() {

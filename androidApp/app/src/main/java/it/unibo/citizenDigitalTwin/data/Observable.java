@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
- * Class that represent an information, where you want to be notified each time a new value has been published
+ * Class that represent an information, where you want to be notified each time a new value has been published.
  * @param <X>
  */
 public class Observable<X> {
@@ -19,7 +19,7 @@ public class Observable<X> {
     }
 
     /**
-     * Subscribe for changes of the value
+     * Subscribe for changes of the value.
      * @param subscriber the subscriber
      * @param consumer how the value has to be used each time a new change occurs
      */
@@ -28,7 +28,7 @@ public class Observable<X> {
     }
 
     /**
-     * Unsubscribe from a previous subscription
+     * Unsubscribe from a previous subscription.
      * @param subscriber the subscriber
      */
     public void unsubscribe(final Object subscriber){
@@ -36,7 +36,7 @@ public class Observable<X> {
     }
 
     /**
-     * Setter
+     * New Value setter.
      * @param newValue the new value for the information
      */
     public synchronized void set(final X newValue){
@@ -45,7 +45,7 @@ public class Observable<X> {
     }
 
     /**
-     * Getter
+     * Get the current value.
      * @return the current value, it may be null
      */
     public synchronized X get(){
