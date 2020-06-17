@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import it.unibo.citizenDigitalTwin.data.Observable;
 
 /**
- * Class that represent a channel for the Bluetooth technology
+ * Class that represent a channel for the Bluetooth technology.
  */
 public class BluetoothChannel extends Thread implements DeviceChannel {
 
@@ -34,6 +34,7 @@ public class BluetoothChannel extends Thread implements DeviceChannel {
         this.observable = new Observable<>();
     }
 
+    @Override
     public void run() {
         StringBuilder messageReceived = new StringBuilder();
         while (work){

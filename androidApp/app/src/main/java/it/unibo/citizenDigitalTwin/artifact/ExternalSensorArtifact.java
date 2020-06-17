@@ -10,7 +10,7 @@ import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
- * Artifact that represents external sensor from which it is possible to gather data
+ * Artifact that represents external sensor from which it is possible to gather data.
  */
 public class ExternalSensorArtifact extends JaCaArtifact {
 
@@ -49,16 +49,25 @@ public class ExternalSensorArtifact extends JaCaArtifact {
         this.knowledge = knowledge;
     }
 
+    /**
+     * Send a new data request for this kind of sensor.
+     */
     @OPERATION
     public void sendDataRequest(){
         knowledge.getReqDataMessage().ifPresent(channel::askForData);
     }
 
+    /**
+     * Send a subscribe request for this kind of sensor.
+     */
     @OPERATION
     public void subscribeForData(){
         knowledge.getSubForDataMessage().ifPresent(channel::askForData);
     }
 
+    /**
+     * Unsubscribe for new sensor's values.
+     */
     @OPERATION
     public void unsubscribeForData(){
         channel.unsubscribeFromIncomingMessages(this);

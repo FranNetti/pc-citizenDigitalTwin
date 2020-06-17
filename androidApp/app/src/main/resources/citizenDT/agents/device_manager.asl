@@ -4,6 +4,7 @@
 */
 
 gpsRequest(0).
+sensorTimeRequestRate(120000).
 
 @start[atomic]
 +activate <-
@@ -40,7 +41,8 @@ gpsRequest(0).
     !!subscribeForLocationUpdates.
 
 +!checkSensorData <-
-    .wait(30000);
+    ?sensorTimeRequestRate(Time)
+    .wait(Time);
     .findall(X,sensor(_,X),L);
     !askForData(L);
     !!checkSensorData.

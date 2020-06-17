@@ -26,17 +26,20 @@ import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
- * Artifact that represent the current state of the user
+ * Artifact that represent the current state of the user.
+ * @obsProperty logged the identifier of the current logged user
+ * @obsProperty state the current user state
+ * @obsProperty notifications the current user notifications
  */
 public class StateManager extends JaCaArtifact {
 
     private static final String TAG = "[StateManager]";
 
     private static final String PROP_LOGGED = "logged";
-    private static final String PROP_NOT_LOGGED = "loginFailed";
     private static final String PROP_STATE = "state";
     private static final String PROP_NOTIFICATIONS = "notifications";
     private static final String MSG_NEW_GENERATED_DATA = "newGeneratedData";
+    private static final String MSG_NOT_LOGGED = "loginFailed";
     private static final String FIRST_RUN = "first_run";
     private static final String SHARED_PREFERENCES_ID = "it.unibo.cdt.stateManager";
 
@@ -68,20 +71,23 @@ public class StateManager extends JaCaArtifact {
         });
     }
 
+    /**
+     * Check if the login procedure has been successful.
+     * @param result the result of the login
+     */
     @OPERATION
     public void checkIfLogged(final LoginResult result){
         if(result.isSuccessful()){
             defineObsProperty(PROP_LOGGED, result.getUri().get());
-            if(hasObsProperty(PROP_NOT_LOGGED)){
-                removeObsProperty(PROP_NOT_LOGGED);
-            }
-        } else if(hasObsProperty(PROP_NOT_LOGGED)){
-            updateObsProperty(PROP_NOT_LOGGED, result.getErrorMessage(getApplicationContext()).get());
         } else {
-            defineObsProperty(PROP_NOT_LOGGED, result.getErrorMessage(getApplicationContext()).get());
+            signal(MSG_NOT_LOGGED, result.getErrorMessage(getApplicationContext()).get());
         }
     }
 
+    /**
+     * Update the current state with a list of new data.
+     * @param dataList the list of data
+     */
     @OPERATION
     public void updateState(final List<Data> dataList) {
         final Map<LeafCategory,Data> state = ((State)getObsProperty(PROP_STATE).getValue()).getState();
@@ -96,6 +102,10 @@ public class StateManager extends JaCaArtifact {
         dbState.insertAll(validData);
     }
 
+    /**
+     * Generate new notifications from the given list of data.
+     * @param dataList the list of data
+     */
     @OPERATION
     public void createNotifications(final List<Data> dataList){
         final String myUri = hasObsProperty(PROP_LOGGED) ?
@@ -113,6 +123,10 @@ public class StateManager extends JaCaArtifact {
         dbNotifications.insertDataNotifications(notifications);
     }
 
+    /**
+     * Update the state with a new data.
+     * @param newData the new data
+     */
     @OPERATION
     public void updateStateFromSingleData(final Data newData){
         if (hasObsProperty(PROP_LOGGED))
@@ -121,6 +135,10 @@ public class StateManager extends JaCaArtifact {
         signal(MSG_NEW_GENERATED_DATA,newData);
     }
 
+    /**
+     * Set the given notifications as read.
+     * @param notifications the notification
+     */
     @OPERATION
     public void setNotificationsRead(final List<Notification> notifications){
         final List<MessageNotification> msgNotifications = new ArrayList<>();

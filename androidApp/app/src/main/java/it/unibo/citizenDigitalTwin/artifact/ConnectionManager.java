@@ -37,7 +37,8 @@ import it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.Header;
 import static it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.Header.*;
 
 /**
- * Artifact that handles the communication with the backend
+ * Artifact that handles the communication with the backend.
+ * @obsProperty token: the token to use at each communication towards the back-end
  */
 public class ConnectionManager extends JaCaArtifact {
 
@@ -95,6 +96,10 @@ public class ConnectionManager extends JaCaArtifact {
                 },error -> Log.e(TAG,"Error in init: " + error.getLocalizedMessage()));
     }
 
+    /**
+     * Get the newest version of the digital state.
+     * @param citizenId the citizen id
+     */
     @OPERATION
     public void getDigitalState(final String citizenId) {
         final String resource = stateResource(citizenId);
@@ -109,12 +114,21 @@ public class ConnectionManager extends JaCaArtifact {
                 });
     }
 
+    /**
+     * Close each connection opened towards the specified citizen.
+     * @param citizenId the citizen id
+     */
     @OPERATION
     public void onClosing(final String citizenId) {
         hasToResendPendingUpdates = false;
         cdtChannel.closeChannel(stateResource(citizenId));
     }
 
+    /**
+     * Update the digital twin state.
+     * @param citizenId the citiezen id
+     * @param data the data to send
+     */
     @OPERATION
     public void updateDigitalState(final String citizenId, final Data data) {
         try {
@@ -126,6 +140,9 @@ public class ConnectionManager extends JaCaArtifact {
         }
     }
 
+    /**
+     * Refresh the token already acquired.
+     */
     @OPERATION
     public void refreshToken() {
         try {
@@ -139,6 +156,13 @@ public class ConnectionManager extends JaCaArtifact {
         }
     }
 
+    /**
+     * Proceed with the login procedure.
+     * @param username the username
+     * @param password the password
+     * @param result the back-end response
+     * @param logged if you're logged in or not
+     */
     @OPERATION
     public void doLogin(final String username, final String password, final OpFeedbackParam<LoginResult> result, final OpFeedbackParam<Boolean> logged) {
         try {

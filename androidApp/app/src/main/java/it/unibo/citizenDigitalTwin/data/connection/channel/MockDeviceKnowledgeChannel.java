@@ -62,7 +62,7 @@ public class MockDeviceKnowledgeChannel implements HttpChannel {
     }
 
     @Override
-    public void subscribe(Object subscriber, String resource, Consumer<JSONObject> data, BiConsumer<Throwable, String> onFailure) {
+    public void subscribe(Object subscriber, String resource, Consumer<JSONObject> onNewData, BiConsumer<Throwable, String> onFailure) {
         throw new UnsupportedOperationException();
     }
 

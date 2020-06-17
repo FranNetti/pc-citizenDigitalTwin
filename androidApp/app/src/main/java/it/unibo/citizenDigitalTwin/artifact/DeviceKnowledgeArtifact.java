@@ -15,6 +15,9 @@ import it.unibo.citizenDigitalTwin.data.connection.channel.response.DeviceKnowle
 import it.unibo.citizenDigitalTwin.data.device.DeviceKnowledge;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that enables the communication with the remote Device Knowledge entity.
+ */
 public class DeviceKnowledgeArtifact extends JaCaArtifact {
 
     private static final String TAG = "[DeviceKnowledge]";
@@ -26,6 +29,11 @@ public class DeviceKnowledgeArtifact extends JaCaArtifact {
         channel = new MockDeviceKnowledgeChannel();
     }
 
+    /**
+     * Look for the given model's device knowledge.
+     * @param model the model of the device you want to know the knowledge of
+     * @param knowledge the knowledge found
+     */
     @LINK
     public void findDeviceKnowledge(final String model, final OpFeedbackParam<DeviceKnowledgeResponse> knowledge){
         final CompletableFuture<ChannelResponse> future = channel.get(SENSOR_RESOURCE + model);

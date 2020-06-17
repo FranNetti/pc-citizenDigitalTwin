@@ -20,6 +20,8 @@ public class MockDeviceChannel implements DeviceChannel {
     private static final double MAX_DIFF = 1;
     private static final double MIN_DIFF = -1;
 
+    private static final int WAIT_TIME = 2 * 60000;
+
     private final Thread t;
     private final Observable<MsgReceived> msgReceivedObservable;
 
@@ -31,7 +33,7 @@ public class MockDeviceChannel implements DeviceChannel {
             df.setMaximumFractionDigits(2);
             while(true) {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(WAIT_TIME);
                     v += new Random().nextDouble() * (MAX_DIFF - MIN_DIFF) + MIN_DIFF;
                     if(v > MAX_TEMP_VALUE) v = MAX_TEMP_VALUE;
                     else if(v < MIN_TEMP_VALUE) v = MIN_TEMP_VALUE;

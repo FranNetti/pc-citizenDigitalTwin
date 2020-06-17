@@ -128,9 +128,9 @@ public class OkHttpChannel implements HttpChannel {
     }
 
     @Override
-    public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> data, final BiConsumer<Throwable,String> onFailure) {
+    public synchronized void subscribe(final Object subscriber, final String resource, final Consumer<JSONObject> onNewData, final BiConsumer<Throwable,String> onFailure) {
         createResourceChannelIfNecessary(resource);
-        Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, data);
+        Objects.requireNonNull(subscriptions.get(resource)).first.subscribe(subscriber, onNewData);
         final List<BiConsumer<Throwable,String>> newList = new LinkedList<>();
         newList.add(onFailure);
         failureHandlers.merge(resource, newList,(oldL,newL) -> {

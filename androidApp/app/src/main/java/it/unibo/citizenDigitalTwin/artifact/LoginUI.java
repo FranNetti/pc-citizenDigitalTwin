@@ -17,6 +17,9 @@ import it.unibo.citizenDigitalTwin.R;
 import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
+/**
+ * The artifact that represents the Login Activity.
+ */
 public class LoginUI extends ActivityArtifact {
 
     public static class LoginActivity extends JaCaBaseActivity {}
@@ -27,6 +30,10 @@ public class LoginUI extends ActivityArtifact {
         super.init(LoginActivity.class, R.layout.activity_login, true);
     }
 
+    /**
+     * Show a new login failed error message.
+     * @param message the login error message
+     */
     @OPERATION
     public void showLoginFailed(final String message){
        execute(() -> {

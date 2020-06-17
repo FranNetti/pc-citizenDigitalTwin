@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Class that represents a new message received from a remote device
+ * Class that represents a new message received from a remote device.
  */
 public class MsgReceived {
 
@@ -17,7 +17,7 @@ public class MsgReceived {
     private final boolean isPresent;
 
     /**
-     * Create a new MsgReceived from a JSON represented as a String
+     * Create a new MsgReceived from a JSON represented as a String.
      * @param message the JSON message
      * @throws JSONException if the message is not in a JSON format
      */
@@ -29,7 +29,7 @@ public class MsgReceived {
     }
 
     /**
-     * Getter
+     * Getter.
      * @return the field type of the message
      */
     public String getType() {
@@ -37,7 +37,7 @@ public class MsgReceived {
     }
 
     /**
-     * Getter
+     * Getter.
      * @return the field value of the message
      */
     public String getValue(){
@@ -45,7 +45,7 @@ public class MsgReceived {
     }
 
     /**
-     * Used to know if the value field is present
+     * Used to know if the value field is present.
      * @return if the value field is present
      */
     public boolean isPresent() {

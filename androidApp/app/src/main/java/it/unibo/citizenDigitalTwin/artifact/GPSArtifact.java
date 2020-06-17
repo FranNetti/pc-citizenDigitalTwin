@@ -3,10 +3,8 @@ package it.unibo.citizenDigitalTwin.artifact;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Looper;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -15,7 +13,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.List;
 import java.util.Objects;
 
 import androidx.core.app.ActivityCompat;
@@ -28,11 +25,13 @@ import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 import it.unibo.citizenDigitalTwin.db.entity.data.DataBuilder;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
+/**
+ * Artifact that wraps the GPS sensor of the mobile phone.
+ * @obsProperty data: the new position data produced by the sensor
+ */
 public class GPSArtifact extends JaCaArtifact {
 
     private static final String PROP_POSITION = "data";
-    private static final String PROP_GPS_NOT_ENABLED = "gpsNotEnabled";
-    private static final String PROP_LOCATION_NOT_GRANTED = "locationNotGranted";
     private static final String GPS_FEEDER = "GPS";
 
     private static final int REQ_CODE = 11;
@@ -68,6 +67,10 @@ public class GPSArtifact extends JaCaArtifact {
         };
     }
 
+    /**
+     * Update the @obsProperty(data) with the last known position of the device.
+     * @param success if the user has granted the location permission
+     */
     @SuppressLint("MissingPermission")
     @OPERATION
     public void updatePosition(final OpFeedbackParam<Boolean> success){
@@ -85,6 +88,10 @@ public class GPSArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Subscribe the artifact for location updates.
+     * @param success if the user has granted the location permission
+     */
     @SuppressLint("MissingPermission")
     @OPERATION
     public void subscribeForLocationUpdates(final OpFeedbackParam<Boolean> success){
@@ -98,6 +105,9 @@ public class GPSArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Unsubscribe the artifact from location updates.
+     */
     @OPERATION
     public void unsubscribeFromLocationUpdates(){
         if(isListeningForLocationUpdates) {
@@ -145,14 +155,6 @@ public class GPSArtifact extends JaCaArtifact {
     private boolean isLocationPermissionGranted(){
         return ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean hasGPS(){
-        final LocationManager mgr = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        if (Objects.isNull(mgr)) return false;
-        final List<String> providers = mgr.getAllProviders();
-        if (Objects.isNull(providers)) return false;
-        return providers.contains(LocationManager.GPS_PROVIDER);
     }
 
 }

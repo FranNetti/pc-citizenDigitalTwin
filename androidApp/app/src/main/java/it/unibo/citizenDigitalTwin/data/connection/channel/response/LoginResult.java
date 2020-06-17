@@ -7,12 +7,25 @@ import java.util.Optional;
 
 import it.unibo.citizenDigitalTwin.R;
 
+/**
+ * Class that contains a response regarding the login procedure.
+ */
 public class LoginResult extends Response {
 
+    /**
+     * Create a successful login result response.
+     * @param uri the user identifier
+     * @return a new instance of LoginResult
+     */
     public static LoginResult loginSuccessful(final String uri){
         return new LoginResult(uri, LOGIN_SUCCESS);
     }
 
+    /**
+     * Create a failed login result response.
+     * @param failCode the error code
+     * @return a new instance of LoginResult
+     */
     public static LoginResult loginFailed(final int failCode){
         return new LoginResult(null, failCode);
     }
@@ -38,6 +51,11 @@ public class LoginResult extends Response {
         return Optional.empty();
     }
 
+    /**
+     * Get the current locale error message if present.
+     * @param context the context of the application
+     * @return the error message
+     */
     public Optional<String> getErrorMessage(final Context context) {
         if(isSuccessful()){
             return Optional.empty();
@@ -57,6 +75,10 @@ public class LoginResult extends Response {
         }
     }
 
+    /**
+     * Get the uri if present
+     * @return the user identifier
+     */
     public Optional<String> getUri() {
         return Optional.ofNullable(uri);
     }

@@ -28,7 +28,10 @@ import it.unibo.citizenDigitalTwin.data.device.type.MockDevice;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
- * Artifact that handles the initiation and the end of a connection with an external device
+ * Artifact that handles the initialization and the end of a connection with an external device.
+ * @obsProperty connectedDevices: the devices connected to the application
+ * @obsProperty pairedDevices: the devices that the system is paired with
+ * @obsProperty discoveredDevices: the devices discovered
  */
 @ARTIFACT_INFO(
         outports = {
@@ -66,6 +69,12 @@ public class DeviceCommunication extends JaCaArtifact {
         execInternalOp("updatePairedDevices");
     }
 
+    /**
+     * Connect to a given device.
+     * @param device the device
+     * @param model the model of the device
+     * @param success the result of the connection
+     */
     @OPERATION
     public void connectToDevice(final Device device, final String model, final OpFeedbackParam<ConnectionResult> success) {
         final ObsProperty propDevices = getObsProperty(PROP_CONNECTED_DEVICES);
@@ -88,6 +97,11 @@ public class DeviceCommunication extends JaCaArtifact {
         }
     }
 
+    /**
+     * Disconnect from a previously connected device.
+     * @param device the device
+     * @param disconnected if the disconnection is successful or not
+     */
     @OPERATION
     public void disconnectFromDevice(final Device device, final OpFeedbackParam<Boolean> disconnected) {
         final AtomicBoolean success = new AtomicBoolean(false);
@@ -114,6 +128,9 @@ public class DeviceCommunication extends JaCaArtifact {
         disconnected.set(success.get());
     }
 
+    /**
+     * Scan for new devices.
+     */
     @OPERATION
     public void scanForDevices() {
         final List<Device> discoveredDevices = new ArrayList<>();

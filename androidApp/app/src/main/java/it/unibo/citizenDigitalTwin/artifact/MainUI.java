@@ -35,7 +35,8 @@ import it.unibo.pslab.jaca_android.core.ActivityArtifact;
 import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 
 /**
- * Artifact that represents the main view
+ * Artifact that represents the Main Activity.
+ * @obsProperty pageShown the current page shown to the user
  */
 public class MainUI extends ActivityArtifact {
 
@@ -67,11 +68,18 @@ public class MainUI extends ActivityArtifact {
         bindOnStopEventToOp("onStop");
     }
 
+    /**
+     * Operation to call when the activity is being stopped.
+     */
     @OPERATION
     public void onStop() {
         signal(MSG_CLOSING);
     }
 
+    /**
+     * Show a new state.
+     * @param state the state
+     */
     @OPERATION
     public void showNewState(final State state){
         execute(() -> {
@@ -81,6 +89,10 @@ public class MainUI extends ActivityArtifact {
         });
     }
 
+    /**
+     * Show the connected devices.
+     * @param devices the connected devices
+     */
     @OPERATION
     public void showConnectedDevices(final List<Device> devices){
         execute(() -> {
@@ -90,6 +102,10 @@ public class MainUI extends ActivityArtifact {
         });
     }
 
+    /**
+     * Show the paired devices.
+     * @param devices the paired devices
+     */
     @OPERATION
     public void showPairedDevices(final List<Device> devices){
         execute(() -> {
@@ -99,6 +115,10 @@ public class MainUI extends ActivityArtifact {
         });
     }
 
+    /**
+     * Show the discovered devices.
+     * @param devices the discovered devices
+     */
     @OPERATION
     public void showDiscoveredDevices(final List<Device> devices){
         execute(() -> {
@@ -108,6 +128,10 @@ public class MainUI extends ActivityArtifact {
         });
     }
 
+    /**
+     * Show the result of the connection to a device.
+     * @param result the result
+     */
     @OPERATION
     public void showResultOfConnectionToDevice(final ConnectionResult result){
         if(result != ConnectionResult.SUCCESS){
@@ -115,6 +139,10 @@ public class MainUI extends ActivityArtifact {
         }
     }
 
+    /**
+     * Show the result of the disconnection from a device.
+     * @param success if the disconnection is successful or not
+     */
     @OPERATION
     public void showResultOfDisconnectionToDevice(final boolean success){
         if(!success){
@@ -122,6 +150,10 @@ public class MainUI extends ActivityArtifact {
         }
     }
 
+    /**
+     * Show the notifications.
+     * @param notifications the notifications
+     */
     @OPERATION
     public void showNotifications(final List<Notification> notifications){
         execute(() -> {
@@ -139,12 +171,6 @@ public class MainUI extends ActivityArtifact {
                 ((NotificationsFragment)currentFragment).updateNotifications(notifications);
             }
         });
-    }
-
-    @OPERATION
-    public void newSubView(final FragmentWithId fragment){
-        this.currentFragment = fragment;
-        updateObsProperty(PAGE_SHOWN_PROP, fragment.getFragmentId());
     }
 
     @INTERNAL_OPERATION
@@ -205,6 +231,11 @@ public class MainUI extends ActivityArtifact {
             return true;
         }
         return false;
+    }
+
+    private void newSubView(final FragmentWithId fragment) {
+        this.currentFragment = fragment;
+        updateObsProperty(PAGE_SHOWN_PROP, fragment.getFragmentId());
     }
 
     private boolean handleNewMenuItemSelected(final MenuItem item){

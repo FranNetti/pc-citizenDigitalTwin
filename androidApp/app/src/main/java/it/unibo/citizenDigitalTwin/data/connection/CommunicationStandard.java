@@ -14,6 +14,9 @@ import java.util.stream.Stream;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 
+/**
+ * Type of value messages that can be used for server-client communication.
+ */
 public enum CommunicationStandard {
 
     DEFAULT_VALUE_IDENTIFIER("val", R.string.value, CommunicationStandard::singleValueToObject),

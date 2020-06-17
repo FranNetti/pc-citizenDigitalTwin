@@ -22,7 +22,9 @@ import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.pslab.jaca_android.core.JaCaArtifact;
 
 /**
- * Artifact that handles the bluetooth
+ * Artifact that handles the Bluetooth.
+ * @obsProperty noBluetooth: indicates that the devices has not the Bluetooth
+ * @obsProperty bluetoothState: the state of the Bluetooth {ON, OFF, TURNING_ON, TURNING_OFF}
  */
 public class BluetoothArtifact extends JaCaArtifact {
 
@@ -37,6 +39,9 @@ public class BluetoothArtifact extends JaCaArtifact {
         execInternalOp("initBluetooth");
     }
 
+    /**
+     * Ask the user to turn on the Bluetooth.
+     */
     @OPERATION
     public void askToTurnOnBluetooth(){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
@@ -47,6 +52,9 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Disconnect all the Bluetooth services that have been enabled until now.
+     */
     @OPERATION
     public void disconnectBTServices(){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
@@ -57,6 +65,11 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Connect a new Bluetooth device to the application.
+     * @param device the Bluetooth device to connect
+     * @param connectionEstablished if the connection has been established or not
+     */
     @LINK
     public void connectDevice(final Device device, final OpFeedbackParam<Boolean> connectionEstablished){
         if(device.getCommunicationType() == CommunicationType.BT) {
@@ -75,6 +88,11 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Disconnect a previous connected Bluetooth device.
+     * @param device the Bluetooth device to disconnect
+     * @param disconnectionSuccessful if the disconnection is successful or not
+     */
     @LINK
     public void disconnectDevice(final Device device, final OpFeedbackParam<Boolean> disconnectionSuccessful){
         if(device.getCommunicationType() == CommunicationType.BT) {
@@ -93,6 +111,10 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Get the available devices.
+     * @param result the available devices
+     */
     @LINK
     public void getAvailableDevices(final OpFeedbackParam<Observable<Device>> result){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
@@ -110,6 +132,10 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
     }
 
+    /**
+     * Get the paired devices
+     * @param result the paired devices
+     */
     @LINK
     public void getPairedDevices(final OpFeedbackParam<List<Device>> result){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
