@@ -6,7 +6,7 @@ import it.unibo.cop_medic.model.data.{Data, Feeder, LeafCategory, Resource, Sens
 import it.unibo.cop_medic.model.channel.rest.vertx._
 
 /**
- * a skeleton on DataParser used to manage JsonObject external representation
+ * A skeleton on DataParser used to manage JsonObject external representation.
  */
 trait VertxJsonParser extends DataParser[JsonObject]{
   override def decode(rawData: JsonObject): Option[Data] = {

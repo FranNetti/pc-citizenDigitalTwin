@@ -21,14 +21,42 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
 import scala.io.Source
 
+/**
+ * Trait for main controllers of the application.
+ */
 sealed trait Controller {
 
   type DataValue = String
   type User = String
 
+  /**
+   * Do the login procedure.
+   * @param username the user username
+   * @param password the user password
+   * @return a future with the result of the operation
+   */
   def doLogin(username: String, password: String): Future[LoginResult]
+
+  /**
+   * Subscribe to a user in order to receive updates for each new data of a given category.
+   * @param user the user you want to subscribe to
+   * @param categories the category you're interested in
+   * @return an observable where the new data received will be published
+   */
   def subscribeTo(user: User, categories: Set[LeafCategory]): Observable[Data]
+
+  /**
+   * Unsubscribe from a user in order to not receive any more notification of a new data.
+   * @param user the user you want to unsubscribe from
+   */
   def unsubscribeFrom(user: String)
+
+  /**
+   * Publish a sequence of data for the given user.
+   * @param data a sequence of (information, category) that corresponds to multiple data
+   * @param user the user you want to update
+   * @return a future with the result of the operation
+   */
   def addNewData(data: Seq[(Seq[DataValue], LeafCategory)])(user: User): Future[InsertResult]
 
 }
@@ -37,7 +65,16 @@ object Controller {
 
   def defaultExecutionContext: ExecutionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
-  def apply(viewCreator: ViewCreator, hostAuthentication: String, hostService: String, executionContext: ExecutionContext): Controller =
+  /**
+   * Create a new Controller.
+   * @param viewCreator the view creation strategy
+   * @param hostAuthentication the host of the authentication service
+   * @param hostService the host of the citizen service
+   * @param executionContext the execution context of the main application
+   * @return a new instance of Controller
+   */
+  def apply(viewCreator: ViewCreator, hostAuthentication: String, hostService: String,
+            executionContext: ExecutionContext = Controller.defaultExecutionContext): Controller =
     ControllerImpl(viewCreator, hostAuthentication, hostService, executionContext)
 
   private implicit def fromAuthenticationInfoToTokenIdentifier(authenticationInfo: AuthenticationInfo): TokenIdentifier =

@@ -1,22 +1,22 @@
 package it.unibo.cop_medic.model.channel.parser
 
 import io.vertx.lang.scala.json.{Json, JsonArray, JsonObject}
-import it.unibo.cop_medic.model.channel.parser.DataParserRegistryParser.ValueParserMap
+import it.unibo.cop_medic.model.channel.parser.DataRegistryParser.ValueParserMap
 import it.unibo.cop_medic.model.channel.parser.ParserLike.Parser
 import it.unibo.cop_medic.model.channel.parser.ValueParser.ValueParser
 import it.unibo.cop_medic.model.channel.rest.vertx._
 import it.unibo.cop_medic.model.data.{GroupCategory, LeafCategory}
 
-object DataParserRegistryParser {
+object DataRegistryParser {
   type ValueParserMap = String => Option[ValueParser[JsonObject]]
-  def apply(valueParserMap: ValueParserMap) = new DataParserRegistryParser(valueParserMap)
+  def apply(valueParserMap: ValueParserMap) = new DataRegistryParser(valueParserMap)
 }
 
-class DataParserRegistryParser(valueParserMap: ValueParserMap) extends Parser[JsonArray, DataParserRegistry[JsonObject]] {
+class DataRegistryParser(valueParserMap: ValueParserMap) extends Parser[JsonArray, DataParserRegistry[JsonObject]] {
 
   private case class DataCategorySection(name: String, ttl: Int, parseType: String, groups: Seq[String])
 
-  override def encode(rawData: DataParserRegistry[JsonObject]): JsonArray = ??? // TODO: implement but is not necessary
+  override def encode(rawData: DataParserRegistry[JsonObject]): JsonArray = ???
 
   override def decode(data: JsonArray): Option[DataParserRegistry[JsonObject]] = {
     val categories = extractDataCategorySections(data)

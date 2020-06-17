@@ -7,12 +7,16 @@ import it.unibo.cop_medic.view.View.SwingExecutionContext
 import it.unibo.cop_medic.view.frame.{LoginFrame, MedicFrame, PoliceFrame, showDialog}
 import javax.swing.JFrame
 
+/**
+ * View that controls the other system's views.
+ * @param controller the main controller of the application
+ */
 private[view] class ViewControllerImpl(controller: Controller) extends View with ViewController {
 
   import ViewControllerImpl._
   private val context = new SwingExecutionContext
   private val loginView = LoginFrame(TITLE, controller, this)
-  private var applicationView: JFrame = _
+  private var applicationView: JFrame = loginView
 
   override def show(): Unit = context execute (() => loginView setVisible true)
 
@@ -34,7 +38,7 @@ private[view] class ViewControllerImpl(controller: Controller) extends View with
   }
 }
 
-object ViewControllerImpl {
+private[view] object ViewControllerImpl {
 
   val TITLE = "CDT Application"
   val POLICE_TITLE = "Police Application"

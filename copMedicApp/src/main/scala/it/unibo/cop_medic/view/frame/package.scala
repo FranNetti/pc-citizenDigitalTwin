@@ -4,10 +4,10 @@ import java.awt.{Component, Dimension}
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
-import java.util.Date
-import scala.collection.JavaConverters._
+import java.text.{DecimalFormat, NumberFormat, SimpleDateFormat}
+import java.util.{Date, Locale}
 
+import scala.collection.JavaConverters._
 import it.unibo.cop_medic.model.data.{Data, LeafCategory, Resource, Sensor}
 import javax.swing.table.DefaultTableModel
 import javax.swing.{Box, JComboBox, JLabel, JList, JOptionPane, JPasswordField, JTable, JTextField, ListCellRenderer}
@@ -59,8 +59,14 @@ package object frame {
       case Resource(uri) => uri
       case Sensor(name) => name
     }
+    val format = NumberFormat.getInstance(Locale.ENGLISH)
+    format.setMaximumFractionDigits(2)
     val valueFormat =  info._2.value match {
       case it : Iterable[_] => it.mkString(";")
+      case (x: Double, y: Double) => format.format(x) + " - " + format.format(y)
+      case (x: Double , y) => format.format(x) + " " + y
+      case (x, y) => x + " " + y
+      case x: Double => format.format(x)
       case other => other.toString
     }
     val date = timestampToDate(info._2.timestamp)

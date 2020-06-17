@@ -12,7 +12,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.{BoxLayout, JCheckBox, JFrame, JPanel, JScrollPane}
 import monix.execution.Scheduler
 
-private [view] object PoliceFrame {
+private[view] object PoliceFrame {
 
   def apply(title: String, controller: Controller) = new PoliceFrame(title, controller)
 
@@ -32,7 +32,11 @@ private [view] object PoliceFrame {
 
 }
 
-
+/**
+ * View for the police role.
+ * @param title the view title
+ * @param controller the main controller of the application
+ */
 private [view] class PoliceFrame(title: String, controller: Controller) extends JFrame {
 
   import PoliceFrame._

@@ -2,6 +2,9 @@ package it.unibo.cop_medic.controller
 
 import it.unibo.cop_medic.util.SystemUser
 
+/**
+ * Abstraction for the result of the login procedure.
+ */
 sealed trait LoginResult
 
 case class SuccessfulLogin(userInfo: SystemUser) extends LoginResult

@@ -7,7 +7,7 @@ import io.vertx.lang.scala.json.{Json, JsonArray, JsonObject}
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.core.http.{WebSocketBase, WebSocketConnectOptions}
 import io.vertx.scala.ext.web.client.{WebClient, WebClientOptions}
-import it.unibo.cop_medic.model.channel.TokenIdentifier
+import it.unibo.cop_medic.model.channel.{AuthenticationService, TokenIdentifier}
 import it.unibo.cop_medic.model.channel.data.{Response, ServiceResponse}
 import it.unibo.cop_medic.model.channel.digital_twin.CitizenDigitalTwin
 import it.unibo.cop_medic.model.data.{Data, DataCategory}
@@ -26,6 +26,13 @@ import org.eclipse.californium.core.{CoapClient, CoapObserveRelation, CoapRespon
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
+/**
+ * Citizen client implementation based on vertx webclient and coap client. It follow the [[CitizenDigitalTwin]] contract.
+ * @param registry data parser
+ * @param host the citizen service host
+ * @param httpPort the port used by the citizen service for REST api protocol
+ * @param coapPort the port user by the citizen service for CoAP api protocol
+ */
 class CitizenChannel(override val citizenIdentifier : String,
                     registry : DataParserRegistry[JsonObject],
                     host : String = "localhost",
@@ -79,7 +86,7 @@ class CitizenChannel(override val citizenIdentifier : String,
   override def readHistoryData(who: TokenIdentifier, dataIdentifier: String): FutureService[Data] = {
     val request = webClient.get(historyEndpoint).putHeader(authorizationHeader(who)).sendFuture()
     parseServiceResponseWhenComplete(request) {
-      case (HttpCode.Ok, data) => parseData(data).get //TODO fix
+      case (HttpCode.Ok, data) => parseData(data).get
     }.toFutureService
   }
 
@@ -115,7 +122,7 @@ class CitizenChannel(override val citizenIdentifier : String,
       case Success(coapResponse) => Success(Response(source))
     }(coapContext).toFutureService
   }
-  //TODO manage in a better way
+
   private def parseToSequence(response : String) : Seq[Data] = {
     val obj = JsonConversion.objectFromString(response).getOrElse(Json.obj("data"->Json.emptyArr()))
     obj.getJsonArray("data").getAsObjectSeq match {
@@ -140,7 +147,7 @@ class CitizenChannel(override val citizenIdentifier : String,
       case (None, Some(WebsocketResponse(id, status))) =>
         val promise = promiseMap.get(id)
         status match {
-          case Ok(seq) => promise.success(Response(seq)) //TODO FIX
+          case Ok(seq) => promise.success(Response(seq))
           case Failed(reason) => promise.failure(new Exception(reason))
         }
       case _ =>

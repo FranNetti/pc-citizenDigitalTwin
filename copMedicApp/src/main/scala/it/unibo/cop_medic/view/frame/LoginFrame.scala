@@ -22,6 +22,12 @@ private[view] object LoginFrame {
   private val LOGIN_ERROR = "Error during login: "
 }
 
+/**
+ * View for the login procedure.
+ * @param title the view title
+ * @param controller the main controller of the application
+ * @param viewController the view controller of the application
+ */
 private[view] class LoginFrame(title: String, controller: Controller, viewController: ViewController) extends JFrame {
 
   import LoginFrame._

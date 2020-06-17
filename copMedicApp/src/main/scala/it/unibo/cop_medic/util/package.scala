@@ -3,7 +3,7 @@ package it.unibo.cop_medic
 package object util {
 
   /**
-   * the representation of an user logged in the system.
+   * The representation of an user logged in the system.
    * It has:
    *  - an email
    *  - an username used to logged in

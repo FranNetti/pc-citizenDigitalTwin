@@ -13,7 +13,7 @@ import monix.execution.Scheduler
 
 import scala.util.{Failure, Success}
 
-private [view] object MedicFrame {
+private[view] object MedicFrame {
 
   def apply(title: String, controller: Controller) = new MedicFrame(title, controller)
 
@@ -39,8 +39,12 @@ private [view] object MedicFrame {
 
 }
 
-
-private [view] class MedicFrame(title: String, controller: Controller) extends JFrame {
+/**
+ * View for the medic role.
+ * @param title the view title
+ * @param controller the main controller of the application
+ */
+private[view] class MedicFrame(title: String, controller: Controller) extends JFrame {
 
   import MedicFrame._
 
@@ -67,6 +71,7 @@ private [view] class MedicFrame(title: String, controller: Controller) extends J
   mainPanel add createVerticalBox()
   mainPanel add tablePane
 
+  /* add data panel */
   private val addDataPanel = AddDataPanel(
     categoriesToChange, new Dimension(ADD_DATA_CIT_FIELD_LENGTH, TEXT_HEIGHT),
     new Dimension(ADD_DATA_VALUE_FIELD_LENGTH, TEXT_HEIGHT), new Dimension(ADD_DATA_CAT_FIELD_LENGTH, TEXT_HEIGHT)

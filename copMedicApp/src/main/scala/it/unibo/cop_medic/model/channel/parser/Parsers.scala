@@ -11,7 +11,7 @@ import it.unibo.cop_medic.model.channel.rest.vertx._
  */
 object Parsers {
   import it.unibo.cop_medic.model.data.Categories._
-  val positionParser = ValueParser.Json {
+  val positionParser: ValueParser[JsonObject] = ValueParser.Json {
     case (x : Double, y : Double) =>
       val result = Json.obj(
         "value" -> Json.obj("lat" -> x, "lng" -> y)
@@ -28,7 +28,7 @@ object Parsers {
     }
   }
 
-  val temperatureParser = ValueParser.Json {
+  val temperatureParser: ValueParser[JsonObject] = ValueParser.Json {
     case (x : Double, y : String) =>
       val result = Json.obj(
         "value" -> Json.obj("val" -> x, "um" -> y)
@@ -43,7 +43,7 @@ object Parsers {
     } yield (temperature, unitOfMeasure)
   }
 
-  val seqStringParser = ValueParser.Json {
+  val seqStringParser: ValueParser[JsonObject] = ValueParser.Json {
     case seq : Seq[String] => Some(Json.obj("value" -> Json.arr(seq:_*)))
     case _ => None
   } {
@@ -86,7 +86,7 @@ object Parsers {
    */
   def configureRegistryFromJson(jsonArray: JsonArray,
                                 supportedParser: String => Option[ValueParser[JsonObject]] = parserByType) : DataParserRegistry[JsonObject] = {
-    DataParserRegistryParser(supportedParser).decode(jsonArray).get
+    DataRegistryParser(supportedParser).decode(jsonArray).get
   }
 
   def parserByType(parserType: String): Option[ValueParser[JsonObject]] = parserType.toLowerCase match {

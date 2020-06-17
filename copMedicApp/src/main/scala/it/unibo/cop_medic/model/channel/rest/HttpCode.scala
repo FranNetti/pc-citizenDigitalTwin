@@ -1,7 +1,7 @@
 package it.unibo.cop_medic.model.channel.rest
 
 /**
- * Abstraction to HTTP response codes
+ * Abstraction to HTTP response codes.
  */
 sealed trait HttpCode {
   def code: Int

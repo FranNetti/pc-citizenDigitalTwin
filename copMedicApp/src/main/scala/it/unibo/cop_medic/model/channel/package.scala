@@ -14,7 +14,7 @@ package object channel {
   }
 
   /**
-   * Token identifier used by the user for make request.
+   * Token identifier used by the user to make a request.
    * @param token The token as string.
    */
   case class TokenIdentifier(token: String) extends TokenValue(token)

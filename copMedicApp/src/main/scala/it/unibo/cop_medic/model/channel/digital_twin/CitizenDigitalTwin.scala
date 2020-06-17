@@ -100,7 +100,3 @@ trait CitizenDigitalTwin {
     def close() : Unit
   }
 }
-
-object CitizenDigitalTwin {
-
-}

@@ -57,7 +57,10 @@ private[frame] class AddDataPanel(categories: Set[LeafCategory], citizenFieldWid
       val category = categoryChoice.getSelectedItem.asInstanceOf[LeafCategory]
       if(citizenId.hasWhiteSpaces) showDialog(getParent, emptyCitizenError)
       else if(value.hasWhiteSpaces) showDialog(getParent, emptyValueError)
-      else fun(citizenId, value, category)
+      else {
+        valueField setText ""
+        fun(citizenId, value, category)
+      }
     })
 
 }

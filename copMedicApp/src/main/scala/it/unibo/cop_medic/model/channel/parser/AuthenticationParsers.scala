@@ -8,6 +8,9 @@ import it.unibo.cop_medic.util.SystemUser
 
 object AuthenticationParsers {
 
+  /**
+   * Parser for token.
+   */
   object TokenParser extends Parser[JsonObject, Token] {
     override def encode(rawData: Token): JsonObject = new JsonObject()
       .put("token", rawData.token)
@@ -20,6 +23,9 @@ object AuthenticationParsers {
     }
   }
 
+  /**
+   * Parser for the authentication info.
+   */
   object AuthInfoParser extends Parser[JsonObject, AuthenticationInfo] {
     override def encode(rawData: AuthenticationInfo): JsonObject = new JsonObject()
       .mergeIn(TokenParser.encode(rawData.token))
@@ -31,6 +37,9 @@ object AuthenticationParsers {
     } yield AuthenticationInfo(token, user)
   }
 
+  /**
+   * Parser for the system info.
+   */
   object SystemUserParser extends Parser[JsonObject, SystemUser] {
     override def encode(user: SystemUser): JsonObject = new JsonObject()
       .put("email", user.email)

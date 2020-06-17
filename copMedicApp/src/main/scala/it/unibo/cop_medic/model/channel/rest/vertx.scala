@@ -75,25 +75,25 @@ object vertx {
       response.setStatusCode(statusCode).end(body)
     }
 
-    def setInternalError(message: String = "Internal Error") = setResponse(500, message)
-    def setNotFound(message: String = "Not Found") = setResponse(400, message)
-    def setForbidden(message: String = "Forbidden") = setResponse(403, message)
-    def setNotAuthorized (message: String = "Not authorized") = setResponse(401, message)
-    def setBadRequest(message: String = "Bad request") = setResponse(400, message)
-    def setConflict(message: String = "Conflict") = setResponse(409, message)
-    def setCreated(obj: JsonObject) = setResponse(201, obj)
-    def setCreated(obj: String) = setResponse(201, obj)
-    def setOk (obj: JsonObject) = setResponse(200, obj)
-    def setOk (obj: JsonArray) = setResponse(200, obj.encode())
-    def setNoContent() = setResponse(204, "")
+    def setInternalError(message: String = "Internal Error"): Unit = setResponse(500, message)
+    def setNotFound(message: String = "Not Found"): Unit = setResponse(400, message)
+    def setForbidden(message: String = "Forbidden"): Unit = setResponse(403, message)
+    def setNotAuthorized (message: String = "Not authorized"): Unit = setResponse(401, message)
+    def setBadRequest(message: String = "Bad request"): Unit = setResponse(400, message)
+    def setConflict(message: String = "Conflict"): Unit = setResponse(409, message)
+    def setCreated(obj: JsonObject): Unit = setResponse(201, obj)
+    def setCreated(obj: String): Unit = setResponse(201, obj)
+    def setOk (obj: JsonObject): Unit = setResponse(200, obj)
+    def setOk (obj: JsonArray): Unit = setResponse(200, obj.encode())
+    def setNoContent(): Unit = setResponse(204, "")
   }
 
   implicit class RichServerWebSocket(webSocket : ServerWebSocket) {
-    def rejectInternalError() = webSocket.reject(500)
-    def rejectForbidden() = webSocket.reject(403)
-    def rejectNotAuthorized() = webSocket.reject(401)
-    def rejectBadContent() = webSocket.reject(400)
-    def writeTextJsonObject(json : JsonObject) = webSocket.writeTextMessage(json.encode())
-    def writeTextJsonArray(json : JsonArray) = webSocket.writeTextMessage(json.encode())
+    def rejectInternalError(): Unit = webSocket.reject(500)
+    def rejectForbidden(): Unit = webSocket.reject(403)
+    def rejectNotAuthorized(): Unit = webSocket.reject(401)
+    def rejectBadContent(): Unit = webSocket.reject(400)
+    def writeTextJsonObject(json : JsonObject): ServerWebSocket = webSocket.writeTextMessage(json.encode())
+    def writeTextJsonArray(json : JsonArray): ServerWebSocket = webSocket.writeTextMessage(json.encode())
   }
 }

@@ -5,7 +5,7 @@ import it.unibo.cop_medic.model.channel.parser.ParserLike
 import it.unibo.cop_medic.model.channel.rest.vertx._
 
 /**
- * a set of message and parser used by websocket to build an upper protocol to manage different
+ * A set of message and parser used by websocket to build an upper protocol to manage different
  * type of communications (e.g. request and response).
  *
  * REQUEST/RESPONSE schema:
