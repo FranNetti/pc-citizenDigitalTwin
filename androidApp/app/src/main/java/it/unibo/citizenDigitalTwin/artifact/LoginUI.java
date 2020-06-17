@@ -56,9 +56,7 @@ public class LoginUI extends ActivityArtifact {
     private void initUI(){
         execute(() -> {
             final EditText usernameEditText = (EditText) findUIElement(R.id.username);
-            usernameEditText.setText("gianluca@unibo.it");
             final EditText passwordEditText = (EditText) findUIElement(R.id.password);
-            passwordEditText.setText("12345678");
             final Button loginButton = (Button) findUIElement(R.id.login);
             final ProgressBar loadingProgressBar = (ProgressBar) findUIElement(R.id.loading);
             passwordEditText.setOnEditorActionListener((v,actionId, event) -> {

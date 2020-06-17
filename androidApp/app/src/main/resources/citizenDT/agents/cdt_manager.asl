@@ -1,8 +1,6 @@
 maxAttempts(3).
 attempts(0).
 credentials("","").
-citizenService("192.168.1.9:8080").
-authenticationService("192.168.1.9:8081").
 
 +!login(Username,Password) <-
     -+credentials(Username,Password);
@@ -24,6 +22,8 @@ authenticationService("192.168.1.9:8081").
 
 @start[atomic]
 +activate <-
+    makeArtifact("configurations", "it.unibo.citizenDigitalTwin.artifact.ConfigurationsArtifact",[],Configurations);
+    focus(Configurations);
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
 	focus(StateManager);
 	?citizenService(CitizenServiceAddress)
