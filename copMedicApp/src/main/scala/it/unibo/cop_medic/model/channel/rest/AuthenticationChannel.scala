@@ -47,6 +47,7 @@ class AuthenticationChannel(serviceUri: URI) extends AuthenticationService with 
   private val clientOptions =  WebClientOptions()
     .setFollowRedirects(true)
     .setDefaultPort(serviceUri.getPort)
+    .setDefaultHost(serviceUri.getHost)
 
   override val webClient: WebClient = WebClient.create(vertx, clientOptions)
 
