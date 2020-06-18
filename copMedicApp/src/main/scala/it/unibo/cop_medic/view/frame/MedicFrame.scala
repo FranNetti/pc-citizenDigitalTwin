@@ -5,17 +5,17 @@ import java.awt.Dimension
 import it.unibo.cop_medic.controller.{Controller, FailedInsert, SuccessfulInsert}
 import it.unibo.cop_medic.model.data.Roles.MedicRole
 import it.unibo.cop_medic.model.data.{Categories, Data, LeafCategory, Roles}
-import it.unibo.cop_medic.view.View
+import it.unibo.cop_medic.view.{View, ViewController}
 import it.unibo.cop_medic.view.frame.panel.{AddDataPanel, CitizenIdPanel}
 import javax.swing.border.EmptyBorder
-import javax.swing.{BoxLayout, JFrame, JPanel, JScrollPane}
+import javax.swing.{BoxLayout, JButton, JFrame, JPanel, JScrollPane}
 import monix.execution.Scheduler
 
 import scala.util.{Failure, Success}
 
 private[view] object MedicFrame {
 
-  def apply(title: String, controller: Controller) = new MedicFrame(title, controller)
+  def apply(title: String, controller: Controller, viewController: ViewController) = new MedicFrame(title, controller, viewController)
 
   private val WIDTH = 900
   private val HEIGHT = 480
@@ -36,6 +36,8 @@ private[view] object MedicFrame {
   private val SUCCESSFUL_INSERT = "Data successfully created!"
   private val FAILED_INSERT_ERROR = "An error occurred during the operation: "
   private val NUMBER_FORMAT_ERROR = "The value is not a number!"
+  private val MEDIC_HISTORY = "Medical History"
+  private val CHECK_HISTORY = "CHECK HISTORY"
 
 }
 
@@ -43,14 +45,17 @@ private[view] object MedicFrame {
  * View for the medic role.
  * @param title the view title
  * @param controller the main controller of the application
+ * @param viewController the view controller to use
  */
-private[view] class MedicFrame(title: String, controller: Controller) extends JFrame {
+private[view] class MedicFrame(title: String, controller: Controller, viewController: ViewController) extends JFrame {
 
   import MedicFrame._
 
   private implicit val scheduler = Scheduler(View.defaultExecutionContext)
   private val categoriesToObserve = Roles.categoriesByRole(MedicRole).map(_.asInstanceOf[LeafCategory]).toSet
   private val categoriesToChange = Categories.medicalDataCategory.dataCategory.map(_.asInstanceOf[LeafCategory])
+
+  private val historyButton = new JButton(CHECK_HISTORY)
 
   /* Main panel */
   private val mainPanel = new JPanel
@@ -77,6 +82,11 @@ private[view] class MedicFrame(title: String, controller: Controller) extends JF
     new Dimension(ADD_DATA_VALUE_FIELD_LENGTH, TEXT_HEIGHT), new Dimension(ADD_DATA_CAT_FIELD_LENGTH, TEXT_HEIGHT)
   )
   mainPanel add addDataPanel
+  mainPanel add createVerticalBox()
+
+  private val historyButtonPanel = new JPanel()
+  historyButtonPanel add historyButton
+  mainPanel add historyButtonPanel
 
   setSize(WIDTH, HEIGHT)
   setResizable(false)
@@ -117,6 +127,11 @@ private[view] class MedicFrame(title: String, controller: Controller) extends JF
       case Failure(exception) => showDialog(this, FAILED_INSERT_ERROR + exception)
     }
   })(EMPTY_TEXT_ERROR, EMPTY_VALUE_ERROR)
+
+  historyButton addActionListener (_ => {
+    this setVisible false
+    HistoryFrame(MEDIC_HISTORY, Categories.medicalDataCategory, controller, viewController) setVisible true
+  })
 
   private def refreshTable(): Unit = {
     val newList = informationMap.toSeq.sortBy(_._1).flatMap(x => {

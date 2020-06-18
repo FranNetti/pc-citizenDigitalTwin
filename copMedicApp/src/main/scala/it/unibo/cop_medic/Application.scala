@@ -8,8 +8,8 @@ import it.unibo.cop_medic.view.View
  */
 object Application extends App {
 
-  val authenticationHost = "localhost"
-  val serviceHost = "localhost"
+  val authenticationHost = "151.42.236.72"
+  val serviceHost = "151.42.236.72"
 
   val view = View()
 

@@ -9,9 +9,10 @@ import it.unibo.cop_medic.model.channel.{AuthenticationInfo, AuthenticationServi
 import it.unibo.cop_medic.model.channel.data.{Fail, Response}
 import it.unibo.cop_medic.model.channel.parser.Parsers
 import it.unibo.cop_medic.model.channel.rest.CitizenChannel
-import it.unibo.cop_medic.model.data.{Categories, Data, LeafCategory, Resource, Roles}
+import it.unibo.cop_medic.model.data.History.History
+import it.unibo.cop_medic.model.data.{Categories, Data, DataCategory, LeafCategory, Resource, Roles}
 import it.unibo.cop_medic.util.SystemUser
-import it.unibo.cop_medic.view.SubscriptionFailed
+import it.unibo.cop_medic.view.{HistoryRequestFailed, NotLoggedError, SubscriptionFailed}
 import it.unibo.cop_medic.view.View.ViewCreator
 import monix.execution.{CancelableFuture, Scheduler}
 import monix.reactive.Observable
@@ -59,6 +60,15 @@ sealed trait Controller {
    */
   def addNewData(data: Seq[(Seq[DataValue], LeafCategory)])(user: User): Future[InsertResult]
 
+  /**
+   * Get the history data of the given user filtered by the given daa category.
+   * @param user the user id
+   * @param category the data category
+   * @param limit how many elements to show
+   * @return a future with the history obtained
+   */
+  def requestHistory(user: User, category: DataCategory)(limit: Int): Future[History]
+
 }
 
 object Controller {
@@ -85,7 +95,7 @@ object Controller {
 
     private val monixContext = Scheduler(executionContext)
     private val registry = Parsers.configureRegistryFromJson(new JsonArray(Source.fromResource("categories.json").mkString))
-    private val authenticationChannel = AuthenticationService createProxy URI.create(s"http://${hostAuthentication}:8081")
+    private val authenticationChannel = AuthenticationService createProxy URI.create(s"http://${hostAuthentication}:80")
     private val view = viewCreator(this)
 
     private var logged = false
@@ -164,6 +174,23 @@ object Controller {
       promise.future
     }
 
+    override def requestHistory(user: User, category: DataCategory)(limit: Int): Future[History] = {
+      val promise = Promise[History]()
+      if (logged) {
+        val channel = this lookForCitizenChannel user
+        channel.readHistory(authenticationInfo, category, limit) whenComplete {
+          case Response(content) => promise success content.sortBy(_.timestamp)
+          case Fail(error) =>
+            view showError HistoryRequestFailed(error.toString)
+            promise failure new IllegalStateException(error.toString)
+        }
+      } else {
+        view showError NotLoggedError
+        promise failure new IllegalStateException()
+      }
+      promise.future
+    }
+
     private def isRoleSupported(user: SystemUser): Boolean = user.role match {
       case Roles.CopRole.name | Roles.MedicRole.name => true
       case _ => false
@@ -198,7 +225,6 @@ object Controller {
         }
       }).start()
     }
-
   }
 
 }

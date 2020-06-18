@@ -4,17 +4,18 @@ import java.awt.{Dimension, FlowLayout}
 
 import it.unibo.cop_medic.controller.Controller
 import it.unibo.cop_medic.model.data.Roles.CopRole
-import it.unibo.cop_medic.model.data.{Data, LeafCategory, Roles}
+import it.unibo.cop_medic.model.data.{Categories, Data, LeafCategory, Roles}
 import it.unibo.cop_medic.util._
-import it.unibo.cop_medic.view.View
+import it.unibo.cop_medic.view.{View, ViewController}
 import it.unibo.cop_medic.view.frame.panel.CitizenIdPanel
 import javax.swing.border.EmptyBorder
-import javax.swing.{BoxLayout, JCheckBox, JFrame, JPanel, JScrollPane}
+import javax.swing.{BoxLayout, JButton, JCheckBox, JFrame, JPanel, JScrollPane}
 import monix.execution.Scheduler
 
 private[view] object PoliceFrame {
 
-  def apply(title: String, controller: Controller) = new PoliceFrame(title, controller)
+  def apply(title: String, controller: Controller, viewController: ViewController) =
+    new PoliceFrame(title, controller, viewController)
 
   private val WIDTH = 900
   private val HEIGHT = 400
@@ -27,6 +28,8 @@ private[view] object PoliceFrame {
   private val SELECT_ONE_LEAF_ERROR = "You have to select at least one category to be notified of!"
   private val EMPTY_TEXT_ERROR = "The user id must not be empty!"
   private val NOT_SUBSCRIBED_ERROR = "You didn't subscribed for updates from this user!"
+  private val LOCATION_HISTORY = "Location History"
+  private val CHECK_HISTORY = "CHECK HISTORY"
 
   private case class LeafCategoryCheckBox(text: String, leafCategory: LeafCategory) extends JCheckBox(text.firstLetterUppercase)
 
@@ -36,13 +39,15 @@ private[view] object PoliceFrame {
  * View for the police role.
  * @param title the view title
  * @param controller the main controller of the application
+ * @param viewController the view controller to use
  */
-private [view] class PoliceFrame(title: String, controller: Controller) extends JFrame {
+private [view] class PoliceFrame(title: String, controller: Controller, viewController: ViewController) extends JFrame {
 
   import PoliceFrame._
 
   private implicit val scheduler = Scheduler(View.defaultExecutionContext)
   private val leafCategoriesCheck = Roles.categoriesByRole(CopRole).map(x => LeafCategoryCheckBox(x.name, x.asInstanceOf[LeafCategory]))
+  private val historyButton = new JButton(CHECK_HISTORY)
 
   /* Main panel */
   private val mainPanel = new JPanel
@@ -67,6 +72,10 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
   val (table,tableModel) = createTable(Seq("user", "id", "category", "feeder", "date", "value"))
   val tablePane = new JScrollPane(table)
   mainPanel add tablePane
+
+  private val historyButtonPanel = new JPanel()
+  historyButtonPanel add historyButton
+  mainPanel add historyButtonPanel
 
   setSize(WIDTH, HEIGHT)
   setResizable(false)
@@ -104,6 +113,11 @@ private [view] class PoliceFrame(title: String, controller: Controller) extends 
       showDialog(this, NOT_SUBSCRIBED_ERROR)
     }
   }(EMPTY_TEXT_ERROR)
+
+  historyButton addActionListener (_ => {
+    this setVisible false
+    HistoryFrame(LOCATION_HISTORY, Categories.locationCategory, controller, viewController) setVisible true
+  })
 
   private def refreshTable(): Unit = {
     val newList = informationMap.toSeq.sortBy(_._1).flatMap(x => {

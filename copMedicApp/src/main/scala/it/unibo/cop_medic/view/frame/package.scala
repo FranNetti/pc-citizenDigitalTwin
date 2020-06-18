@@ -73,6 +73,25 @@ package object frame {
     Seq(info._1, info._2.identifier, info._2.category.name, feeder, date, valueFormat).asJava.toArray
   }
 
+  def toTableFormat(info:Data) : Array[AnyRef] = {
+    val feeder = info.feeder match {
+      case Resource(uri) => uri
+      case Sensor(name) => name
+    }
+    val format = NumberFormat.getInstance(Locale.ENGLISH)
+    format.setMaximumFractionDigits(2)
+    val valueFormat =  info.value match {
+      case it : Iterable[_] => it.mkString(";")
+      case (x: Double, y: Double) => format.format(x) + " - " + format.format(y)
+      case (x: Double , y) => format.format(x) + " " + y
+      case (x, y) => x + " " + y
+      case x: Double => format.format(x)
+      case other => other.toString
+    }
+    val date = timestampToDate(info.timestamp)
+    Seq(info.identifier, info.category.name, feeder, date, valueFormat).asJava.toArray
+  }
+
   private val DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
 
   def timestampToDate(timestamp: Long): String = {

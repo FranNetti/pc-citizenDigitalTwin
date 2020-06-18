@@ -10,10 +10,15 @@ import scala.concurrent.ExecutionContext
  */
 trait ViewController {
   /**
-   * handle the result of the login operation.
+   * Handle the result of the login operation.
    * @param result the result of the login operation
    */
   def handleLoginResult(result: LoginResult)
+
+  /**
+   * Show the current application view.
+   */
+  def showApplicationView()
 }
 
 /**
@@ -42,6 +47,17 @@ sealed trait ViewError
  * @param error the error
  */
 case class SubscriptionFailed(error: String) extends ViewError
+
+/**
+ * An error about the history request.
+ * @param error the error
+ */
+case class HistoryRequestFailed(error: String) extends ViewError
+
+/**
+ * An error risen when you're not logged.
+ */
+object NotLoggedError extends ViewError
 
 object View {
 
