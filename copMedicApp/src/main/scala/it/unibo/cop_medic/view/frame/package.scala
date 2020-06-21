@@ -82,7 +82,7 @@ package object frame {
     format.setMaximumFractionDigits(2)
     val valueFormat =  info.value match {
       case it : Iterable[_] => it.mkString(";")
-      case (x: Double, y: Double) => format.format(x) + " - " + format.format(y)
+      case (x: Double, y: Double) => format.format(x) + " | " + format.format(y)
       case (x: Double , y) => format.format(x) + " " + y
       case (x, y) => x + " " + y
       case x: Double => format.format(x)
