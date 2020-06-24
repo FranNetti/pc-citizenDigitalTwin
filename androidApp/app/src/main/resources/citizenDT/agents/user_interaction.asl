@@ -8,7 +8,7 @@
     makeArtifact("loginUI", "it.unibo.citizenDigitalTwin.artifact.LoginUI",[],LoginUI);
     focus(LoginUI).
 
-+!initializeGui <-
++!initializeMainUI <-
     makeArtifact("mainUI", "it.unibo.citizenDigitalTwin.artifact.MainUI",[],MainUI);
     focus(MainUI);
     lookupArtifact("loginUI",LoginUI);
@@ -44,7 +44,7 @@
 
 /* Handle user login */
 +loginButtonClicked(Username, Password) <- .send(cdt_manager, achieve, login(Username, Password)).
-+logged(_) <- !!initializeGui.
++logged(_) <- !!initializeMainUI.
 +loginFailed(Message) <- showLoginFailed(Message).
 
 /* Handle state change */

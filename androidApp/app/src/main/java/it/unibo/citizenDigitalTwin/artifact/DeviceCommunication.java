@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import cartago.ARTIFACT_INFO;
 import cartago.ArtifactId;
@@ -55,12 +56,10 @@ public class DeviceCommunication extends JaCaArtifact {
 
     void init(final ArtifactId deviceKnowledgeArtifact, final Object[] technologies) {
         this.deviceKnowledgeArtifact = deviceKnowledgeArtifact;
-        this.technologies = new ArrayList<>();
-        for(Object tec : technologies){
-            if(tec instanceof ArtifactId){
-                this.technologies.add((ArtifactId)tec);
-            }
-        }
+        this.technologies = Stream.of(technologies)
+                .filter(obj -> obj instanceof ArtifactId)
+                .map(obj -> (ArtifactId)obj)
+                .collect(Collectors.toList());
         work = true;
 
         defineObsProperty(PROP_CONNECTED_DEVICES, new ArrayList<Device>());

@@ -119,7 +119,7 @@ public class ConnectionManager extends JaCaArtifact {
      * @param citizenId the citizen id
      */
     @OPERATION
-    public void onClosing(final String citizenId) {
+    public void stopConnectionToDigitalState(final String citizenId) {
         hasToResendPendingUpdates = false;
         cdtChannel.closeChannel(stateResource(citizenId));
     }
