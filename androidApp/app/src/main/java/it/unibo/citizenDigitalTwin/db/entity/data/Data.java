@@ -76,7 +76,7 @@ public class Data implements Serializable, JsonSerializable {
             final String identifier,
             final Date date,
             final Feeder feeder,
-            final String leafCategoryName,
+            @NotNull final String leafCategoryName,
             final Map<CommunicationStandard, String> information) throws IllegalArgumentException {
             this.identifier = identifier;
             this.date = date;

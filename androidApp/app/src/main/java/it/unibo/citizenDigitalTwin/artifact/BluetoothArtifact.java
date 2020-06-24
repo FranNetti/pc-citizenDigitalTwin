@@ -121,10 +121,8 @@ public class BluetoothArtifact extends JaCaArtifact {
             final Observable<Device> observable = new Observable<>();
             final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
             if(Objects.nonNull(activity)){
-                BluetoothHelper.scanAvailableDevices(adapter, activity, deviceFound -> {
-                    //TODO filter for BluetoothClass.Device.Major.HEALTH
-                    observable.set(new BluetoothDevice(deviceFound));
-                });
+                BluetoothHelper.scanAvailableDevices(adapter, activity,
+                        deviceFound -> observable.set(new BluetoothDevice(deviceFound)));
             }
             result.set(observable);
         } else {

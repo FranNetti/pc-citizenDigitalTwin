@@ -53,6 +53,10 @@ public class MainUI extends ActivityArtifact {
 
     public static final String MAIN_UI_ACTIVITY_NAME = "mainUI";
 
+    private static final String DEVICE_SELECTED = "deviceSelected";
+    private static final String DEVICE_TO_DISCONNECT = "deviceToDisconnect";
+    private static final String NOTIFICATIONS_READ = "notificationsRead";
+
     private static final int GPS_REQ_CODE = 12;
     private static final int GPS_BACKGROUND_REQ_CODE = 13;
     private static final String MAIN_UI_TAG = "[MainUI]";
@@ -290,19 +294,19 @@ public class MainUI extends ActivityArtifact {
 
         public void connectToDevice(final Device device, final String model) {
             MainUI.this.beginExternalSession();
-            signal("deviceSelected", device, model);
+            signal(DEVICE_SELECTED, device, model);
             MainUI.this.endExternalSession(true);
         }
 
         public void disconnectFromDevice(final Device device) {
             MainUI.this.beginExternalSession();
-            signal("deviceToDisconnect", device);
+            signal(DEVICE_TO_DISCONNECT, device);
             MainUI.this.endExternalSession(true);
         }
 
         public void readNotification(final List<Notification> notifications){
             MainUI.this.beginExternalSession();
-            signal("notificationsRead", notifications);
+            signal(NOTIFICATIONS_READ, notifications);
             MainUI.this.endExternalSession(true);
         }
     }

@@ -1,5 +1,5 @@
-maxAttempts(3).
-attempts(0).
+maxRefreshTokenAttempts(3).
+refreshTokenAttempts(0).
 credentials("","").
 
 +!login(Username,Password) <-
@@ -32,19 +32,20 @@ credentials("","").
 	focus(ConnectionManager);
 	.print("CDT Manager ready").
 
+/* New state from ConnectionManager (Digital State) */
 +newState(NewData) <-
 	updateState(NewData);
 	createNotifications(NewData).
 
 +token(_,Ttl) <-
-    -+attempts(0);
+    -+refreshTokenAttempts(0);
     !!refreshToken(Ttl).
 
 +logged(CitizenId) <-
     getDigitalState(CitizenId).
 
-+refreshTokenFailed : maxAttempts(M) & attempts(X) & X < M <-
-    -+attempts(X+1);
++refreshTokenFailed : maxRefreshTokenAttempts(M) & refreshTokenAttempts(X) & X < M <-
+    -+refreshTokenAttempts(X+1);
     refreshToken.
 
 +refreshTokenFailed <-
@@ -56,4 +57,4 @@ credentials("","").
 
 +deactivate : logged(_) <-
     ?logged(CitizenId);
-    onClosing(CitizenId).
+    stopConnectionToDigitalState(CitizenId).

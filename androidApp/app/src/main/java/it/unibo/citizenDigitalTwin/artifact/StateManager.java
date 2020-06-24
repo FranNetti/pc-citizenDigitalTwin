@@ -94,8 +94,8 @@ public class StateManager extends JaCaArtifact {
         final List<Data> validData = dataList.stream()
                 .filter(x -> this.isMoreRecentThanStoredData(x, state))
                 .collect(Collectors.groupingBy(Data::getLeafCategory,Collectors.toList()))
-                .entrySet().stream()
-                .map(x -> x.getValue().stream().max((a,b) -> Long.compare(a.getDate().getTime(),b.getDate().getTime())))
+                .values().stream()
+                .map(data -> data.stream().max((a, b) -> Long.compare(a.getDate().getTime(), b.getDate().getTime())))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -116,8 +116,7 @@ public class StateManager extends JaCaArtifact {
                 .filter(x -> this.isMoreRecentThanStoredData(x, state))
                 .filter(x -> x.getFeeder().isResource() && !x.getFeeder().getUri().equals(myUri))
                 .collect(Collectors.groupingBy(x -> x.getFeeder().getUri(), Collectors.toSet()))
-                .entrySet()
-                .stream()
+                .entrySet().stream()
                 .map(x -> new DataNotification(x.getKey(), x.getValue().stream().map(Data::getLeafCategory).collect(Collectors.toList())))
                 .collect(Collectors.toList());
         dbNotifications.insertDataNotifications(notifications);

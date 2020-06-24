@@ -3,7 +3,8 @@
     sensor(DeviceName, SensorName)
 */
 
-gpsRequest(0).
+maxGPSRequestAttempts(3).
+GPSRequestAttempts(0).
 sensorTimeRequestRate(120000).
 
 @start[atomic]
@@ -29,19 +30,19 @@ sensorTimeRequestRate(120000).
     .wait(100);
     !observeState.
 
-+!subscribeForLocationUpdates : gpsRequest(X) & X < 3 <-
++!subscribeForLocationUpdates : maxGPSRequestAttempts(Y) & GPSRequestAttempts(X) & X < Y <-
     subscribeForLocationUpdates(Result);
     !checkIfLocationPermissionIsGranted(Result).
 
 +!checkIfLocationPermissionIsGranted(true).
 +!checkIfLocationPermissionIsGranted(false) <-
     .wait(60000);
-    ?gpsRequest(X);
-    -+gpsRequest(X + 1);
+    ?GPSRequestAttempts(X);
+    -+GPSRequestAttempts(X + 1);
     !!subscribeForLocationUpdates.
 
 +!checkSensorData <-
-    ?sensorTimeRequestRate(Time)
+    ?sensorTimeRequestRate(Time);
     .wait(Time);
     .findall(X,sensor(_,X),L);
     !askForData(L);
@@ -58,8 +59,8 @@ sensorTimeRequestRate(120000).
 
 +!unsubscribeFromSensors(DeviceName, []).
 +!unsubscribeFromSensors(DeviceName, [H|T]) <-
-    unsubscribeForData[artifact_name(H)];
     lookupArtifact(H,Id);
+    unsubscribeForData[artifact_id(Id)];
     disposeArtifact(Id);
     -sensor(DeviceName, H);
     !!unsubscribeFromSensors(DeviceName, T).
@@ -77,4 +78,4 @@ sensorTimeRequestRate(120000).
 
 +data(Data) <- updateStateFromSingleData(Data).
 
-+shutdown <- disconnectBTServices.
++deactivate <- disconnectBTServices.
