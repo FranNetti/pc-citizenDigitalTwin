@@ -1,0 +1,6 @@
+{
+  "authenticationHost" : "localhost",
+  "authenticationPort": 80,
+  "citizenHost" : "192.168.1.9",
+  "citizenPort" : 8080
+}

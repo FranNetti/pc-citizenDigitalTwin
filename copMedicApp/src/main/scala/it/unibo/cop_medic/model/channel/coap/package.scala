@@ -41,26 +41,13 @@ package object coap {
   implicit class RichClient(ex : CoapClient) {
     def coapTokenOption(token : String) : CoapOption = new CoapOption(TOKEN_HEADER_CODE, UserMiddleware.asToken(token))
 
-    def observeWithToken(token : String, coapHandler: CoapHandler) : CoapObserveRelation = {
-      val request = Request.newGet().setObserve()
-      ex.getEndpoint
-      val options = request.getOptions
-      options.addOption(coapTokenOption(token))
-      ex.observe(request, coapHandler)
-    }
-    def observeWithTokenAndWait(token : String, coapHandler: CoapHandler) : CoapObserveRelation = {
-      val request = Request.newGet().setObserve()
-      val options = request.getOptions
-      options.addOption(coapTokenOption(token))
-      ex.observeAndWait(request, coapHandler)
-    }
+    def observeWithToken(token : String, coapHandler: CoapHandler) : CoapObserveRelation =
+      ex.observe(Request.newGet().setObserve() >>> token, coapHandler)
+    def observeWithTokenAndWait(token : String, coapHandler: CoapHandler) : CoapObserveRelation =
+      ex.observeAndWait(Request.newGet().setObserve() >>> token, coapHandler)
 
-    def getWithToken(token : String) : CoapResponse = {
-      val request = Request.newGet()
-      val options = request.getOptions
-      options.addOption(coapTokenOption(token))
-      ex.advanced(request)
-    }
+    def getWithToken(token : String) : CoapResponse =
+      ex advanced Request.newGet() >>> token
 
     def putWithOptions(payload : String, contentFormat: ContentFormat, optionSequence : (Int, String) *): CoapResponse = {
       val request = Request.newPut()
@@ -72,5 +59,14 @@ package object coap {
       }
       ex.advanced(request)
     }
+
+    private implicit class RichRequest(request: Request) {
+      def >>>(token: String): Request = {
+        val options = request.getOptions
+        options.addOption(coapTokenOption(token))
+        request
+      }
+    }
+
   }
 }

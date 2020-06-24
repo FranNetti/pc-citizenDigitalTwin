@@ -11,9 +11,9 @@ sealed trait Role {
 
 object Roles {
 
-  object CopRole extends Role { val name="policeman" }
-  object MedicRole extends Role { val name="medic" }
-  object CitizenRole extends Role { val name="citizen" }
+  object CopRole extends Role { val name = "policeman" }
+  object MedicRole extends Role { val name = "medic" }
+  object CitizenRole extends Role { val name = "citizen" }
 
   /**
    * Get a sequence of data category based on the role.

@@ -29,7 +29,9 @@ trait RestClientServiceResponse {
    * @tparam U Type parameter of ServiceResponse
    * @return
    */
-  def parseServiceResponseWhenComplete[T, U](future: Future[HttpResponse[T]])(responseMap: PartialFunction[(HttpCode.Success, String), U])(implicit context: ExecutionContext): Future[ServiceResponse[U]] = {
+  def parseServiceResponseWhenComplete[T, U](future: Future[HttpResponse[T]])
+                                            (responseMap: PartialFunction[(HttpCode.Success, String), U])
+                                            (implicit context: ExecutionContext): Future[ServiceResponse[U]] = {
     future.map(response => parseServiceResponse(response, responseMap))
   }
 

@@ -1,5 +1,6 @@
 package it.unibo.cop_medic.model.channel.rest
 
+import java.net.URI
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap, Executors}
 
 import io.vertx.lang.scala.VertxExecutionContext
@@ -7,7 +8,7 @@ import io.vertx.lang.scala.json.{Json, JsonArray, JsonObject}
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.core.http.{WebSocketBase, WebSocketConnectOptions}
 import io.vertx.scala.ext.web.client.{WebClient, WebClientOptions}
-import it.unibo.cop_medic.model.channel.{AuthenticationService, TokenIdentifier}
+import it.unibo.cop_medic.model.channel.TokenIdentifier
 import it.unibo.cop_medic.model.channel.data.{Response, ServiceResponse}
 import it.unibo.cop_medic.model.channel.digital_twin.CitizenDigitalTwin
 import it.unibo.cop_medic.model.data.{Data, DataCategory}
@@ -29,35 +30,32 @@ import scala.util.{Failure, Success}
 /**
  * Citizen client implementation based on vertx webclient and coap client. It follow the [[CitizenDigitalTwin]] contract.
  * @param registry data parser
- * @param host the citizen service host
- * @param httpPort the port used by the citizen service for REST api protocol
+ * @param address the citizen service address
  * @param coapPort the port user by the citizen service for CoAP api protocol
  */
 class CitizenChannel(override val citizenIdentifier : String,
-                    registry : DataParserRegistry[JsonObject],
-                    host : String = "localhost",
-                    httpPort : Int = 8080,
+                    registry : DataParserRegistry[JsonObject], address: URI,
                     coapPort : Int = 5683) extends CitizenDigitalTwin  with RestApiClient with RestClientServiceResponse {
   private val vertx = Vertx.vertx()
   private val coapFixedThreadpool = Executors.newFixedThreadPool(4)
-  implicit lazy val ctx = VertxExecutionContext(vertx.getOrCreateContext())
+  private implicit lazy val ctx = VertxExecutionContext(vertx.getOrCreateContext())
   private val httpClient = vertx.createHttpClient()
   private val atomicInt = AtomicInt(0)
-  private def stateEndpoint(port : Int) = s"${host}:${port}/citizens/$citizenIdentifier/state"
   private val httpStateEndpoint = s"/citizens/$citizenIdentifier/state"
-  private val coapStateEndpoint = s"coap://${stateEndpoint(coapPort)}"
+  private val coapStateEndpoint = s"coap://${address.getHost}:$coapPort/citizens/$citizenIdentifier/state"
   private val historyEndpoint = s"/citizens/$citizenIdentifier/history"
 
-  override val webClient: WebClient = WebClient.create(vertx, WebClientOptions().setDefaultHost(host).setDefaultPort(httpPort))
+  override val webClient: WebClient = WebClient.create(vertx, WebClientOptions()
+    .setDefaultHost(address.getHost)
+    .setDefaultPort(address.getPort)
+  )
 
   private def authorizationHeader(token : TokenIdentifier) : (String, String) = "Authorization" -> token.bearer
 
   private def enrichPathWithCategory(basePath : String, data : DataCategory) : String = basePath + s"?data_category=${data.name}"
 
   override def updateState(who: TokenIdentifier, data: Seq[Data]): FutureService[Seq[String]] = {
-    val jsonData = data.map(registry.encode).collect { case Some(data) => data }
-    val jsonArray = Json.arr(jsonData:_*)
-    val jsonPayload = Json.obj("data" -> jsonArray)
+    val jsonPayload = Json.obj("data" -> fromSequenceToJsonArray(data))
     println("LOG : payload to sent = " + jsonPayload)
     val request = webClient.patch(httpStateEndpoint).putHeader(authorizationHeader(who)).sendJsonObjectFuture(jsonPayload)
 
@@ -101,8 +99,8 @@ class CitizenChannel(override val citizenIdentifier : String,
   override def createPhysicalLink(who: TokenIdentifier): FutureService[PhysicalLink] = {
     val (header, value) = authorizationHeader(who)
     val option = WebSocketConnectOptions()
-      .setHost(host)
-      .setPort(httpPort)
+      .setHost(address.getHost)
+      .setPort(address.getPort)
       .setURI(httpStateEndpoint)
       .addHeader(header, value)
     httpClient.webSocketFuture(option).transform {
@@ -117,17 +115,17 @@ class CitizenChannel(override val citizenIdentifier : String,
     val source = PublishSubject[Data]()
     Future[CoapObserveRelation] {
       coapClient.observeWithTokenAndWait(who.token, (result : CoapResponse) => {
-        val publishResult = JsonConversion.objectFromString(result.getResponseText) match {
-          case None =>
+        val _ = JsonConversion.objectFromString(result.getResponseText) match {
           case Some(element) => registry.decode(element) match {
             case Some(data) => source.onNext(data)
             case _ =>
           }
+          case _ =>
         }
       })
     }(coapContext).transform {
       case Success(coapResponse) if coapResponse.isCanceled => Failure(new RuntimeException("observe failed"))
-      case Success(coapResponse) => Success(Response(source))
+      case Success(_) => Success(Response(source))
     }(coapContext).toFutureService
   }
 
@@ -162,10 +160,8 @@ class CitizenChannel(override val citizenIdentifier : String,
     })
 
     override def updateState(data: Seq[Data]): FutureService[Seq[String]] = {
-      val jsonToSend = data.map(registry.encode).collect { case Some(data) => data }
-      val array = Json.arr(jsonToSend:_*)
       val requestId = atomicInt.incrementAndGet()
-      val request = WebsocketRequest[JsonArray](requestId, array)
+      val request = WebsocketRequest[JsonArray](requestId, data)
       val requestJson = CitizenProtocol.requestParser.encode(request)
       val promise = Promise[Response[Seq[String]]]()
       promiseMap.put(requestId, promise)
@@ -180,4 +176,10 @@ class CitizenChannel(override val citizenIdentifier : String,
       websocket.close()
     }
   }
+
+  private implicit def fromSequenceToJsonArray(seq: Seq[Data]): JsonArray = {
+    val jsonToSend = seq.map(registry.encode).collect { case Some(data) => data }
+    Json.arr(jsonToSend:_*)
+  }
+
 }

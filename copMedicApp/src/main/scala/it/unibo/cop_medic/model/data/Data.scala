@@ -19,9 +19,8 @@ trait Data {
 
 object Data {
 
-  def apply(identifier : String, feeder: Feeder, category: LeafCategory, timestamp: Long, value : Any) : Data = {
+  def apply(identifier : String, feeder: Feeder, category: LeafCategory, timestamp: Long, value : Any) : Data =
     AnyData(identifier, feeder, category, timestamp, value)
-  }
 
   /**
    * A Data used to wrap a generic value.

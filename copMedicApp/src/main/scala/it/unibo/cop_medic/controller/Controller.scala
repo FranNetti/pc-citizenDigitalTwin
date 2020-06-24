@@ -78,24 +78,24 @@ object Controller {
   /**
    * Create a new Controller.
    * @param viewCreator the view creation strategy
-   * @param hostAuthentication the host of the authentication service
-   * @param hostService the host of the citizen service
+   * @param authenticationAddress the address of the authentication service
+   * @param citizenAddress the address of the citizen service
    * @param executionContext the execution context of the main application
    * @return a new instance of Controller
    */
-  def apply(viewCreator: ViewCreator, hostAuthentication: String, hostService: String,
+  def apply(viewCreator: ViewCreator, authenticationAddress: URI, citizenAddress: URI,
             executionContext: ExecutionContext = Controller.defaultExecutionContext): Controller =
-    ControllerImpl(viewCreator, hostAuthentication, hostService, executionContext)
+    ControllerImpl(viewCreator, authenticationAddress, citizenAddress, executionContext)
 
   private implicit def fromAuthenticationInfoToTokenIdentifier(authenticationInfo: AuthenticationInfo): TokenIdentifier =
     TokenIdentifier(authenticationInfo.token.token)
 
-  private case class ControllerImpl(viewCreator: ViewCreator, hostAuthentication: String, hostService: String,
+  private case class ControllerImpl(viewCreator: ViewCreator, authenticationAddress: URI, citizenAddress: URI,
                                     implicit val executionContext: ExecutionContext) extends Controller {
 
     private val monixContext = Scheduler(executionContext)
     private val registry = Parsers.configureRegistryFromJson(new JsonArray(Source.fromResource("categories.json").mkString))
-    private val authenticationChannel = AuthenticationService createProxy URI.create(s"http://${hostAuthentication}:80")
+    private val authenticationChannel = AuthenticationService createProxy authenticationAddress
     private val view = viewCreator(this)
 
     private var logged = false
@@ -199,7 +199,7 @@ object Controller {
     private def lookForCitizenChannel(user: User): CitizenChannel = {
       if (citizenChannels contains user) citizenChannels(user)
       else {
-        val newChannel = CitizenService createProxy(user, registry, hostService)
+        val newChannel = CitizenService createProxy(user, registry, citizenAddress)
         citizenChannels = citizenChannels + (user -> newChannel)
         newChannel
       }
@@ -210,7 +210,7 @@ object Controller {
       case Categories.bloodOxygenCategory | Categories.heartrateCategory => values.head.toDouble
       case Categories.positionCategory => (values.head.toDouble, values(1).toDouble)
       case Categories.medicalRecordCategory => values
-      case _ => values.head
+      case _ => print("ciaoooooooooooo") ; values.head
     }
 
     private def backgroundTokenRefresh(): Unit = {

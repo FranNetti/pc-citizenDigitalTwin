@@ -27,7 +27,7 @@ package object util {
 
   implicit class RichString(value: String) {
 
-    def hasNoWhiteSpaces: Boolean = !value.isEmpty && value.trim.length > 0
+    def hasNoWhiteSpaces: Boolean = !value.isEmpty && !value.trim.isEmpty
 
     def hasWhiteSpaces: Boolean = !hasNoWhiteSpaces
 

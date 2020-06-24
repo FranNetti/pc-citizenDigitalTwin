@@ -29,6 +29,7 @@ object HistoryFrame {
   private val HISTORY_BUTTON = "GET HISTORY"
   private val EMPTY_TEXT_ERROR = "The user id must not be empty!"
   private val ERROR = "An error occurred during the operation: "
+  private val EMPTY_HISTORY = "The user has no history data."
 
 }
 
@@ -69,7 +70,7 @@ private[view] class HistoryFrame(title: String, dataCategory: DataCategory, cont
   setVisible(false)
   this addWindowListener new WindowAdapter() {
     override def windowClosing(ev: WindowEvent): Unit = {
-      viewController.showApplicationView
+      viewController.showApplicationView()
     }
   }
 
@@ -81,7 +82,8 @@ private[view] class HistoryFrame(title: String, dataCategory: DataCategory, cont
       case Success(history) =>
         historyData = history
         refreshTable()
-      case Failure(exception) => showDialog(this, ERROR + exception.getLocalizedMessage)
+        if(history.isEmpty) showDialog(this, EMPTY_HISTORY)
+      case Failure(exception) => showDialog(this, ERROR concat exception.getLocalizedMessage)
     }
   }(EMPTY_TEXT_ERROR)
 

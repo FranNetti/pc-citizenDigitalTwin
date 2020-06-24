@@ -1,18 +1,30 @@
 package it.unibo.cop_medic
 
+import java.net.URI
+
+import io.vertx.lang.scala.json.JsonObject
 import it.unibo.cop_medic.controller.Controller
 import it.unibo.cop_medic.view.View
+
+import scala.io.Source
 
 /**
  * Main entry of the application.
  */
 object Application extends App {
 
-  val authenticationHost = "151.42.236.72"
-  val serviceHost = "151.42.236.72"
+  val jsonConfigurations = new JsonObject(Source.fromResource("configurations.json").mkString)
+
+  val authenticationHost = jsonConfigurations.getString("authenticationHost")
+  val authenticationPort = jsonConfigurations.getInteger("authenticationPort")
+  val citizenHost = jsonConfigurations.getString("citizenHost")
+  val citizenPort = jsonConfigurations.getInteger("citizenPort")
+
+  val authenticationAddress = URI.create(s"http://${authenticationHost}:${authenticationPort}")
+  val citizenAddress = URI.create(s"http://${citizenHost}:${citizenPort}")
 
   val view = View()
 
-  val controller = Controller(view, authenticationHost, serviceHost)
+  val controller = Controller(view, authenticationAddress, citizenAddress)
 
 }

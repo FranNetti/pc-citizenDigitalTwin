@@ -16,7 +16,7 @@ class DataRegistryParser(valueParserMap: ValueParserMap) extends Parser[JsonArra
 
   private case class DataCategorySection(name: String, ttl: Int, parseType: String, groups: Seq[String])
 
-  override def encode(rawData: DataParserRegistry[JsonObject]): JsonArray = ???
+  override def encode(rawData: DataParserRegistry[JsonObject]): JsonArray = new JsonArray()
 
   override def decode(data: JsonArray): Option[DataParserRegistry[JsonObject]] = {
     val categories = extractDataCategorySections(data)

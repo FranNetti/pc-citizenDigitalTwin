@@ -23,18 +23,18 @@ private[view] class ViewControllerImpl(controller: Controller) extends View with
   override def handleLoginResult(result: LoginResult): Unit = result match {
     case SuccessfulLogin(userInfo) =>
       applicationView =
-        Roles.all.find(_.name == userInfo.role).map({
+        Roles.all.find(_.name == userInfo.role).map {
         case CopRole => PoliceFrame(POLICE_TITLE, controller, this)
         case MedicRole => MedicFrame(MEDIC_TITLE, controller, this)
-      }).get
+      }.get
       loginView.setVisible(false)
       applicationView.setVisible(true)
-    case FailedLogin(cause) => showDialog(loginView, LOGIN_ERROR_MESSAGE + cause)
+    case FailedLogin(cause) => showDialog(loginView, LOGIN_ERROR_MESSAGE concat cause)
     case UnsupportedRole => showDialog(loginView, LOGIN_UNSUPPORTED_ROLE_MESSAGE)
   }
 
   override def showError(error: ViewError): Unit = error match {
-    case SubscriptionFailed(error) => showDialog(applicationView, SUBSCRIPTION_ERROR + error)
+    case SubscriptionFailed(error) => showDialog(applicationView, SUBSCRIPTION_ERROR concat error)
     case NotLoggedError => showDialog(applicationView, NOT_LOGGED_ERROR)
     case HistoryRequestFailed(error) =>  showDialog(applicationView, error)
   }

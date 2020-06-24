@@ -55,7 +55,7 @@ trait CitizenDigitalTwin {
   /**
    * get citizen historical data filtered by the dataIdentifier
    * @param who The one who would get the specific historical data
-   * @param dataIdentifier
+   * @param dataIdentifier the data to read
    * @return Success(data) if @who could read citizen history, Fail(error) if there are some error (e.g authorization issue) during reading
    */
   def readHistoryData(who: TokenIdentifier, dataIdentifier: String): FutureService[Data]

@@ -2,6 +2,7 @@ package it.unibo.cop_medic.model.channel.rest
 
 import io.vertx.lang.scala.json.{Json, JsonArray, JsonObject}
 import io.vertx.scala.core.http.{HttpServerResponse, ServerWebSocket}
+import it.unibo.cop_medic.model.channel.rest.HttpCode._
 
 object vertx {
   protected[vertx] def tryOrNone[E](some : => E) : Option[E] = try {
@@ -10,11 +11,9 @@ object vertx {
     case e : Exception => None
   }
 
-  protected[vertx] def getOrNone[E](string : String, jsonObject: JsonObject)(some : => E) = if(jsonObject.containsKey(string)) {
-    tryOrNone(some)
-  } else {
-    None
-  }
+  protected[vertx] def getOrNone[E](string : String, jsonObject: JsonObject)(some : => E): Option[E] =
+    if(jsonObject containsKey string) tryOrNone(some)
+    else None
 
   /**
    * other conversion that wrap the result of Json.fromObjectString and Json.fromArrayString with Option.
@@ -52,7 +51,7 @@ object vertx {
         val objects = (0 to elems).map (json.getJsonObject)
         Some(objects)
       } catch {
-        case exception: Exception => None
+        case _: Exception => None
       }
     }
     def getAsStringSeq : Option[Seq[String]] = {
@@ -61,7 +60,7 @@ object vertx {
         val objects = (0 to elems).map(json.getString)
         Some(objects)
       } catch {
-        case exception: Exception => None
+        case _: Exception => None
       }
     }
   }
@@ -75,25 +74,27 @@ object vertx {
       response.setStatusCode(statusCode).end(body)
     }
 
-    def setInternalError(message: String = "Internal Error"): Unit = setResponse(500, message)
-    def setNotFound(message: String = "Not Found"): Unit = setResponse(400, message)
-    def setForbidden(message: String = "Forbidden"): Unit = setResponse(403, message)
-    def setNotAuthorized (message: String = "Not authorized"): Unit = setResponse(401, message)
-    def setBadRequest(message: String = "Bad request"): Unit = setResponse(400, message)
-    def setConflict(message: String = "Conflict"): Unit = setResponse(409, message)
-    def setCreated(obj: JsonObject): Unit = setResponse(201, obj)
-    def setCreated(obj: String): Unit = setResponse(201, obj)
-    def setOk (obj: JsonObject): Unit = setResponse(200, obj)
-    def setOk (obj: JsonArray): Unit = setResponse(200, obj.encode())
-    def setNoContent(): Unit = setResponse(204, "")
+    def setInternalError(message: String = "Internal Error"): Unit = setResponse(InternalError, message)
+    def setNotFound(message: String = "Not Found"): Unit = setResponse(BadRequest, message)
+    def setForbidden(message: String = "Forbidden"): Unit = setResponse(Forbidden, message)
+    def setNotAuthorized (message: String = "Not authorized"): Unit = setResponse(Unauthorized, message)
+    def setBadRequest(message: String = "Bad request"): Unit = setResponse(BadRequest, message)
+    def setConflict(message: String = "Conflict"): Unit = setResponse(Conflict, message)
+    def setCreated(obj: JsonObject): Unit = setResponse(Created, obj)
+    def setCreated(obj: String): Unit = setResponse(Created, obj)
+    def setOk (obj: JsonObject): Unit = setResponse(Ok, obj)
+    def setOk (obj: JsonArray): Unit = setResponse(Ok, obj.encode())
+    def setNoContent(): Unit = setResponse(NoContent, "")
   }
 
   implicit class RichServerWebSocket(webSocket : ServerWebSocket) {
-    def rejectInternalError(): Unit = webSocket.reject(500)
-    def rejectForbidden(): Unit = webSocket.reject(403)
-    def rejectNotAuthorized(): Unit = webSocket.reject(401)
-    def rejectBadContent(): Unit = webSocket.reject(400)
+    def rejectInternalError(): Unit = webSocket.reject(InternalError)
+    def rejectForbidden(): Unit = webSocket.reject(Forbidden)
+    def rejectNotAuthorized(): Unit = webSocket.reject(Unauthorized)
+    def rejectBadContent(): Unit = webSocket.reject(BadRequest)
     def writeTextJsonObject(json : JsonObject): ServerWebSocket = webSocket.writeTextMessage(json.encode())
     def writeTextJsonArray(json : JsonArray): ServerWebSocket = webSocket.writeTextMessage(json.encode())
   }
+
+  private implicit def fromHttpCodeToInt(code: HttpCode): Int = code.code
 }

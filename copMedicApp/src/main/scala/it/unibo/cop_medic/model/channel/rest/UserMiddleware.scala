@@ -13,7 +13,7 @@ object UserMiddleware {
 
   /**
    * It tries to extract the token to the authorization header expressed in string from.
-   * @param authorizationHeader
+   * @param authorizationHeader the authorization header
    * @return If authorizationHeader is : Bearer token, it returns Some(token), None otherwise
    */
   def extractToken(authorizationHeader: String): Option[String] = {

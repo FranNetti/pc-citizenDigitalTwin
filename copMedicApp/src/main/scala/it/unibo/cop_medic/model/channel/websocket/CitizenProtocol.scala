@@ -2,6 +2,7 @@ package it.unibo.cop_medic.model.channel.websocket
 
 import io.vertx.lang.scala.json.{Json, JsonArray, JsonObject}
 import it.unibo.cop_medic.model.channel.parser.ParserLike
+import it.unibo.cop_medic.model.channel.rest.HttpCode
 import it.unibo.cop_medic.model.channel.rest.vertx._
 
 /**
@@ -42,7 +43,7 @@ object CitizenProtocol {
   /**
    * the response when the client speaks other "protocol" .
    */
-  val unknown : JsonObject = Json.obj("reason" -> "unknown protocol", "code" -> 500)
+  val unknown : JsonObject = Json.obj("reason" -> "unknown protocol", "code" -> HttpCode.InternalError.code)
   /**
    * in the request, some data category are unknown by the server
    */

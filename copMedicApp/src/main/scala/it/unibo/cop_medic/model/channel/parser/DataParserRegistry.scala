@@ -12,15 +12,15 @@ import it.unibo.cop_medic.model.data.{Data, DataCategory, GroupCategory, LeafCat
  */
 trait DataParserRegistry[External] extends DataParser[External] {
   /**
-   * Add a group category in the registry
-   * @param groupCategory
+   * Add a group category in the registry.
+   * @param groupCategory the category
    * @return A new DataParserRegistry enabled to parser groupCategory
    */
   def registerGroupCategory(groupCategory : GroupCategory) : DataParserRegistry[External]
 
   /**
-   * Add a dataParser in the registry
-   * @param dataParser
+   * Add a dataParser in the registry.
+   * @param dataParser the parser
    * @return a new DataParserRegistry that used dataParser to decode/encode Data.
    */
   def registerParser(dataParser : DataParser[External]) : DataParserRegistry[External]
@@ -44,12 +44,12 @@ object DataParserRegistry {
                                                       dataParserRegistry : Seq[DataParser[External]] = Seq.empty[DataParser[External]]) extends DataParserRegistry[External] {
 
     override def decode(rawData: External): Option[Data] = dataParserRegistry
-      .map(_.decode(rawData))
+      .map(_ decode rawData)
       .collectFirst { case Some(value) => value}
 
 
     override def encode(data: Data): Option[External] = dataParserRegistry
-      .map(_.encode(data))
+      .map(_ encode data)
       .collectFirst { case Some(value) => value }
 
     override def registerGroupCategory(groupCategory: GroupCategory): DataParserRegistry[External] = {
@@ -62,7 +62,7 @@ object DataParserRegistry {
       this.copy(categoryEncoderUpdated, dataParserRegistry = this.dataParserRegistry :+ dataParser)
     }
 
-    override def decodeCategory(category: String): Option[DataCategory] = this.categoryEncoder.get(category)
+    override def decodeCategory(category: String): Option[DataCategory] = this.categoryEncoder get category
 
     override def supportedCategories: Seq[LeafCategory] = this.categoryEncoder.values.collect { case cat : LeafCategory => cat }.toSeq
   }
