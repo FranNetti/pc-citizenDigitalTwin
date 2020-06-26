@@ -55,15 +55,13 @@ sensorTimeRequestRate(120000).
     sendDataRequest[artifact_name(H)];
     !askForData(T).
 
-+!deleteSensors(DeviceName, L) <- !unsubscribeFromSensors(DeviceName, L).
-
-+!unsubscribeFromSensors(DeviceName, []).
-+!unsubscribeFromSensors(DeviceName, [H|T]) <-
++!deleteSensors(DeviceName, []).
++!deleteSensors(DeviceName, [H|T]) <-
     lookupArtifact(H,Id);
     unsubscribeForData[artifact_id(Id)];
     disposeArtifact(Id);
     -sensor(DeviceName, H);
-    !!unsubscribeFromSensors(DeviceName, T).
+    !!deleteSensors(DeviceName, T).
 
 +newSensor(DeviceName, SensorName, Channel, SensorKnowledge) <-
     makeArtifact(SensorName, "it.unibo.citizenDigitalTwin.artifact.ExternalSensorArtifact", [DeviceName, Channel, SensorKnowledge], Id);
