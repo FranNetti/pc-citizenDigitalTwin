@@ -40,10 +40,10 @@ import static it.unibo.citizenDigitalTwin.data.connection.channel.HttpChannel.He
  * Artifact that handles the communication with the backend.
  * @obsProperty token: the token to use at each communication towards the back-end
  */
-public class ConnectionManager extends JaCaArtifact {
+public class ConnectionManagerArtifact extends JaCaArtifact {
 
     private static final double TOKEN_TTL_REDUCTION_FACTOR = 0.8;
-    private static final String TAG = "[ConnectionManager]";
+    private static final String TAG = "[ConnectionManagerArtifact]";
 
     private static final String PROP_TOKEN = "token";
     private static final String MSG_REFRESH_TOKEN_FAILED = "refreshTokenFailed";

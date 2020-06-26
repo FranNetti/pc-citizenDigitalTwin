@@ -39,9 +39,9 @@ import it.unibo.pslab.jaca_android.core.JaCaArtifact;
                 @OUTPORT(name = "technologies")
         }
 )
-public class DeviceCommunication extends JaCaArtifact {
+public class DeviceCommunicationArtifact extends JaCaArtifact {
 
-    private static final String DEVICE_COMMUNICATION_TAG = "[DeviceCommunication]";
+    private static final String DEVICE_COMMUNICATION_TAG = "[DeviceCommunicationArtifact]";
 
     private static final String PROP_CONNECTED_DEVICES = "connectedDevices";
     private static final String PROP_PAIRED_DEVICES = "pairedDevices";
@@ -142,7 +142,7 @@ public class DeviceCommunication extends JaCaArtifact {
                 execLinkedOp(x, "getAvailableDevices", op);
                 final Observable<Device> observable = op.get();
                 if(Objects.nonNull(observable)){
-                    observable.subscribe(DeviceCommunication.this, device -> {
+                    observable.subscribe(DeviceCommunicationArtifact.this, device -> {
                         if(!discoveredDevices.contains(device) && !pairedDevices.contains(device)){
                             discoveredDevices.add(device);
                             beginExternalSession();

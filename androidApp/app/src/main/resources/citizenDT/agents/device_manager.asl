@@ -15,7 +15,7 @@ sensorTimeRequestRate(120000).
     focus(Bluetooth);
     makeArtifact("GPS", "it.unibo.citizenDigitalTwin.artifact.GPSArtifact", [], GPS);
     focus(GPS);
-	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunication", [Knowledge, [Bluetooth]], Communication);
+	makeArtifact("devices", "it.unibo.citizenDigitalTwin.artifact.DeviceCommunicationArtifact", [Knowledge, [Bluetooth]], Communication);
 	focus(Communication);
 	!observeState;
 	.print("Device Manager ready");

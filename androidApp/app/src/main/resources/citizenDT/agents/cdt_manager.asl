@@ -24,11 +24,11 @@ credentials("","").
 +activate <-
     makeArtifact("configurations", "it.unibo.citizenDigitalTwin.artifact.ConfigurationsArtifact",[],Configurations);
     focus(Configurations);
-	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManager",[],StateManager);
+	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManagerArtifact",[],StateManager);
 	focus(StateManager);
 	?citizenService(CitizenServiceAddress)
 	?authenticationService(AuthenticationServiceAddress)
-	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManager",[CitizenServiceAddress,AuthenticationServiceAddress],ConnectionManager);
+	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManagerArtifact",[CitizenServiceAddress,AuthenticationServiceAddress],ConnectionManager);
 	focus(ConnectionManager);
 	.print("CDT Manager ready").
 

@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import it.unibo.citizenDigitalTwin.artifact.MainUI;
+import it.unibo.citizenDigitalTwin.artifact.MainUIArtifact;
 import it.unibo.citizenDigitalTwin.R;
 import it.unibo.citizenDigitalTwin.db.entity.notification.Notification;
 import it.unibo.citizenDigitalTwin.ui.util.BackHelper;
@@ -28,7 +28,7 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
     private static final String FRAGMENT_ID = "NOTIFICATIONS";
     private static final String ARTIFACT = "artifact";
 
-    public static NotificationsFragment getInstance(final MainUI.MainUIMediator artifact){
+    public static NotificationsFragment getInstance(final MainUIArtifact.MainUIMediator artifact){
         final NotificationsFragment fragment = new NotificationsFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(artifact)) {
@@ -44,7 +44,7 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
     private NotificationAdapter adapter;
 
     private List<Notification> notifications;
-    private MainUI.MainUIMediator mainUIArtifact;
+    private MainUIArtifact.MainUIMediator mainUIArtifact;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {

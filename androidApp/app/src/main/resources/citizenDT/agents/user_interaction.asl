@@ -5,11 +5,11 @@
     .print("User interaction ready").
 
 +!initializeLogin <-
-    makeArtifact("loginUI", "it.unibo.citizenDigitalTwin.artifact.LoginUI",[],LoginUI);
+    makeArtifact("loginUI", "it.unibo.citizenDigitalTwin.artifact.LoginUIArtifact",[],LoginUI);
     focus(LoginUI).
 
 +!initializeMainUI <-
-    makeArtifact("mainUI", "it.unibo.citizenDigitalTwin.artifact.MainUI",[],MainUI);
+    makeArtifact("mainUI", "it.unibo.citizenDigitalTwin.artifact.MainUIArtifact",[],MainUI);
     focus(MainUI);
     lookupArtifact("loginUI",LoginUI);
     disposeArtifact(LoginUI).

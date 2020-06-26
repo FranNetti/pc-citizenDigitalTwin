@@ -35,10 +35,10 @@
             android:name="it.unibo.pslab.jaca_android.core.JaCaBaseActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".artifact.MainUI$MainActivity"
+            android:name=".artifact.MainUIArtifact$MainActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".artifact.LoginUI$LoginActivity"
+            android:name=".artifact.LoginUIArtifact$LoginActivity"
             android:label="" />
     </application>
 

@@ -31,9 +31,9 @@ import it.unibo.pslab.jaca_android.core.JaCaArtifact;
  * @obsProperty state the current user state
  * @obsProperty notifications the current user notifications
  */
-public class StateManager extends JaCaArtifact {
+public class StateManagerArtifact extends JaCaArtifact {
 
-    private static final String TAG = "[StateManager]";
+    private static final String TAG = "[StateManagerArtifact]";
 
     private static final String PROP_LOGGED = "logged";
     private static final String PROP_STATE = "state";

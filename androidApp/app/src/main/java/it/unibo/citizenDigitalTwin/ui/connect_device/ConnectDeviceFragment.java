@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.artifact.MainUI;
+import it.unibo.citizenDigitalTwin.artifact.MainUIArtifact;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
 
@@ -27,7 +27,7 @@ public class ConnectDeviceFragment extends FragmentWithId implements ConnectDevi
     private static final String ARTIFACT = "artifact";
     private static final String DIALOG_TAG = "connectDeviceDialog";
 
-    public static ConnectDeviceFragment getInstance(final MainUI.MainUIMediator artifact){
+    public static ConnectDeviceFragment getInstance(final MainUIArtifact.MainUIMediator artifact){
         final ConnectDeviceFragment fragment = new ConnectDeviceFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(artifact)){
@@ -39,7 +39,7 @@ public class ConnectDeviceFragment extends FragmentWithId implements ConnectDevi
 
     private List<Device> pairedDevices = new ArrayList<>();
     private List<Device> discoveredDevices = new ArrayList<>();
-    private MainUI.MainUIMediator artifact;
+    private MainUIArtifact.MainUIMediator artifact;
 
     private ConnectDeviceAdapter pairedAdapter;
     private ConnectDeviceAdapter discoveredAdapter;

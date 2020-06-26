@@ -20,7 +20,7 @@ import it.unibo.pslab.jaca_android.core.JaCaArtifact;
  */
 public class DeviceKnowledgeArtifact extends JaCaArtifact {
 
-    private static final String TAG = "[DeviceKnowledge]";
+    private static final String TAG = "[DeviceKnowledgeArtifact]";
     private static final String SENSOR_RESOURCE = "sensor/";
 
     private HttpChannel channel;

@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.artifact.MainUI;
+import it.unibo.citizenDigitalTwin.artifact.MainUIArtifact;
 import it.unibo.citizenDigitalTwin.data.device.type.Device;
 import it.unibo.citizenDigitalTwin.ui.connect_device.ConnectDeviceFragment;
 import it.unibo.citizenDigitalTwin.ui.util.FragmentWithId;
@@ -31,7 +31,7 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
     private static final String FRAGMENT_ID = "DEVICES";
     private static final String ARTIFACT = "artifact";
 
-    public static DevicesFragment getInstance(final MainUI.MainUIMediator artifact){
+    public static DevicesFragment getInstance(final MainUIArtifact.MainUIMediator artifact){
         final DevicesFragment fragment = new DevicesFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(artifact)){
@@ -46,7 +46,7 @@ public class DevicesFragment extends FragmentWithId implements DeviceAdapter.Dev
     private TextView emptyDevices;
 
     private List<Device> devices = new ArrayList<>();
-    private MainUI.MainUIMediator artifact;
+    private MainUIArtifact.MainUIMediator artifact;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {

@@ -18,7 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.artifact.MainUI;
+import it.unibo.citizenDigitalTwin.artifact.MainUIArtifact;
 import it.unibo.citizenDigitalTwin.data.State;
 import it.unibo.citizenDigitalTwin.data.category.GroupCategory;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
@@ -33,7 +33,7 @@ public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter
     private static final String FRAGMENT_ID = "HOME";
     private static final String ARTIFACT = "artifact";
 
-    public static HomeFragment getInstance(final MainUI.MainUIMediator artifact){
+    public static HomeFragment getInstance(final MainUIArtifact.MainUIMediator artifact){
         final HomeFragment fragment = new HomeFragment();
         final Bundle bundle = new Bundle();
         if(Objects.nonNull(artifact)){
@@ -44,7 +44,7 @@ public class HomeFragment extends FragmentWithId implements GroupCategoryAdapter
     }
 
     private State state;
-    private MainUI.MainUIMediator artifact;
+    private MainUIArtifact.MainUIMediator artifact;
     private TextView userName;
 
     @Override

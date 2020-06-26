@@ -45,7 +45,7 @@ public class BluetoothArtifact extends JaCaArtifact {
     @OPERATION
     public void askToTurnOnBluetooth(){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
-            final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+            final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
             if (Objects.nonNull(activity)) {
                 BluetoothHelper.askToTurnOnBluetooth(activity, ACTION_BT_ON);
             }
@@ -58,7 +58,7 @@ public class BluetoothArtifact extends JaCaArtifact {
     @OPERATION
     public void disconnectBTServices(){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
-            final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+            final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
             if(Objects.nonNull(activity)){
                 BluetoothHelper.unregisterFromBroadcasts(activity);
             }
@@ -119,7 +119,7 @@ public class BluetoothArtifact extends JaCaArtifact {
     public void getAvailableDevices(final OpFeedbackParam<Observable<Device>> result){
         if(!hasObsProperty(PROP_NO_BLUETOOTH)) {
             final Observable<Device> observable = new Observable<>();
-            final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+            final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
             if(Objects.nonNull(activity)){
                 BluetoothHelper.scanAvailableDevices(adapter, activity,
                         deviceFound -> observable.set(new BluetoothDevice(deviceFound)));
@@ -157,7 +157,7 @@ public class BluetoothArtifact extends JaCaArtifact {
         }
 
         defineObsProperty(PROP_BLUETOOTH_STATE, adapter.isEnabled() ? BluetoothState.ON.name() : BluetoothState.OFF.name());
-        final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+        final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
         if(Objects.nonNull(activity)){
             BluetoothHelper.observeBluetoothStateChanges(activity, bluetoothState -> {
                 if(Objects.nonNull(bluetoothState)){

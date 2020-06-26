@@ -38,7 +38,7 @@ import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
  * Artifact that represents the Main Activity.
  * @obsProperty pageShown the current page shown to the user
  */
-public class MainUI extends ActivityArtifact {
+public class MainUIArtifact extends ActivityArtifact {
 
     public static class MainActivity extends JaCaBaseActivity {
 
@@ -59,7 +59,7 @@ public class MainUI extends ActivityArtifact {
 
     private static final int GPS_REQ_CODE = 12;
     private static final int GPS_BACKGROUND_REQ_CODE = 13;
-    private static final String MAIN_UI_TAG = "[MainUI]";
+    private static final String TAG = "[MainUIArtifact]";
     private static final String PAGE_SHOWN_PROP = "pageShown";
     private static final String MSG_CLOSING = "closing";
 
@@ -287,27 +287,27 @@ public class MainUI extends ActivityArtifact {
         public void writeToParcel(Parcel dest, int flags) {}
 
         public void newSubView(final FragmentWithId fragment){
-            MainUI.this.beginExternalSession();
-            MainUI.this.newSubView(fragment);
-            MainUI.this.endExternalSession(true);
+            MainUIArtifact.this.beginExternalSession();
+            MainUIArtifact.this.newSubView(fragment);
+            MainUIArtifact.this.endExternalSession(true);
         }
 
         public void connectToDevice(final Device device, final String model) {
-            MainUI.this.beginExternalSession();
+            MainUIArtifact.this.beginExternalSession();
             signal(DEVICE_SELECTED, device, model);
-            MainUI.this.endExternalSession(true);
+            MainUIArtifact.this.endExternalSession(true);
         }
 
         public void disconnectFromDevice(final Device device) {
-            MainUI.this.beginExternalSession();
+            MainUIArtifact.this.beginExternalSession();
             signal(DEVICE_TO_DISCONNECT, device);
-            MainUI.this.endExternalSession(true);
+            MainUIArtifact.this.endExternalSession(true);
         }
 
         public void readNotification(final List<Notification> notifications){
-            MainUI.this.beginExternalSession();
+            MainUIArtifact.this.beginExternalSession();
             signal(NOTIFICATIONS_READ, notifications);
-            MainUI.this.endExternalSession(true);
+            MainUIArtifact.this.endExternalSession(true);
         }
     }
 }

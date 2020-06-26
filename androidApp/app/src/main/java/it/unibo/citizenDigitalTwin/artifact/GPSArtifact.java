@@ -74,7 +74,7 @@ public class GPSArtifact extends JaCaArtifact {
     @SuppressLint("MissingPermission")
     @OPERATION
     public void updatePosition(final OpFeedbackParam<Boolean> success){
-        final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+        final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
         if (isLocationPermissionGranted()) {
             askForPermissionToUser();
             success.set(false);
@@ -116,7 +116,7 @@ public class GPSArtifact extends JaCaArtifact {
     }
 
     private void askForPermissionToUser(){
-        final Activity activity = getActivity(MainUI.MAIN_UI_ACTIVITY_NAME);
+        final Activity activity = getActivity(MainUIArtifact.MAIN_UI_ACTIVITY_NAME);
         if(Objects.nonNull(activity)){
             ActivityCompat.requestPermissions(
                     activity,

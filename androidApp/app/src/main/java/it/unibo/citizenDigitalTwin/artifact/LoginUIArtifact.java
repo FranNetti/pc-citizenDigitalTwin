@@ -20,7 +20,7 @@ import it.unibo.pslab.jaca_android.core.JaCaBaseActivity;
 /**
  * The artifact that represents the Login Activity.
  */
-public class LoginUI extends ActivityArtifact {
+public class LoginUIArtifact extends ActivityArtifact {
 
     public static class LoginActivity extends JaCaBaseActivity {}
 
@@ -81,9 +81,9 @@ public class LoginUI extends ActivityArtifact {
             password.requestFocus();
         } else {
             progressBar.setVisibility(View.VISIBLE);
-            LoginUI.this.beginExternalSession();
+            LoginUIArtifact.this.beginExternalSession();
             signal("loginButtonClicked", email, pwd);
-            LoginUI.this.endExternalSession(true);
+            LoginUIArtifact.this.endExternalSession(true);
         }
     }
 
