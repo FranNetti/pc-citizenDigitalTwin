@@ -2,7 +2,8 @@ package it.unibo.citizenDigitalTwin.data;
 
 import org.junit.Test;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -13,6 +14,8 @@ import static org.junit.Assert.fail;
 public class ObservableTest {
 
     private static final Integer VALUE = 5;
+    private static final Integer DEFAULT_VALUE = -1;
+    private static final int MAX_SECONDS_TO_WAIT = 2;
 
     @Test
     public void isEmptyOnCreation() {
@@ -29,31 +32,38 @@ public class ObservableTest {
 
     @Test
     public void subscribesToNewValues() {
+        final Semaphore semaphore = new Semaphore(0);
         final Observable<Integer> observable = new Observable<>();
-        AtomicInteger newValue = new AtomicInteger(-1);
-        observable.subscribe(this, newValue::set);
+        AtomicInteger newValue = new AtomicInteger(DEFAULT_VALUE);
+        observable.subscribe(this, val -> {
+            newValue.set(val);
+            semaphore.release();
+        });
         try {
-            Thread.sleep(1000);
             observable.set(VALUE);
-            Thread.sleep(3000);
-            assertEquals(VALUE, new Integer(newValue.get()));
-        } catch (InterruptedException e) {
-            fail();
+            final boolean acquired = semaphore.tryAcquire(MAX_SECONDS_TO_WAIT, TimeUnit.SECONDS);
+            if(acquired){
+                assertEquals(VALUE, new Integer(newValue.get()));
+                return;
+            }
+        } catch (final InterruptedException e) {
+            System.err.println(e.getLocalizedMessage());
         }
+        fail();
     }
 
     @Test
     public void unsubscribesFromUpdates() {
+        final Semaphore semaphore = new Semaphore(0);
         final Observable<Integer> observable = new Observable<>();
-        AtomicBoolean newValueReceived = new AtomicBoolean(false);
-        observable.subscribe(this, newValue -> newValueReceived.set(true));
+        observable.subscribe(this, newValue -> semaphore.release());
         try {
-            Thread.sleep(1000);
             observable.unsubscribe(this);
             observable.set(VALUE);
-            Thread.sleep(3000);
-            assertFalse(newValueReceived.get());
-        } catch (InterruptedException e) {
+            final boolean acquired = semaphore.tryAcquire(MAX_SECONDS_TO_WAIT, TimeUnit.SECONDS);
+            assertFalse(acquired);
+        } catch (final InterruptedException e) {
+            System.err.println(e.getLocalizedMessage());
             fail();
         }
     }
