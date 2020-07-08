@@ -2,6 +2,8 @@ package it.unibo.citizenDigitalTwin.data;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -10,6 +12,7 @@ import java.util.function.Consumer;
  */
 public class Observable<X> {
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private X value;
     private final Map<Object, Consumer<X>> subscribers;
 
@@ -41,7 +44,7 @@ public class Observable<X> {
      */
     public synchronized void set(final X newValue){
         this.value = newValue;
-        this.subscribers.values().forEach(consumer -> consumer.accept(newValue));
+        executor.execute(() -> this.subscribers.values().forEach(consumer -> consumer.accept(newValue)));
     }
 
     /**
