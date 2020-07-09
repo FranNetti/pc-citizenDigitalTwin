@@ -11,7 +11,7 @@ abstract class Response {
     }
 
     public boolean isSuccessful(){
-        return this.code == HttpURLConnection.HTTP_OK;
+        return this.code / 100 == 2;
     }
 
     public int getCode() {

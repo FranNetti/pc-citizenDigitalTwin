@@ -16,10 +16,13 @@ public class DeviceKnowledge {
 
     private final List<SensorKnowledge> sensorKnowledgeList;
 
-    public DeviceKnowledge(final JSONObject object) throws JSONException {
+    public DeviceKnowledge(final JSONObject object) throws JSONException, IllegalStateException {
         sensorKnowledgeList = new ArrayList<>();
         final JSONArray sensors = object.getJSONArray(DEVICE);
         final int length = sensors.length();
+        if(length <= 0){
+            throw new IllegalStateException("No sensor knowledge found");
+        }
         for(int x = 0; x < length; x++){
             sensorKnowledgeList.add(new SensorKnowledge(sensors.getJSONObject(x)));
         }

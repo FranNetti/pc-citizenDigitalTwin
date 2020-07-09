@@ -30,7 +30,7 @@ public class LoginResult extends Response {
         return new LoginResult(null, failCode);
     }
 
-    public static final int LOGIN_SUCCESS = 201;
+    public static final int LOGIN_SUCCESS = HttpURLConnection.HTTP_CREATED;
     public static final int APPLICATION_ERROR = 600;
     public static final int MALFORMED_RECEIVED_DATA = 601;
 

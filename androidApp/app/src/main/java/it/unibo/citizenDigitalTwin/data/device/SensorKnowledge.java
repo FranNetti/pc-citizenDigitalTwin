@@ -45,7 +45,7 @@ public class SensorKnowledge {
         if(leafCategory.isPresent()){
             this.leafCategory = leafCategory.get();
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Leaf category not found: " + leafCategoryIdentifier);
         }
         this.sensorDataIdentifier = object.getString(DATA_ID);
         this.unitOfMeasure = object.getString(UM);
@@ -58,6 +58,9 @@ public class SensorKnowledge {
             this.subForDataMessage = object.getString(SUB_FOR_DATA);
         } catch (final JSONException e){
             this.subForDataMessage = null;
+        }
+        if(Objects.isNull(reqDataMessage) && Objects.isNull(subForDataMessage)){
+            throw new IllegalStateException("Missing message for request and subscription");
         }
     }
 
@@ -99,6 +102,23 @@ public class SensorKnowledge {
      */
     public Optional<String> getSubForDataMessage() {
         return Objects.nonNull(subForDataMessage) && !subForDataMessage.isEmpty() ? Optional.of(subForDataMessage) : Optional.empty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SensorKnowledge that = (SensorKnowledge) o;
+        return leafCategory == that.leafCategory &&
+                sensorDataIdentifier.equals(that.sensorDataIdentifier) &&
+                unitOfMeasure.equals(that.unitOfMeasure) &&
+                Objects.equals(reqDataMessage, that.reqDataMessage) &&
+                Objects.equals(subForDataMessage, that.subForDataMessage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(leafCategory, sensorDataIdentifier, unitOfMeasure, reqDataMessage, subForDataMessage);
     }
 
     /**

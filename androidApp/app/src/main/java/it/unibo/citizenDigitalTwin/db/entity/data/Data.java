@@ -6,7 +6,9 @@ import android.util.Pair;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -161,14 +163,15 @@ public class Data implements Serializable, JsonSerializable {
                 .put(VALUE,value);
     }
 
-    private static Map<CommunicationStandard, String> decodeInformation(final Object obj) {
+    private static Map<CommunicationStandard, String> decodeInformation(final Object obj) throws JSONException {
         final Map<CommunicationStandard, String> information = new HashMap<>();
         if (obj instanceof JSONObject) {
             final JSONObject json = (JSONObject) obj;
-            json.keys().forEachRemaining(name -> {
-                final Pair<CommunicationStandard, String> value = getValue(obj,name);
+            final Iterator<String> it = json.keys();
+            while(it.hasNext()){
+                final Pair<CommunicationStandard, String> value = getValue(obj,it.next());
                 information.put(value.first, value.second);
-            });
+            }
         } else {
             final Pair<CommunicationStandard, String> value = getValue(obj);
             information.put(value.first, value.second);
@@ -176,19 +179,20 @@ public class Data implements Serializable, JsonSerializable {
         return information;
     }
 
-    private static Pair<CommunicationStandard,String> getValue(final Object obj, final String communicationStandard) {
+    private static Pair<CommunicationStandard,String> getValue(final Object obj, final String communicationStandard) throws JSONException {
             try {
                 if (obj instanceof JSONObject)
                     return CommunicationStandard.decodeValue((JSONObject)obj,communicationStandard);
                 else if (obj instanceof JSONArray)
                     return CommunicationStandard.decodeValue((JSONArray)obj);
             } catch (final JSONException e) {
-                Log.e(TAG, "Error in decodeInformation: " + e.getLocalizedMessage());
+                Log.e(TAG, "Error in getValue: " + e.getLocalizedMessage());
+                throw e;
             }
             return Pair.create(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER,obj.toString());
     }
 
-    private static Pair<CommunicationStandard,String> getValue(final Object obj) {
+    private static Pair<CommunicationStandard,String> getValue(final Object obj) throws JSONException {
         return getValue(obj,"");
     }
 
