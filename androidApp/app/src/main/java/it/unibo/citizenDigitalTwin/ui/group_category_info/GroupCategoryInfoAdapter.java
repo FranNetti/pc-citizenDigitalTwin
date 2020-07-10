@@ -10,12 +10,15 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
+import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
+import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 
 class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAdapter.GroupCategoryInfoHolder> {
@@ -90,7 +93,15 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
         holder.recyclerView.setLayoutManager(linearLayoutManager);
         holder.recyclerView.setHasFixedSize(true);
 
-        final InformationAdapter adapter = new InformationAdapter(context, listener, data.getInformation());
+
+        final Map<CommunicationStandard, String> dataInfo = data.getInformation();
+        if(!dataInfo.containsKey(CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER)){
+            data.getLeafCategory().getUm().ifPresent(um ->
+                    dataInfo.put(CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER, um)
+            );
+        }
+
+        final InformationAdapter adapter = new InformationAdapter(context, listener, dataInfo);
         holder.recyclerView.setAdapter(adapter);
     }
 

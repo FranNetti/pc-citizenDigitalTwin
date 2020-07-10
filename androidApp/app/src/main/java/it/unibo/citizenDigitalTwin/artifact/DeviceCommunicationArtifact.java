@@ -133,9 +133,9 @@ public class DeviceCommunicationArtifact extends JaCaArtifact {
     @OPERATION
     public void scanForDevices() {
         final List<Device> discoveredDevices = new ArrayList<>();
+        discoveredDevices.add(new MockDevice());
         final List<Device> pairedDevices = (List<Device>)getObsProperty(PROP_PAIRED_DEVICES).getValue();
         updateObsProperty(PROP_DISCOVERED_DEVICES, discoveredDevices);
-        discoveredDevices.add(new MockDevice());
         this.technologies.forEach(x -> {
             final OpFeedbackParam<Observable<Device>> op = new OpFeedbackParam<>();
             try{

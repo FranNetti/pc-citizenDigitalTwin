@@ -147,11 +147,19 @@ public class Data implements Serializable, JsonSerializable {
             final String v = information.get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER);
             value = CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getInferType(leafCategory,v);
         } else {
-            value = new JSONObject();
-            final JSONObject json = (JSONObject)value;
-            for (final Map.Entry<CommunicationStandard,String> info : information.entrySet()) {
-                final CommunicationStandard key = info.getKey();
-                json.put(key.getIdentifier(),key.getInferType(leafCategory,info.getValue()));
+            switch (leafCategory){
+                case HEART_RATE:
+                case BLOOD_OXIGEN:
+                    final String v = information.get(CommunicationStandard.DEFAULT_VALUE_IDENTIFIER);
+                    value = CommunicationStandard.DEFAULT_VALUE_IDENTIFIER.getInferType(leafCategory,v);
+                    break;
+                default:
+                    value = new JSONObject();
+                    final JSONObject json = (JSONObject)value;
+                    for (final Map.Entry<CommunicationStandard,String> info : information.entrySet()) {
+                        final CommunicationStandard key = info.getKey();
+                        json.put(key.getIdentifier(),key.getInferType(leafCategory,info.getValue()));
+                    }
             }
         }
 

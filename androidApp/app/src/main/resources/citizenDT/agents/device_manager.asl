@@ -4,7 +4,7 @@
 */
 
 maxGPSRequestAttempts(3).
-GPSRequestAttempts(0).
+gpsRequestAttempts(0).
 sensorTimeRequestRate(120000).
 
 @start[atomic]
@@ -30,15 +30,15 @@ sensorTimeRequestRate(120000).
     .wait(100);
     !observeState.
 
-+!subscribeForLocationUpdates : maxGPSRequestAttempts(Y) & GPSRequestAttempts(X) & X < Y <-
++!subscribeForLocationUpdates : maxGPSRequestAttempts(Y) & gpsRequestAttempts(X) & X < Y <-
     subscribeForLocationUpdates(Result);
     !checkIfLocationPermissionIsGranted(Result).
 
 +!checkIfLocationPermissionIsGranted(true).
 +!checkIfLocationPermissionIsGranted(false) <-
     .wait(60000);
-    ?GPSRequestAttempts(X);
-    -+GPSRequestAttempts(X + 1);
+    ?gpsRequestAttempts(X);
+    -+gpsRequestAttempts(X + 1);
     !!subscribeForLocationUpdates.
 
 +!checkSensorData <-

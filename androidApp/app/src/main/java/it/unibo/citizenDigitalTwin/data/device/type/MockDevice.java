@@ -8,12 +8,12 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
-import it.unibo.citizenDigitalTwin.data.device.SensorKnowledge;
 
 public class MockDevice implements Device {
 
     private static final String MOCK_DEVICE_NAME = "Mock-device";
-    public static final String MOCK_DEVICE_SENSOR_DATA_IDENTIFIER = "body/temperature";
+    public static final String MOCK_DEVICE_TEMPERATURE_SENSOR_DATA_IDENTIFIER = "body/temperature";
+    public static final String MOCK_DEVICE_HEART_RATE_SENSOR_DATA_IDENTIFIER = "body/heartrate";
 
     @Override
     public String getName() {
@@ -22,7 +22,7 @@ public class MockDevice implements Device {
 
     @Override
     public List<LeafCategory> getCategories() {
-        return Arrays.asList(LeafCategory.TEMPERATURE);
+        return Arrays.asList(LeafCategory.TEMPERATURE, LeafCategory.HEART_RATE);
     }
 
     @Override
@@ -33,16 +33,6 @@ public class MockDevice implements Device {
     @Override
     public CommunicationType getCommunicationType() {
         return CommunicationType.MOCK;
-    }
-
-    public SensorKnowledge getSensorKnowledge(){
-        return new SensorKnowledge.SensorKnowledgeBuilder()
-                .leafCategory(LeafCategory.TEMPERATURE)
-                .sensorDataIdentifier(MOCK_DEVICE_SENSOR_DATA_IDENTIFIER)
-                .reqDataMessage("get/body/temperature")
-                .subForDataMessage("subscribe/body/temperature")
-                .unitOfMeasure("°C")
-                .build();
     }
 
     @Override
