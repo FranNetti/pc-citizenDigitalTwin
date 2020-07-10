@@ -1,4 +1,4 @@
-name := "cop-medic-app"
+name := "stakeholderApp"
 
 version := "0.1"
 
