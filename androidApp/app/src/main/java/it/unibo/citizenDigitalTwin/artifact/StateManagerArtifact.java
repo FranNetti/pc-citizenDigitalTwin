@@ -1,7 +1,5 @@
 package it.unibo.citizenDigitalTwin.artifact;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -173,13 +171,11 @@ public class StateManagerArtifact extends JaCaArtifact {
     }
 
     private boolean isFirstRun() {
-        final SharedPreferences prefs = getApplicationContext()
-                .getSharedPreferences(SHARED_PREFERENCES_ID, Context.MODE_PRIVATE);
-        if (prefs.getBoolean(FIRST_RUN, true)) {
-            prefs.edit().putBoolean(FIRST_RUN, false).apply();
-            return true;
+        final boolean isFirstRun = readSharedPreference(SHARED_PREFERENCES_ID, FIRST_RUN, true);
+        if (isFirstRun) {
+            writeSharedPreference(SHARED_PREFERENCES_ID, FIRST_RUN, false);
         }
-        return false;
+        return isFirstRun;
     }
 
     private boolean isMoreRecentThanStoredData(final Data newData, final Map<LeafCategory,Data> state){
