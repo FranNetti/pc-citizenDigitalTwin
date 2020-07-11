@@ -17,7 +17,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import it.unibo.citizenDigitalTwin.R;
-import it.unibo.citizenDigitalTwin.data.category.LeafCategory;
 import it.unibo.citizenDigitalTwin.data.connection.CommunicationStandard;
 import it.unibo.citizenDigitalTwin.db.entity.data.Data;
 
@@ -96,7 +95,7 @@ class GroupCategoryInfoAdapter extends RecyclerView.Adapter<GroupCategoryInfoAda
 
         final Map<CommunicationStandard, String> dataInfo = data.getInformation();
         if(!dataInfo.containsKey(CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER)){
-            data.getLeafCategory().getUm().ifPresent(um ->
+            data.getLeafCategory().getDefaultUnitOfMeasure().ifPresent(um ->
                     dataInfo.put(CommunicationStandard.DEFAULT_UNIT_OF_MEASURE_IDENTIFIER, um)
             );
         }

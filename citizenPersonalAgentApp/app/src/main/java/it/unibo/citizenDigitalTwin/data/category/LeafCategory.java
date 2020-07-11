@@ -29,14 +29,14 @@ public enum LeafCategory {
 
     private final GroupCategory groupCategory;
     private final String identifier;
-    private final String um;
+    private final String defaultUnitOfMeasure;
     private final int displayName;
 
     LeafCategory(final GroupCategory category, final String identifier, final int displayName, final String um) {
         this.groupCategory = category;
         this.identifier = identifier;
         this.displayName = displayName;
-        this.um = um;
+        this.defaultUnitOfMeasure = um;
     }
 
     public String getIdentifier() {
@@ -47,8 +47,8 @@ public enum LeafCategory {
         return groupCategory;
     }
 
-    public Optional<String> getUm() {
-        return Optional.ofNullable(um);
+    public Optional<String> getDefaultUnitOfMeasure() {
+        return Optional.ofNullable(defaultUnitOfMeasure);
     }
 
     public String getDisplayName(final Context context) {
