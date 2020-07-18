@@ -36,7 +36,9 @@
     lookupArtifact("devices", D);
     focus(D);
     lookupArtifact("bluetooth", B);
-    focus(B).
+    focus(B);
+    lookupArtifact("notifications", N);
+    focus(N).
 
 -!observeDevices <-
     .wait(100);

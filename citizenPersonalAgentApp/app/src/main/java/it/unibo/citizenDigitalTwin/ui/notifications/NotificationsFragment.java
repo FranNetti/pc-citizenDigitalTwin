@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,6 +59,9 @@ public class NotificationsFragment extends FragmentWithId implements Notificatio
                              final ViewGroup container, final Bundle savedInstanceState) {
 
         final View root = inflater.inflate(R.layout.fragment_notifications, container, false);
+
+        final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        notificationManager.cancelAll();
 
         emptyNotifications = root.findViewById(R.id.emptyNotifications);
         readNotificationsBtn = root.findViewById(R.id.readNotificationsButton);

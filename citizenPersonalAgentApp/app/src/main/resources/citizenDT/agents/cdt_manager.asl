@@ -26,6 +26,8 @@ credentials("","").
     focus(Configurations);
 	makeArtifact("state","it.unibo.citizenDigitalTwin.artifact.StateManagerArtifact",[],StateManager);
 	focus(StateManager);
+	makeArtifact("notifications","it.unibo.citizenDigitalTwin.artifact.NotificationArtifact",[],NotificationManager);
+    focus(NotificationManager);
 	?citizenService(CitizenServiceAddress)
 	?authenticationService(AuthenticationServiceAddress)
 	makeArtifact("connection","it.unibo.citizenDigitalTwin.artifact.ConnectionManagerArtifact",[CitizenServiceAddress,AuthenticationServiceAddress],ConnectionManager);
@@ -34,8 +36,9 @@ credentials("","").
 
 /* New state from ConnectionManager (Digital State) */
 +newState(NewData) <-
-	updateState(NewData);
-	createNotifications(NewData).
+	updateState(NewData, ValidData);
+	?logged(CitizenId);
+	createNotifications(CitizenId, ValidData).
 
 +token(_,Ttl) <-
     -+refreshTokenAttempts(0);

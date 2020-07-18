@@ -51,6 +51,8 @@
     <string name="feeder_text">Produced by</string>
     <string name="date_text">In date</string>
     <string name="model_search_failed">An error occurred while searching for the information about the model, try again.</string>
+    <string name="notifications_channel_description">CDT Notifications</string>
+    <string name="notifications_channel_name">Channel for Digital Twin changes notifications</string>
 
     /* -----------------Leaf categories----------------- */
     <string name="LC_name">Name</string>

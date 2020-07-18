@@ -63,4 +63,6 @@
     <string name="lng">Longitudine</string>
     <string name="title_home">Il tuo stato</string>
     <string name="model_search_failed">Si è verificato un errore durante la ricerca delle informazioni sul modello inserito, riprova.</string>
+    <string name="notifications_channel_description">Notifiche CDT</string>
+    <string name="notifications_channel_name">Canale per le notifiche relative a cambiamenti del Digital Twin</string>
 </resources>
